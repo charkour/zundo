@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-Undo middleware for your favorite, comfy, bearbones state-management solution: [zustand](https://github.com/pmndrs/zustand).
+Undo middleware for [zustand](https://github.com/pmndrs/zustand); built with zustand. 
 
 [![Build Size](https://img.shields.io/bundlephobia/min/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
@@ -55,6 +55,7 @@ const App = () => {
 ## Road Map
 
 - add redo. probably with index to traverse through prevStates
+- possibly use better data structure for storing prevous states. Maybe just a diff between states?
 - clean up api? return `undo` with the store hook?
 
 ## Contributing
