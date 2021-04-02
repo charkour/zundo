@@ -2,7 +2,10 @@
 
 Undo middleware for your favorite, comfy, bearbones state-management solution: [zustand](https://github.com/pmndrs/zustand).
 
-## TODO: add demo
+[![Build Size](https://img.shields.io/bundlephobia/min/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
+[![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
+
+See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 
 ## Install
 
@@ -15,8 +18,8 @@ npm i zundo
 This returns the familiar store accessible by a hook! But now your store tacks past actions.
 
 ```tsx
-import { undo, useUndo } from 'zundo';
 import create from 'zustand';
+import { undo, useUndo } from 'zundo';
 
 const useStore = create(
   undo(set => ({
