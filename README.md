@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-Undo middleware for your favorite, comfy state-management solution: [zustand](https://github.com/pmndrs/zustand).
+Undo middleware for your favorite, comfy, bearbones state-management solution: [zustand](https://github.com/pmndrs/zustand).
 
 ## Install
 
