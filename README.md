@@ -17,7 +17,7 @@ npm i zundo
 
 ## First create a store with undo middleware
 
-This returns the familiar store accessible by a hook! But now your store tacks past actions.
+This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
 import create from 'zustand';
