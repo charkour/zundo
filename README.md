@@ -2,6 +2,8 @@
 
 Undo middleware for your favorite, comfy, bearbones state-management solution: [zustand](https://github.com/pmndrs/zustand).
 
+## TODO: add demo
+
 ## Install
 
 ```sh
@@ -47,8 +49,7 @@ const App = () => {
 
 ## Road Map
 
-- add redo
-- typescript support
+- add redo. probably with index to traverse through prevStates
 - clean up api? return `undo` with the store hook?
 
 ## Contributing

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { undo, useUndo } from '../src';
-import create from 'zustand';
+import create, { State } from 'zustand';
 
 const meta: Meta = {
   title: 'bears',
@@ -19,8 +19,14 @@ const meta: Meta = {
 
 export default meta;
 
+interface StoreState extends State {
+  bears: number;
+  increasePopulation: () => void;
+  removeAllBears: () => void;
+}
+
 // create a store with undo middleware
-const useStore = create(
+const useStore = create<StoreState>(
   undo(set => ({
     bears: 0,
     increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
@@ -29,13 +35,13 @@ const useStore = create(
 );
 
 const App = () => {
-  const { prevActions, undo } = useUndo();
+  const { prevStates, undo } = useUndo();
   const { bears, increasePopulation, removeAllBears } = useStore();
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
-      previous actions: {JSON.stringify(prevActions)}
+      previous actions: {JSON.stringify(prevStates)}
       <br />
       <br />
       bears: {bears}
@@ -43,7 +49,7 @@ const App = () => {
       <button onClick={increasePopulation}>increase</button>
       <button onClick={removeAllBears}>remove</button>
       <br />
-      <button onClick={undo as any}>undo</button>
+      <button onClick={undo}>undo</button>
     </div>
   );
 };
