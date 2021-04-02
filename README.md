@@ -6,6 +6,7 @@ Undo middleware for your favorite, comfy, bearbones state-management solution: [
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
 ![zundo demo](./zundo.gif)
+
 See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 
 ## Install
