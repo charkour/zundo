@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { undo, useUndo } from '../src';
 import create from 'zustand';
 
 const meta: Meta = {
-  title: 'Demo',
+  title: 'Another',
   argTypes: {
     children: {
       control: {
@@ -20,49 +20,33 @@ const meta: Meta = {
 export default meta;
 
 // create a store with undo middleware
-const useStoreWithUndo = create(
+const useStore = create(
   undo(set => ({
-    bees: 0,
-    text: "",
-    incrementBees: () => set(state => (state.bees += 1)),
-    decrementBees: () => set(state => (state.bees -= 1)),
-    submitText: text => set({ text })
+    bears: 0,
+    increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+    removeAllBears: () => set({ bears: 0 }),
   }))
 );
 
 const App = () => {
   const { prevActions, undo } = useUndo();
-  const {
-    bees,
-    incrementBees,
-    decrementBees,
-    submitText,
-    text
-  } = useStoreWithUndo();
-  const [inputText, setInputText] = useState("");
+  const { bears, increasePopulation, removeAllBears } = useStore();
 
   return (
     <div>
-      <h1>🐻 ♻️ Zustand undo!</h1>
-      actions stack: {JSON.stringify(prevActions)}
+      <h1>🐻 ♻️ Zundo!</h1>
+      previous actions: {JSON.stringify(prevActions)}
       <br />
       <br />
-      bees: {bees}
+      bears: {bears}
       <br />
-      <button onClick={incrementBees}>incremenet</button>
-      <button onClick={decrementBees}>decrement</button>
-      <br />
-      <br />
-      <input value={inputText} onChange={e => setInputText(e.target.value)} />
-      <br />
-      <button onClick={() => submitText(inputText)}>submit text</button>
-      <br />
-      text: {text}
+      <button onClick={increasePopulation}>increase</button>
+      <button onClick={removeAllBears}>remove</button>
       <br />
       <button onClick={undo as any}>undo</button>
     </div>
   );
-}
+};
 
 const Template: Story<{}> = args => <App {...args} />;
 

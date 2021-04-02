@@ -1,6 +1,13 @@
 {
   "name": "zundo",
   "version": "0.1.0",
+  "private": false,
+  "description": "🍜 Undo middleware for your favorite, comfy state-management solution: [zustand](https://github.com/pmndrs/zustand).",
+  "keywords": [
+    "undo",
+    "middleware",
+    "zustand"
+  ],
   "license": "MIT",
   "author": "Charles Kornoelje",
   "main": "dist/index.js",
@@ -31,6 +38,9 @@
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "dependencies": {
+    "zustand": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.13.14",
@@ -67,8 +77,5 @@
       "path": "dist/zundo.esm.js",
       "limit": "10 KB"
     }
-  ],
-  "dependencies": {
-    "zustand": "^3.3.3"
-  }
+  ]
 }
