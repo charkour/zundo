@@ -4,7 +4,7 @@ import { undo, useUndo } from '../src';
 import create from 'zustand';
 
 const meta: Meta = {
-  title: 'Another',
+  title: 'bears',
   argTypes: {
     children: {
       control: {
