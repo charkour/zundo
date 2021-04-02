@@ -2,12 +2,20 @@
   "name": "zundo",
   "version": "0.1.0",
   "private": false,
-  "description": "🍜 Undo middleware for your favorite, comfy state-management solution: [zustand](https://github.com/pmndrs/zustand).",
+  "description": "🍜 Undo middleware for zustand",
   "keywords": [
     "undo",
     "middleware",
     "zustand"
   ],
+  "homepage": "https://github.com/charkour/zundo",
+  "bugs": {
+    "url": "https://github.com/charkour/zundo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charkour/zundo.git"
+  },
   "license": "MIT",
   "author": "Charles Kornoelje",
   "main": "dist/index.js",
@@ -44,11 +52,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.13.14",
-    "@size-limit/preset-small-lib": "^4.10.2",
-    "@storybook/addon-essentials": "^6.2.1",
-    "@storybook/addon-info": "^5.3.21",
-    "@storybook/addon-links": "^6.2.1",
-    "@storybook/addons": "^6.2.1",
     "@storybook/react": "^6.2.1",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
@@ -57,7 +60,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-is": "^17.0.2",
-    "size-limit": "^4.10.2",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
     "typescript": "^4.2.3"
@@ -67,15 +69,5 @@
   },
   "engines": {
     "node": ">=10"
-  },
-  "size-limit": [
-    {
-      "path": "dist/zundo.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/zundo.esm.js",
-      "limit": "10 KB"
-    }
-  ]
+  }
 }
