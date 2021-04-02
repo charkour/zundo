@@ -41,7 +41,7 @@ const App = () => {
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
-      previous actions: {JSON.stringify(prevStates)}
+      previous states: {JSON.stringify(prevStates)}
       <br />
       <br />
       bears: {bears}
