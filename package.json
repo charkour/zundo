@@ -67,5 +67,8 @@
       "path": "dist/zundo.esm.js",
       "limit": "10 KB"
     }
-  ]
+  ],
+  "dependencies": {
+    "zustand": "^3.3.3"
+  }
 }
