@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-Undo middleware for [zustand](https://github.com/pmndrs/zustand); built with zustand. 
+undo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. 
 
 [![Build Size](https://img.shields.io/bundlephobia/min/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
