@@ -39,7 +39,6 @@ export const undo = <TState extends State>(config: StateCreator<TState>) => (
         handle: set,
       });
       set(args);
-      console.log('  new state', get());
     },
     get,
     api
