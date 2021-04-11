@@ -11,17 +11,29 @@ import create from 'zustand';
 
 interface UndoStoreState extends State {
   prevStates: any[];
+  futureStates: any[];
   undo: () => void;
-  handle: Function;
+  redo: () => void;
+  setStore: Function;
+  getStore: Function;
 }
 
 // Stores previous actions
 const undoStore = createVanilla<UndoStoreState>((_, get) => ({
   prevStates: [],
   undo: () => {
-    get().handle(get().prevStates.pop());
+    const prevState = get().prevStates.pop();
+    get().futureStates.push(get().getStore());
+    get().setStore(prevState);
   },
-  handle: () => {},
+  setStore: () => {},
+  getStore: () => {},
+  futureStates: [],
+  redo: () => {
+    const futureState = get().futureStates.pop();
+    get().prevStates.push(get().getStore());
+    get().setStore(futureState);
+  },
 }));
 const { getState, setState } = undoStore;
 export const useUndo = create(undoStore);
@@ -36,7 +48,9 @@ export const undo = <TState extends State>(config: StateCreator<TState>) => (
     args => {
       setState({
         prevStates: [...getState().prevStates, { ...get() }],
-        handle: set,
+        setStore: set,
+        futureStates: [],
+        getStore: get,
       });
       set(args);
     },
