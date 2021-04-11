@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-undo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. 
+enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand.
 
 [![Build Size](https://img.shields.io/bundlephobia/min/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
@@ -38,7 +38,7 @@ Use your store anywhere and get undo from `zundo` and add it to a button to go b
 
 ```tsx
 const App = () => {
-  const { undo } = useUndo();
+  const { undo, redo } = useUndo();
   const { bears, increasePopulation, removeAllBears } = useStore();
 
   return (
@@ -47,15 +47,43 @@ const App = () => {
       <button onClick={increasePopulation}>increase</button>
       <button onClick={removeAllBears}>remove</button>
       <button onClick={undo}>undo</button>
+      <button onClick={redo}>redo</button>
     </>
   );
 };
 ```
 
+## API
+
+### `undo()`
+
+Middleware for Zustand to add the ability to time travel through states.
+
+```tsx
+import create from 'zustand';
+import { undo } from 'zundo';
+
+const useStore = create(
+  undo(() => ({ ... }))
+);
+```
+
+### `useUndo()`
+
+Hook that provides reference to a store containing actions that undo/redo states for your main store when called.
+
+```tsx
+const { undo, redo } = useUndo();
+```
+
+- `undo`: call function to apply previous state (if there are previous states)
+- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states."
+
+Dispatching a new state will clear all of the future states.
+
 ## Road Map
 
-- add redo. probably with index to traverse through prevStates
-- possibly use better data structure for storing prevous states. Maybe just a diff between states?
+- possibly use better data structure for storing previous states. Maybe just a diff between states?
 - clean up api? return `undo` with the store hook?
 
 ## Contributing
