@@ -22,17 +22,23 @@ interface UndoStoreState extends State {
 const undoStore = createVanilla<UndoStoreState>((_, get) => ({
   prevStates: [],
   undo: () => {
-    const prevState = get().prevStates.pop();
-    get().futureStates.push(get().getStore());
-    get().setStore(prevState);
+    const prevStates = get().prevStates;
+    if (prevStates.length > 0) {
+      const prevState = prevStates.pop();
+      get().futureStates.push(get().getStore());
+      get().setStore(prevState);
+    }
   },
   setStore: () => {},
   getStore: () => {},
   futureStates: [],
   redo: () => {
-    const futureState = get().futureStates.pop();
-    get().prevStates.push(get().getStore());
-    get().setStore(futureState);
+    const futureStates = get().futureStates;
+    if (futureStates.length > 0) {
+      const futureState = futureStates.pop();
+      get().prevStates.push(get().getStore());
+      get().setStore(futureState);
+    }
   },
 }));
 const { getState, setState } = undoStore;
