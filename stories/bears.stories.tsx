@@ -35,13 +35,18 @@ const useStore = create<StoreState>(
 );
 
 const App = () => {
-  const { prevStates, undo } = useUndo();
-  const { bears, increasePopulation, removeAllBears } = useStore();
+  const { prevStates, undo, futureStates, redo } = useUndo();
+  const store = useStore();
+  const { bears, increasePopulation, removeAllBears } = store;
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
       previous states: {JSON.stringify(prevStates)}
+      <br />
+      future states: {JSON.stringify(futureStates)}
+      <br />
+      current state: {JSON.stringify(store)}
       <br />
       <br />
       bears: {bears}
@@ -50,6 +55,7 @@ const App = () => {
       <button onClick={removeAllBears}>remove</button>
       <br />
       <button onClick={undo}>undo</button>
+      <button onClick={redo}>redo</button>
     </div>
   );
 };
