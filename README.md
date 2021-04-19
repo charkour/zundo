@@ -12,7 +12,7 @@ See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 ## Install
 
 ```sh
-npm i zundo
+npm i zustand zundo
 ```
 
 ## First create a store with undo middleware
