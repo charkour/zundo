@@ -64,7 +64,7 @@ import create from 'zustand';
 import { undo } from 'zundo';
 
 const useStore = create(
-  undo(() => ({ ... }))
+  undo((set, get, api) => ({ ... }))
 );
 ```
 
