@@ -14,14 +14,16 @@ interface UndoStoreState extends State {
   futureStates: any[];
   undo: () => void;
   redo: () => void;
+  clear: () => void;
   setStore: Function;
   getStore: Function;
 }
 
 // Stores previous actions
-const undoStore = createVanilla<UndoStoreState>((_, get) => {
+const undoStore = createVanilla<UndoStoreState>((set, get) => {
   return {
     prevStates: [],
+    futureStates: [],
     undo: () => {
       const { prevStates, futureStates, setStore, getStore } = get();
       if (prevStates.length > 0) {
@@ -30,9 +32,6 @@ const undoStore = createVanilla<UndoStoreState>((_, get) => {
         setStore(prevState);
       }
     },
-    setStore: () => {},
-    getStore: () => {},
-    futureStates: [],
     redo: () => {
       const { prevStates, futureStates, setStore, getStore } = get();
       if (futureStates.length > 0) {
@@ -41,6 +40,11 @@ const undoStore = createVanilla<UndoStoreState>((_, get) => {
         setStore(futureState);
       }
     },
+    clear: () => {
+      set({ prevStates: [], futureStates: [] });
+    },
+    setStore: () => {},
+    getStore: () => {},
   };
 });
 const { getState, setState } = undoStore;

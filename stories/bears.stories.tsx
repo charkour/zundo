@@ -23,21 +23,28 @@ interface StoreState extends State {
   bears: number;
   increasePopulation: () => void;
   removeAllBears: () => void;
+  decreasePopulation: () => void;
 }
 
 // create a store with undo middleware
 const useStore = create<StoreState>(
-  undo(set => ({
+  undo<StoreState>(set => ({
     bears: 0,
     increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+    decreasePopulation: () => set(state => ({ bears: state.bears - 1 })),
     removeAllBears: () => set({ bears: 0 }),
   }))
 );
 
 const App = () => {
-  const { prevStates, undo, futureStates, redo } = useUndo();
+  const { prevStates, undo, futureStates, redo, clear } = useUndo();
   const store = useStore();
-  const { bears, increasePopulation, removeAllBears } = store;
+  const {
+    bears,
+    increasePopulation,
+    removeAllBears,
+    decreasePopulation,
+  } = store;
 
   return (
     <div>
@@ -52,10 +59,13 @@ const App = () => {
       bears: {bears}
       <br />
       <button onClick={increasePopulation}>increase</button>
+      <button onClick={decreasePopulation}>decrease</button>
       <button onClick={removeAllBears}>remove</button>
       <br />
       <button onClick={undo}>undo</button>
       <button onClick={redo}>redo</button>
+      <br />
+      <button onClick={clear}>clear</button>
     </div>
   );
 };
