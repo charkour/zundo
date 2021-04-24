@@ -19,34 +19,39 @@ interface UndoStoreState extends State {
   getStore: Function;
 }
 
+// factory to create undoStore
+const createUndoStore = () => {
+  return createVanilla<UndoStoreState>((set, get) => {
+    return {
+      prevStates: [],
+      futureStates: [],
+      undo: () => {
+        const { prevStates, futureStates, setStore, getStore } = get();
+        if (prevStates.length > 0) {
+          futureStates.push(getStore());
+          const prevState = prevStates.pop();
+          setStore(prevState);
+        }
+      },
+      redo: () => {
+        const { prevStates, futureStates, setStore, getStore } = get();
+        if (futureStates.length > 0) {
+          prevStates.push(getStore());
+          const futureState = futureStates.pop();
+          setStore(futureState);
+        }
+      },
+      clear: () => {
+        set({ prevStates: [], futureStates: [] });
+      },
+      setStore: () => {},
+      getStore: () => {},
+    };
+  });
+}
+
 // Stores previous actions
-const undoStore = createVanilla<UndoStoreState>((set, get) => {
-  return {
-    prevStates: [],
-    futureStates: [],
-    undo: () => {
-      const { prevStates, futureStates, setStore, getStore } = get();
-      if (prevStates.length > 0) {
-        futureStates.push(getStore());
-        const prevState = prevStates.pop();
-        setStore(prevState);
-      }
-    },
-    redo: () => {
-      const { prevStates, futureStates, setStore, getStore } = get();
-      if (futureStates.length > 0) {
-        prevStates.push(getStore());
-        const futureState = futureStates.pop();
-        setStore(futureState);
-      }
-    },
-    clear: () => {
-      set({ prevStates: [], futureStates: [] });
-    },
-    setStore: () => {},
-    getStore: () => {},
-  };
-});
+const undoStore = createUndoStore()
 const { getState, setState } = undoStore;
 export const useUndo = create(undoStore);
 
