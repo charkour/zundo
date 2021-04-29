@@ -5,7 +5,6 @@ import createVanilla, {
   StateCreator,
   StoreApi,
 } from 'zustand/vanilla';
-import create from 'zustand';
 
 // use immer patches? https://immerjs.github.io/immer/patches/
 
@@ -48,20 +47,20 @@ const createUndoStore = () => {
       getStore: () => {},
     };
   });
-}
+};
 
-// Stores previous actions
-const undoStore = createUndoStore()
-const { getState, setState } = undoStore;
-export const useUndo = create(undoStore);
+export type UndoState = Partial<
+  Pick<UndoStoreState, 'undo' | 'redo' | 'clear'> & { getState: () => UndoStoreState }
+> &
+  State;
 
 // custom middleware to get previous state
-export const undo = <TState extends State>(config: StateCreator<TState>) => (
-  set: SetState<TState>,
-  get: GetState<TState>,
-  api: StoreApi<TState>
-) =>
-  config(
+export const undoMiddleware = <TState extends UndoState>(
+  config: StateCreator<TState>
+) => (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
+  const undoStore = createUndoStore();
+  const { getState, setState} = undoStore;
+  return config(
     args => {
       setState({
         prevStates: [...getState().prevStates, { ...get() }],
@@ -69,8 +68,20 @@ export const undo = <TState extends State>(config: StateCreator<TState>) => (
         futureStates: [],
         getStore: get,
       });
+      // TODO: const, should do this only once
+      const { undo, clear, redo } = getState();
+      set({
+        undo,
+        clear,
+        redo,
+        getState,
+      });
+
       set(args);
     },
     get,
     api
   );
+};
+
+

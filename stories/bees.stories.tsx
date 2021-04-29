@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import { undo, useUndo } from '../src';
-import create, { State } from 'zustand';
+import { undoMiddleware, UndoState } from '../src';
+import create from 'zustand';
 
 const meta: Meta = {
   title: 'bees',
@@ -19,7 +19,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreStateWithUndo extends State {
+interface StoreStateWithUndo extends UndoState {
   bees: number;
   text: string;
   incrementBees: () => void;
@@ -29,7 +29,7 @@ interface StoreStateWithUndo extends State {
 
 // create a store with undo middleware
 const useStoreWithUndo = create<StoreStateWithUndo>(
-  undo(set => ({
+  undoMiddleware(set => ({
     bees: 0,
     text: "",
     incrementBees: () => set(state => (state.bees += 1)),
@@ -39,20 +39,21 @@ const useStoreWithUndo = create<StoreStateWithUndo>(
 );
 
 const App = () => {
-  const { prevStates, undo } = useUndo();
   const {
     bees,
     incrementBees,
     decrementBees,
     submitText,
-    text
+    text,
+    undo,
+    getState
   } = useStoreWithUndo();
   const [inputText, setInputText] = useState("");
 
   return (
     <div>
       <h1>🐻 ♻️ Zustand undo!</h1>
-      actions stack: {JSON.stringify(prevStates)}
+      actions stack: {JSON.stringify(getState && getState().prevStates)}
       <br />
       <br />
       bees: {bees}
