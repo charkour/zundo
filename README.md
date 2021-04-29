@@ -80,7 +80,7 @@ const { undo, redo, clear } = useUndo();
 
 - `undo`: call function to apply previous state (if there are previous states)
 - `redo`: call function to apply future state (if there are future states). Future states are "previous previous states."
-- `clear`; call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
+- `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
 
 Dispatching a new state will clear all of the future states.
 
