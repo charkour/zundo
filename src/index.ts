@@ -1,4 +1,5 @@
 export { UndoState, undoMiddleware } from './middleware';
+export { UseStore } from "zustand";
 
 import createStore, { State, StateCreator } from 'zustand';
 import undoMiddleware from './middleware';
