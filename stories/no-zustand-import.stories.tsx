@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import { UndoState } from '../src';
-import undo from '../src/middleware';
-import create from 'zustand';
+import create, { UndoState } from '../src';
 
 const meta: Meta = {
-  title: 'bees',
+  title: 'no zustand import',
   argTypes: {
     children: {
       control: {
@@ -28,16 +26,13 @@ interface StoreState extends UndoState {
   submitText: (text: string) => void;
 }
 
-// create a store with undo middleware
-const useStoreWithUndo = create<StoreState>(
-  undo(set => ({
-    bees: 0,
-    text: '',
-    incrementBees: () => set(state => ({ bees: state.bees + 1 })),
-    decrementBees: () => set(state => ({ bees: state.bees - 1 })),
-    submitText: text => set({ text }),
-  }))
-);
+const useStoreWithUndo = create<StoreState>(set => ({
+  bees: 0,
+  text: '',
+  incrementBees: () => set(state => ({ bees: state.bees + 1 })),
+  decrementBees: () => set(state => ({ bees: state.bees - 1 })),
+  submitText: text => set({ text }),
+}));
 
 const App = () => {
   const {
