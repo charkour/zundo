@@ -32,8 +32,8 @@ const useStoreWithUndo = create<StoreStateWithUndo>(
   undoMiddleware(set => ({
     bees: 0,
     text: "",
-    incrementBees: () => set(state => (state.bees += 1)),
-    decrementBees: () => set(state => (state.bees -= 1)),
+    incrementBees: () => set(state => ({ bees: state.bees + 1 })),
+    decrementBees: () => set(state => ({ bees: state.bees - 1 })),
     submitText: text => set({ text })
   }))
 );

@@ -1,14 +1,13 @@
 import createVanilla, {
   GetState,
   SetState,
-  State,
   StateCreator,
   StoreApi,
 } from 'zustand/vanilla';
 
 // use immer patches? https://immerjs.github.io/immer/patches/
 
-interface UndoStoreState extends State {
+interface UndoStoreState {
   prevStates: any[];
   futureStates: any[];
   undo: () => void;
@@ -51,8 +50,7 @@ const createUndoStore = () => {
 
 export type UndoState = Partial<
   Pick<UndoStoreState, 'undo' | 'redo' | 'clear'> & { getState: () => UndoStoreState }
-> &
-  State;
+>;
 
 // custom middleware to get previous state
 export const undoMiddleware = <TState extends UndoState>(
@@ -68,7 +66,8 @@ export const undoMiddleware = <TState extends UndoState>(
         futureStates: [],
         getStore: get,
       });
-      // TODO: const, should do this only once
+      // TODO: const, should call this function and inject the values once, but it does
+      // it on every action call currently.
       const { undo, clear, redo } = getState();
       set({
         undo,
