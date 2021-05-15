@@ -68,7 +68,7 @@ const App = () => {
 
 ## Alternatively, use the middleware
 
-Instead of using `create` from `zundo`, use with `zundo` middleware and the `zustand` create.
+Instead of using `create` from `zundo`, use the `zundo` middleware and the `zustand` create.
 
 ```tsx
 import { undoMiddleware, UndoState } from 'zundo';
