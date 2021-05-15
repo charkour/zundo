@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { undo, useUndo } from '../src';
-import create, { State } from 'zustand';
+import { undoMiddleware, UndoState } from '../src';
+import create from 'zustand';
 
 const meta: Meta = {
   title: 'bears',
@@ -19,7 +19,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreState extends State {
+interface StoreState extends UndoState {
   bears: number;
   increasePopulation: () => void;
   removeAllBears: () => void;
@@ -28,7 +28,7 @@ interface StoreState extends State {
 
 // create a store with undo middleware
 const useStore = create<StoreState>(
-  undo<StoreState>(set => ({
+  undoMiddleware(set => ({
     bears: 0,
     increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
     decreasePopulation: () => set(state => ({ bears: state.bears - 1 })),
@@ -37,21 +37,25 @@ const useStore = create<StoreState>(
 );
 
 const App = () => {
-  const { prevStates, undo, futureStates, redo, clear } = useUndo();
   const store = useStore();
   const {
     bears,
     increasePopulation,
     removeAllBears,
     decreasePopulation,
+    undo,
+    clear,
+    redo,
+    getState,
   } = store;
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
-      previous states: {JSON.stringify(prevStates)}
+      previous states: {JSON.stringify(getState && getState().prevStates)}
       <br />
-      future states: {JSON.stringify(futureStates)}
+      {/* TODO: make the debug testing better */}
+      future states: {JSON.stringify(getState && getState().futureStates)}
       <br />
       current state: {JSON.stringify(store)}
       <br />

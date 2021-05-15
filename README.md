@@ -21,26 +21,37 @@ npm i zustand zundo
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
-import create from 'zustand';
-import { undo, useUndo } from 'zundo';
+import create, { UndoState } from 'zundo';
 
-const useStore = create(
-  undo(set => ({
-    bears: 0,
-    increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
-    removeAllBears: () => set({ bears: 0 }),
-  }))
-);
+// define the store (typescript)
+interface StoreState extends UndoState {
+  bears: number;
+  increasePopulation: () => void;
+  removeAllBears: () => void;
+}
+
+// creates a store with undo/redo capability
+const useStoreWithUndo = create<StoreState>(set => ({
+  bears: 0,
+  increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+  removeAllBears: () => set({ bears: 0 }),
+}));
 ```
 
 ## Then bind your components
 
-Use your store anywhere and get undo from `zundo` and add it to a button to go backwards in time!
+Use your store anywhere, including `undo`, `redo`, and `clear`!
 
 ```tsx
 const App = () => {
-  const { undo, redo, clear } = useUndo();
-  const { bears, increasePopulation, removeAllBears } = useStore();
+  const {
+    bears,
+    increasePopulation,
+    removeAllBears,
+    undo,
+    redo,
+    clear,
+  } = useStoreWithUndo();
 
   return (
     <>
@@ -55,28 +66,36 @@ const App = () => {
 };
 ```
 
-## API
+## Alternatively, use the middleware
 
-### `undo()`
-
-Middleware for Zustand to add the ability to time travel through states.
+Instead of using `create` from `zundo`, use with `zundo` middleware and the `zustand` create.
 
 ```tsx
+import { undoMiddleware, UndoState } from 'zundo';
 import create from 'zustand';
-import { undo } from 'zundo';
 
-const useStore = create(
-  undo((set, get, api) => ({ ... }))
+const useStoreWithUndo = create<StoreState>(
+  undoMiddleware(set => ({
+    bears: 0,
+    increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+    removeAllBears: () => set({ bears: 0 }),
+  }))
 );
 ```
 
-### `useUndo()`
+## API
 
-Hook that provides reference to a store containing actions that undo/redo states for your main store when called.
+### `undoMiddleware(config: StateCreator<TState>)`
 
-```tsx
-const { undo, redo, clear } = useUndo();
-```
+This is middleware for `zustand` which takes in a config for the store.
+
+This works for multiple undoable stores in the same app.
+
+### `create`
+
+Create from `zundo` will return a store hook that has undo/redo capabilities. In addition to what fields are in the provided in your `StoreState`, the functions `undo`, `redo`, `clear`, and `getState` are added as well.
+
+This works for multiple undoable stores in the same app.
 
 - `undo`: call function to apply previous state (if there are previous states)
 - `redo`: call function to apply future state (if there are future states). Future states are "previous previous states."
@@ -84,10 +103,73 @@ const { undo, redo, clear } = useUndo();
 
 Dispatching a new state will clear all of the future states.
 
+### `createUndoStore()`
+
+Will create a store that is used by the middleware to track the internal state of type `UndoStoreState`.
+
+### `UndoState`
+
+A type to extend when creating a global store with undo/redo capabilities.
+
+```tsx
+type UndoState = {
+  // Will go back one state
+  undo?: (() => void) | undefined;
+  // Will go forward one state
+  redo?: (() => void) | undefined;
+  // Will clear
+  clear?: (() => void) | undefined;
+  getState?: (() => UndoStoreState) | undefined;
+};
+```
+
+#### Usage
+
+```tsx
+import create, { UndoState } from 'zundo';
+
+interface StoreState extends UndoState {
+  // fields
+}
+
+const useStoreWithUndo = create<StoreState>();
+// (set, get, api)
+```
+
+### `UseStore`
+
+It is an interface from `zustand` where `T` is your `StoreState`. Very similar to the type definition shown below. It is the type of any `useStore` hook. Used when passing the `useStore` hook as a prop.
+
+```tsx
+type UseStore<T extends object> = {
+    (): T;
+    <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U> | undefined): U;
+    setState: SetState<T>;
+    getState: GetState<...>;
+    subscribe: Subscribe<...>;
+    destroy: Destroy;
+}
+```
+
+### `UndoStoreState`
+
+An interface for the store that tracks states.
+
+```tsx
+type UndoStoreState = {
+  prevStates: any[];
+  futureStates: any[];
+  undo: () => void;
+  redo: () => void;
+  clear: () => void;
+  setStore: Function;
+  getStore: Function;
+};
+```
+
 ## Road Map
 
 - possibly use better data structure for storing previous states. Maybe just a diff between states?
-- clean up api? return `undo` with the store hook?
 
 ## Contributing
 
