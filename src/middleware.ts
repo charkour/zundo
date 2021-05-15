@@ -7,7 +7,7 @@ export type UndoState = Partial<
   }
 >;
 
-// custom middleware to get previous state
+// custom zustand middleware to get previous state
 export const undoMiddleware = <TState extends UndoState>(
   config: StateCreator<TState>
 ) => (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
@@ -22,7 +22,7 @@ export const undoMiddleware = <TState extends UndoState>(
         getStore: get,
       });
       // TODO: const, should call this function and inject the values once, but it does
-      // it on every action call currently.
+      //   it on every action call currently.
       const { undo, clear, redo } = getState();
       set({
         undo,

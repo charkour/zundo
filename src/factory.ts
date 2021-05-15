@@ -8,11 +8,13 @@ export interface UndoStoreState {
   undo: () => void;
   redo: () => void;
   clear: () => void;
+  // handle on the parent store's setter
   setStore: Function;
+  // handle on the parent store's getter
   getStore: Function;
 }
 
-// factory to create undoStore
+// factory to create undoStore. contains memory about past and future states and has methods to traverse states
 export const createUndoStore = () => {
   return createVanilla<UndoStoreState>((set, get) => {
     return {
