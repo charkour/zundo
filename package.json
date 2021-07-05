@@ -67,7 +67,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
-    "zustand": "3.5.1"
+    "zustand": "^3.5.5"
   },
   "engines": {
     "node": ">=10"
