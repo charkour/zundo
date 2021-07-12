@@ -39,7 +39,7 @@ const useStore = create<StoreState>(
         set(state => ({ bears: state.bears - 1, ignored: state.ignored - 1 })),
       removeAllBears: () => set({ bears: 0 }),
     }),
-    ['ignored']
+    { omit: ['ignored'] }
   )
 );
 

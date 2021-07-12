@@ -8,11 +8,15 @@ export type UndoState = Partial<
   }
 >;
 
+export interface Options {
+  // TODO: improve this type. ignored should only be fields on TState
+  omit?: string[];
+}
+
 // custom zustand middleware to get previous state
 export const undoMiddleware = <TState extends UndoState>(
   config: StateCreator<TState>,
-  // TODO: improve this type. ignored should only be fields on TState
-  ignored: string[] = []
+  options: Options
 ) => (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
   const undoStore = createUndoStore();
   const { getState, setState } = undoStore;
@@ -21,12 +25,12 @@ export const undoMiddleware = <TState extends UndoState>(
       setState({
         prevStates: [
           ...getState().prevStates,
-          filterState({ ...get() }, ignored),
+          filterState({ ...get() }, options.omit || []),
         ],
         setStore: set,
         futureStates: [],
         getStore: get,
-        ignored,
+        options,
       });
       /* TODO: const, should call this function and inject the values once, but it does
         it on every action call currently. */
