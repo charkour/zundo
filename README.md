@@ -83,6 +83,22 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
+### Other features
+
+## Omit fields from being tracked in history
+
+Some fields you may not want to track in history and they can be ignored by zundo middleware.
+The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history.
+
+```tsx
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { omit: ['field1', 'field2'] }
+  )
+);
+```
+
 ## API
 
 ### `undoMiddleware(config: StateCreator<TState>)`

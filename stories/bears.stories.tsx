@@ -21,6 +21,7 @@ export default meta;
 
 interface StoreState extends UndoState {
   bears: number;
+  ignored: number;
   increasePopulation: () => void;
   removeAllBears: () => void;
   decreasePopulation: () => void;
@@ -28,18 +29,25 @@ interface StoreState extends UndoState {
 
 // create a store with undo middleware
 const useStore = create<StoreState>(
-  undoMiddleware(set => ({
-    bears: 0,
-    increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
-    decreasePopulation: () => set(state => ({ bears: state.bears - 1 })),
-    removeAllBears: () => set({ bears: 0 }),
-  }))
+  undoMiddleware(
+    set => ({
+      bears: 0,
+      ignored: 0,
+      increasePopulation: () =>
+        set(state => ({ bears: state.bears + 1, ignored: state.ignored + 1 })),
+      decreasePopulation: () =>
+        set(state => ({ bears: state.bears - 1, ignored: state.ignored - 1 })),
+      removeAllBears: () => set({ bears: 0 }),
+    }),
+    { omit: ['ignored'] }
+  )
 );
 
 const App = () => {
   const store = useStore();
   const {
     bears,
+    ignored,
     increasePopulation,
     removeAllBears,
     decreasePopulation,
@@ -61,6 +69,8 @@ const App = () => {
       <br />
       <br />
       bears: {bears}
+      <br />
+      ignored: {ignored}
       <br />
       <button onClick={increasePopulation}>increase</button>
       <button onClick={decreasePopulation}>decrease</button>

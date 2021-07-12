@@ -1,4 +1,6 @@
 import createVanilla from 'zustand/vanilla';
+import { Options } from './middleware';
+import { filterState } from './utils';
 
 // use immer patches? https://immerjs.github.io/immer/patches/
 
@@ -12,6 +14,7 @@ export interface UndoStoreState {
   setStore: Function;
   // handle on the parent store's getter
   getStore: Function;
+  options?: Options;
 }
 
 // factory to create undoStore. contains memory about past and future states and has methods to traverse states
@@ -21,17 +24,17 @@ export const createUndoStore = () => {
       prevStates: [],
       futureStates: [],
       undo: () => {
-        const { prevStates, futureStates, setStore, getStore } = get();
+        const { prevStates, futureStates, setStore, getStore, options } = get();
         if (prevStates.length > 0) {
-          futureStates.push(getStore());
+          futureStates.push(filterState(getStore(), options?.omit || []));
           const prevState = prevStates.pop();
           setStore(prevState);
         }
       },
       redo: () => {
-        const { prevStates, futureStates, setStore, getStore } = get();
+        const { prevStates, futureStates, setStore, getStore, options } = get();
         if (futureStates.length > 0) {
-          prevStates.push(getStore());
+          prevStates.push(filterState(getStore(), options?.omit || []));
           const futureState = futureStates.pop();
           setStore(futureState);
         }
@@ -41,6 +44,7 @@ export const createUndoStore = () => {
       },
       setStore: () => {},
       getStore: () => {},
+      options: {},
     };
   });
 };
