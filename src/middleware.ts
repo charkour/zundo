@@ -16,7 +16,7 @@ export interface Options {
 // custom zustand middleware to get previous state
 export const undoMiddleware = <TState extends UndoState>(
   config: StateCreator<TState>,
-  options: Options
+  options?: Options
 ) => (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
   const undoStore = createUndoStore();
   const { getState, setState } = undoStore;
@@ -25,7 +25,7 @@ export const undoMiddleware = <TState extends UndoState>(
       setState({
         prevStates: [
           ...getState().prevStates,
-          filterState({ ...get() }, options.omit || []),
+          filterState({ ...get() }, options?.omit || []),
         ],
         setStore: set,
         futureStates: [],

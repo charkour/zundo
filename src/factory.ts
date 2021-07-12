@@ -14,7 +14,7 @@ export interface UndoStoreState {
   setStore: Function;
   // handle on the parent store's getter
   getStore: Function;
-  options: Options;
+  options?: Options;
 }
 
 // factory to create undoStore. contains memory about past and future states and has methods to traverse states
@@ -24,29 +24,17 @@ export const createUndoStore = () => {
       prevStates: [],
       futureStates: [],
       undo: () => {
-        const {
-          prevStates,
-          futureStates,
-          setStore,
-          getStore,
-          options: { omit = [] },
-        } = get();
+        const { prevStates, futureStates, setStore, getStore, options } = get();
         if (prevStates.length > 0) {
-          futureStates.push(filterState(getStore(), omit));
+          futureStates.push(filterState(getStore(), options?.omit || []));
           const prevState = prevStates.pop();
           setStore(prevState);
         }
       },
       redo: () => {
-        const {
-          prevStates,
-          futureStates,
-          setStore,
-          getStore,
-          options: { omit = [] },
-        } = get();
+        const { prevStates, futureStates, setStore, getStore, options } = get();
         if (futureStates.length > 0) {
-          prevStates.push(filterState(getStore(), omit));
+          prevStates.push(filterState(getStore(), options?.omit || []));
           const futureState = futureStates.pop();
           setStore(futureState);
         }
