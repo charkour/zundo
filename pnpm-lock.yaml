@@ -1,23 +1,23 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@babel/core': ^7.13.14
-  '@storybook/addon-essentials': ^6.2.1
+  '@babel/core': ^7.15.5
+  '@storybook/addon-essentials': ^6.3.8
   '@storybook/addon-info': ^5.3.21
-  '@storybook/addon-links': ^6.2.1
-  '@storybook/addons': ^6.2.1
-  '@storybook/react': ^6.2.1
-  '@types/react': ^17.0.3
-  '@types/react-dom': ^17.0.3
+  '@storybook/addon-links': ^6.3.8
+  '@storybook/addons': ^6.3.8
+  '@storybook/react': ^6.3.8
+  '@types/react': ^17.0.20
+  '@types/react-dom': ^17.0.9
   babel-loader: ^8.2.2
   husky: ^6.0.0
   react: ^17.0.2
   react-dom: ^17.0.2
   react-is: ^17.0.2
   tsdx: ^0.14.1
-  tslib: ^2.1.0
-  typescript: ^4.2.3
-  zustand: 3.5.10
+  tslib: ^2.3.1
+  typescript: ^4.4.2
+  zustand: ^3.5.10
 
 devDependencies:
   '@babel/core': 7.15.5
@@ -8877,7 +8877,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 16.9.1
+      '@types/node': 14.17.15
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true
