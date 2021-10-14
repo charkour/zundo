@@ -25,6 +25,7 @@ interface StoreState extends UndoState {
   increasePopulation: () => void;
   removeAllBears: () => void;
   decreasePopulation: () => void;
+  doNothing: () => void;
 }
 
 // create a store with undo middleware
@@ -37,6 +38,7 @@ const useStore = create<StoreState>(
         set(state => ({ bears: state.bears + 1, ignored: state.ignored + 1 })),
       decreasePopulation: () =>
         set(state => ({ bears: state.bears - 1, ignored: state.ignored - 1 })),
+      doNothing: () => set(state  => ({ ...state })),
       removeAllBears: () => set({ bears: 0 }),
     }),
     { omit: ['ignored'] }
@@ -55,6 +57,7 @@ const App = () => {
     clear,
     redo,
     getState,
+    doNothing,
   } = store;
 
   return (
@@ -80,6 +83,8 @@ const App = () => {
       <button onClick={redo}>redo</button>
       <br />
       <button onClick={clear}>clear</button>
+      <br />
+      <button onClick={doNothing}>do nothing</button>
     </div>
   );
 };
