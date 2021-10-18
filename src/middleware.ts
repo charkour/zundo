@@ -24,6 +24,17 @@ export const undoMiddleware = <TState extends UndoState>(
   const { getState, setState } = undoStore;
   return config(
     args => {
+      /* TODO: const, should call this function and inject the values once, but it does
+      it on every action call currently. */
+      const { undo, clear, redo } = getState();
+      // inject helper functions to user defined store.
+      set({
+        undo,
+        clear,
+        redo,
+        getState,
+      });
+
       // Get the last state before updating state
       const lastState = filterState({ ...get() }, options?.omit || []);
 
@@ -47,17 +58,6 @@ export const undoMiddleware = <TState extends UndoState>(
           options,
         });
       }
-
-      /* TODO: const, should call this function and inject the values once, but it does
-      it on every action call currently. */
-      const { undo, clear, redo } = getState();
-      // inject helper functions to user defined store.
-      set({
-        undo,
-        clear,
-        redo,
-        getState,
-      });
     },
     get,
     api
