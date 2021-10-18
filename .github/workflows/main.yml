@@ -19,10 +19,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6.14.6
-          run_install: true
+      - name: install deps
+        run: npx pnpm install
 
       - name: Lint
         run: yarn lint
