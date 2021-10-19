@@ -7,10 +7,12 @@ specifiers:
   '@storybook/addon-links': ^6.3.8
   '@storybook/addons': ^6.3.8
   '@storybook/react': ^6.3.8
+  '@types/lodash': ^4.14.175
   '@types/react': ^17.0.20
   '@types/react-dom': ^17.0.9
   babel-loader: ^8.2.2
   husky: ^6.0.0
+  lodash.isequal: ^4.5.0
   react: ^17.0.2
   react-dom: ^17.0.2
   react-is: ^17.0.2
@@ -19,6 +21,9 @@ specifiers:
   typescript: ^4.4.2
   zustand: ^3.5.10
 
+dependencies:
+  lodash.isequal: 4.5.0
+
 devDependencies:
   '@babel/core': 7.15.5
   '@storybook/addon-essentials': 6.3.8_b0dbd42f2545bff61bdda920a55bb3a7
@@ -26,6 +31,7 @@ devDependencies:
   '@storybook/addon-links': 6.3.8_react-dom@17.0.2+react@17.0.2
   '@storybook/addons': 6.3.8_react-dom@17.0.2+react@17.0.2
   '@storybook/react': 6.3.8_a785ddf0edf0e1b74082bea8df29b5ee
+  '@types/lodash': 4.14.175
   '@types/react': 17.0.20
   '@types/react-dom': 17.0.9
   babel-loader: 8.2.2_@babel+core@7.15.5
@@ -3571,6 +3577,10 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha1-7ihweulOEdK4J7y+UnC86n8+ce4=}
+    dev: true
+
+  /@types/lodash/4.14.175:
+    resolution: {integrity: sha512-XmdEOrKQ8a1Y/yxQFOMbC47G/V2VDO1GvMRnl4O75M4GW/abC5tnfzadQYkqEveqRM1dEJGFFegfPNA2vvx2iw==}
     dev: true
 
   /@types/markdown-to-jsx/6.11.3:
@@ -9199,6 +9209,10 @@ packages:
   /lodash.debounce/4.0.8:
     resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
     dev: true
+
+  /lodash.isequal/4.5.0:
+    resolution: {integrity: sha1-QVxEePK8wwEgwizhDtMib30+GOA=}
+    dev: false
 
   /lodash.memoize/4.1.2:
     resolution: {integrity: sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=}
