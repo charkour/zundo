@@ -54,6 +54,7 @@
     "@storybook/addon-links": "^6.3.8",
     "@storybook/addons": "^6.3.8",
     "@storybook/react": "^6.3.8",
+    "@types/lodash": "^4.14.175",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
     "babel-loader": "^8.2.2",
@@ -72,5 +73,8 @@
   },
   "engines": {
     "node": ">=10"
+  },
+  "dependencies": {
+    "lodash.isequal": "^4.5.0"
   }
 }

@@ -1,6 +1,7 @@
 import { GetState, SetState, StateCreator, StoreApi } from 'zustand/vanilla';
 import { createUndoStore, UndoStoreState } from './factory';
 import { filterState } from './utils';
+import isEqual from 'lodash/isEqual';
 
 export type UndoState = Partial<
   Pick<UndoStoreState, 'undo' | 'redo' | 'clear'> & {
@@ -11,6 +12,7 @@ export type UndoState = Partial<
 export interface Options {
   // TODO: improve this type. ignored should only be fields on TState
   omit?: string[];
+  allowUnchanged?: boolean;
 }
 
 // custom zustand middleware to get previous state
@@ -22,20 +24,9 @@ export const undoMiddleware = <TState extends UndoState>(
   const { getState, setState } = undoStore;
   return config(
     args => {
-      setState({
-        prevStates: [
-          ...getState().prevStates,
-          filterState({ ...get() }, options?.omit || []),
-        ],
-        setStore: set,
-        futureStates: [],
-        getStore: get,
-        options,
-      });
       /* TODO: const, should call this function and inject the values once, but it does
-        it on every action call currently. */
+      it on every action call currently. */
       const { undo, clear, redo } = getState();
-
       // inject helper functions to user defined store.
       set({
         undo,
@@ -44,7 +35,29 @@ export const undoMiddleware = <TState extends UndoState>(
         getState,
       });
 
+      // Get the last state before updating state
+      const lastState = filterState({ ...get() }, options?.omit || []);
+
       set(args);
+
+      // Get the current state after updating state
+      const currState = filterState({ ...get() }, options?.omit || []);
+      
+      // Only store changes if state isn't equal (or option has been set)
+      const shouldStoreChange =
+        !isEqual(lastState, currState) || options?.allowUnchanged;
+
+      if (shouldStoreChange) {
+        const prevStates = getState().prevStates;
+
+        setState({
+          prevStates: [...prevStates, lastState],
+          setStore: set,
+          futureStates: [],
+          getStore: get,
+          options,
+        });
+      }
     },
     get,
     api

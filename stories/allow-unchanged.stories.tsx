@@ -4,7 +4,7 @@ import { undoMiddleware, UndoState } from '../src';
 import create from 'zustand';
 
 const meta: Meta = {
-  title: 'bears',
+  title: 'allow unchanged',
   argTypes: {
     children: {
       control: {
@@ -41,7 +41,7 @@ const useStore = create<StoreState>(
       doNothing: () => set(state  => ({ ...state })),
       removeAllBears: () => set({ bears: 0 }),
     }),
-    { omit: ['ignored'] }
+    { omit: ['ignored'], allowUnchanged: true }
   )
 );
 
@@ -62,7 +62,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>🐻 ♻️ Zundo!</h1>
+      <h1>🐻 ♻️ Zundo! (allow unchanged state option)</h1>
       previous states: {JSON.stringify(getState && getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
