@@ -83,18 +83,35 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-### Other features
+### Middleware Options
+
+```tsx
+options: { omit: string[], allowUnchanged: boolean } = { omit: [], allowUnchanged: undefined } 
+```
 
 ## Omit fields from being tracked in history
 
 Some fields you may not want to track in history and they can be ignored by zundo middleware.
-The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history.
+The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history. By default, nothing is omitted. 
 
 ```tsx
 const useStore = create<StoreState>(
   undoMiddleware(
     set => ({ ... }),
     { omit: ['field1', 'field2'] }
+  )
+);
+```
+
+## Allow unchanged states to be stored
+
+Sometimes you may want to track states in history even if nothing has actually changed. Set `allowUnchanged` to be `true` to allow unchanged states to be stored. By default, it is `false` (well, technically it is `undefined`).
+
+```tsx
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { allowUnchanged: true }
   )
 );
 ```
