@@ -26,19 +26,18 @@
     "src"
   ],
   "scripts": {
-    "analyze": "size-limit --why",
     "build": "tsdx build",
     "build-storybook": "build-storybook",
     "lint": "tsdx lint",
+    "lint:fix": "tsdx lint --fix",
     "prepare": "tsdx build",
-    "size": "size-limit",
     "start": "tsdx watch",
     "storybook": "start-storybook -p 6006",
     "test": "tsdx test --passWithNoTests"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "tsdx lint --fix"
     }
   },
   "prettier": {
