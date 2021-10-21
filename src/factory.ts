@@ -6,7 +6,8 @@ import { filterState } from './utils';
 
 export interface UndoStoreState {
   prevStates: any[];
-  futureStates: any[];isUndoHistoryEnabled: boolean;
+  futureStates: any[];
+  isUndoHistoryEnabled: boolean;
   undo: () => void;
   redo: () => void;
   clear: () => void;
