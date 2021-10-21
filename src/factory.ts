@@ -6,10 +6,11 @@ import { filterState } from './utils';
 
 export interface UndoStoreState {
   prevStates: any[];
-  futureStates: any[];
+  futureStates: any[];isUndoHistoryEnabled: boolean;
   undo: () => void;
   redo: () => void;
   clear: () => void;
+  setIsUndoHistoryEnabled: (isEnabled: boolean) => void;
   // handle on the parent store's setter
   setStore: Function;
   // handle on the parent store's getter
@@ -23,6 +24,7 @@ export const createUndoStore = () => {
     return {
       prevStates: [],
       futureStates: [],
+      isUndoHistoryEnabled: true,
       undo: () => {
         const { prevStates, futureStates, setStore, getStore, options } = get();
         if (prevStates.length > 0) {
@@ -41,6 +43,15 @@ export const createUndoStore = () => {
       },
       clear: () => {
         set({ prevStates: [], futureStates: [] });
+      },
+      setIsUndoHistoryEnabled: (isEnabled) => {
+        const { prevStates, getStore, options } = get();
+        const currState = filterState(getStore(), options?.omit || [])
+
+        set({ 
+          isUndoHistoryEnabled: isEnabled, 
+          prevStates: isEnabled ? prevStates : [...prevStates, currState] 
+        });
       },
       setStore: () => {},
       getStore: () => {},
