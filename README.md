@@ -80,7 +80,7 @@ const useStoreWithUndo = create<StoreState>(
 ### Middleware Options
 
 ```tsx
-options: { omit: string[], allowUnchanged: boolean } = { omit: [], allowUnchanged: undefined }
+options: { omit?: string[], allowUnchanged?: boolean, historyDepthLimit?: number }
 ```
 
 #### **Omit fields from being tracked in history**
@@ -106,6 +106,19 @@ const useStore = create<StoreState>(
   undoMiddleware(
     set => ({ ... }),
     { allowUnchanged: true }
+  )
+);
+```
+
+#### **Limit number of states stored**
+
+For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `historyDepthLimit` will limit the number of previous and future states stored in the `zundo` store. By default, no limit is set.
+
+```tsx
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { historyDepthLimit: 100 }
   )
 );
 ```

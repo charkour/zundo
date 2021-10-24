@@ -1,4 +1,4 @@
-import createVanilla from 'zustand/vanilla';
+import createVanilla, { GetState } from 'zustand/vanilla';
 import { Options } from './middleware';
 import { filterState } from './utils';
 
@@ -27,27 +27,17 @@ export const createUndoStore = () => {
       futureStates: [],
       isUndoHistoryEnabled: true,
       undo: () => {
-        const { prevStates, futureStates, setStore, getStore, options } = get();
-        if (prevStates.length > 0) {
-          futureStates.push(filterState(getStore(), options?.omit || []));
-          const prevState = prevStates.pop();
-          setStore(prevState);
-        }
+        handleStoreUpdates(get, 'undo');
       },
       redo: () => {
-        const { prevStates, futureStates, setStore, getStore, options } = get();
-        if (futureStates.length > 0) {
-          prevStates.push(filterState(getStore(), options?.omit || []));
-          const futureState = futureStates.pop();
-          setStore(futureState);
-        }
+        handleStoreUpdates(get, 'redo');
       },
       clear: () => {
         set({ prevStates: [], futureStates: [] });
       },
       setIsUndoHistoryEnabled: isEnabled => {
         const { prevStates, getStore, options } = get();
-        const currState = filterState(getStore(), options?.omit || []);
+        const currState = filterState(getStore(), options?.omit);
 
         set({
           isUndoHistoryEnabled: isEnabled,
@@ -59,4 +49,27 @@ export const createUndoStore = () => {
       options: {},
     };
   });
+};
+
+const handleStoreUpdates = (
+  get: GetState<UndoStoreState>,
+  action: 'undo' | 'redo'
+) => {
+  const { prevStates, futureStates, setStore, getStore, options } = get();
+
+  const isUndo = action === 'undo';
+  const currentActionStates = isUndo ? prevStates : futureStates;
+  const otherActionStates = isUndo ? futureStates : prevStates;
+  const limit = options?.historyDepthLimit;
+
+  if (currentActionStates.length > 0) {
+    // check history limit
+    if (limit && otherActionStates.length >= limit) {
+      // pop front
+      otherActionStates.shift();
+    }
+    otherActionStates.push(filterState(getStore(), options?.omit));
+    const currentStoreState = currentActionStates.pop();
+    setStore(currentStoreState);
+  }
 };

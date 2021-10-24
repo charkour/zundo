@@ -1,5 +1,5 @@
 import React from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom';
 import { Default as App } from '../stories/bears.stories';
 
 describe('App', () => {

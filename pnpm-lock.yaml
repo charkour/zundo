@@ -7,6 +7,7 @@ specifiers:
   '@storybook/addon-links': ^6.3.8
   '@storybook/addons': ^6.3.8
   '@storybook/react': ^6.3.8
+  '@testing-library/react-hooks': 7.0.2
   '@types/lodash.isequal': 4.5.5
   '@types/react': ^17.0.20
   '@types/react-dom': ^17.0.9
@@ -31,6 +32,7 @@ devDependencies:
   '@storybook/addon-links': 6.3.12_react-dom@17.0.2+react@17.0.2
   '@storybook/addons': 6.3.12_react-dom@17.0.2+react@17.0.2
   '@storybook/react': 6.3.12_755f3acb7fe5750b5738a46e04688b88
+  '@testing-library/react-hooks': 7.0.2_react-dom@17.0.2+react@17.0.2
   '@types/lodash.isequal': 4.5.5
   '@types/react': 17.0.31
   '@types/react-dom': 17.0.10
@@ -3473,6 +3475,28 @@ packages:
       - '@types/react'
     dev: true
 
+  /@testing-library/react-hooks/7.0.2_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-dYxpz8u9m4q1TuzfcUApqi8iFfR6R0FaMbr2hjZJy1uC8z+bO/K4v8Gs9eogGKYQop7QsrBTFkv/BCF7MzD2Cg==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+      react-test-renderer: '>=16.9.0'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-test-renderer:
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.15.4
+      '@types/react': 17.0.31
+      '@types/react-dom': 17.0.10
+      '@types/react-test-renderer': 17.0.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      react-error-boundary: 3.1.3_react@17.0.2
+    dev: true
+
   /@types/babel__core/7.1.16:
     resolution: {integrity: sha512-EAEHtisTMM+KaKwfWdC3oyllIqswlznXCIVCt7/oRNrh+DhgT4UEBNC/jlADNjvw7UnfbcdkGQcPVZ1xYiLcrQ==}
     dependencies:
@@ -3700,6 +3724,12 @@ packages:
 
   /@types/react-syntax-highlighter/11.0.5:
     resolution: {integrity: sha512-VIOi9i2Oj5XsmWWoB72p3KlZoEbdRAcechJa8Ztebw7bDl2YmR+odxIqhtJGp1q2EozHs02US+gzxJ9nuf56qg==}
+    dependencies:
+      '@types/react': 17.0.31
+    dev: true
+
+  /@types/react-test-renderer/17.0.1:
+    resolution: {integrity: sha512-3Fi2O6Zzq/f3QR9dRnlnHso9bMl7weKCviFmfF6B4LS1Uat6Hkm15k0ZAQuDz+UBq6B3+g+NM6IT2nr5QgPzCw==}
     dependencies:
       '@types/react': 17.0.31
     dev: true
@@ -11030,6 +11060,16 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+    dev: true
+
+  /react-error-boundary/3.1.3_react@17.0.2:
+    resolution: {integrity: sha512-A+F9HHy9fvt9t8SNDlonq01prnU8AmkjvGKV4kk8seB9kU3xMEO8J/PQlLVmoOIDODl5U2kufSBs4vrWIqhsAA==}
+    engines: {node: '>=10', npm: '>=6'}
+    peerDependencies:
+      react: '>=16.13.1'
+    dependencies:
+      '@babel/runtime': 7.15.4
+      react: 17.0.2
     dev: true
 
   /react-error-overlay/6.0.9:
