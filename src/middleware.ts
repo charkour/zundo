@@ -17,7 +17,6 @@ export interface Options {
   omit?: string[];
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
-  futureDepthLimit?: number;
 }
 
 // custom zustand middleware to get previous state

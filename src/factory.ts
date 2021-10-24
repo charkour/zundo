@@ -60,14 +60,11 @@ const handleStoreUpdates = (
   const isUndo = action === 'undo';
   const currentActionStates = isUndo ? prevStates : futureStates;
   const otherActionStates = isUndo ? futureStates : prevStates;
-  const stateDepthLimit = isUndo
-    ? // default to historyLimit if no future limit.
-      options?.futureDepthLimit || options?.historyDepthLimit
-    : options?.historyDepthLimit;
+  const limit = options?.historyDepthLimit;
 
   if (currentActionStates.length > 0) {
     // check history limit
-    if (stateDepthLimit && otherActionStates.length >= stateDepthLimit) {
+    if (limit && otherActionStates.length >= limit) {
       // pop front
       otherActionStates.shift();
     }
