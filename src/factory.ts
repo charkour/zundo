@@ -36,7 +36,7 @@ export const createUndoStore = () => {
         set({ prevStates: [], futureStates: [] });
         get().setStore();
       },
-      setIsUndoHistoryEnabled: (isEnabled) => {
+      setIsUndoHistoryEnabled: isEnabled => {
         const { prevStates, getStore, options } = get();
         const currState = filterState(getStore(), options?.omit);
 
