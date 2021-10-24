@@ -56,6 +56,7 @@ const App = () => {
     undo,
     clear,
     redo,
+    setIsUndoHistoryEnabled,
     getState,
     doNothing,
   } = store;
@@ -70,7 +71,6 @@ const App = () => {
       <br />
       current state: {JSON.stringify(store)}
       <br />
-      <br />
       bears: {bears}
       <br />
       ignored: {ignored}
@@ -83,6 +83,9 @@ const App = () => {
       <button onClick={redo}>redo</button>
       <br />
       <button onClick={clear}>clear</button>
+      <br />
+      <button onClick={() => { setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(false) }}>Disable History</button>
+      <button onClick={() => { setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(true) }}>Enable History</button>
       <br />
       <button onClick={doNothing}>do nothing</button>
     </div>
