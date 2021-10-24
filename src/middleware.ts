@@ -4,7 +4,10 @@ import { filterState } from './utils';
 import isEqual from 'lodash.isequal';
 
 export type UndoState = Partial<
-  Pick<UndoStoreState, 'undo' | 'redo' | 'clear' | 'setIsUndoHistoryEnabled'> & {
+  Pick<
+    UndoStoreState,
+    'undo' | 'redo' | 'clear' | 'setIsUndoHistoryEnabled'
+  > & {
     getState: () => UndoStoreState;
   }
 >;
@@ -26,14 +29,20 @@ export const undoMiddleware = <TState extends UndoState>(
     args => {
       /* TODO: const, should call this function and inject the values once, but it does
       it on every action call currently. */
-      const { undo, clear, redo, setIsUndoHistoryEnabled, isUndoHistoryEnabled } = getState();
+      const {
+        undo,
+        clear,
+        redo,
+        setIsUndoHistoryEnabled,
+        isUndoHistoryEnabled,
+      } = getState();
       // inject helper functions to user defined store.
       set({
         undo,
         clear,
         redo,
         getState,
-        setIsUndoHistoryEnabled
+        setIsUndoHistoryEnabled,
       });
 
       // Get the last state before updating state
@@ -43,10 +52,11 @@ export const undoMiddleware = <TState extends UndoState>(
 
       // Get the current state after updating state
       const currState = filterState({ ...get() }, options?.omit || []);
-      
+
       // Only store changes if state isn't equal (or option has been set)
       const shouldStoreChange =
-        isUndoHistoryEnabled && (!isEqual(lastState, currState) || options?.allowUnchanged);
+        isUndoHistoryEnabled &&
+        (!isEqual(lastState, currState) || options?.allowUnchanged);
 
       if (shouldStoreChange) {
         const prevStates = getState().prevStates;
