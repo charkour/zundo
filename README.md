@@ -83,7 +83,7 @@ const useStoreWithUndo = create<StoreState>(
 options: { omit: string[], allowUnchanged: boolean } = { omit: [], allowUnchanged: undefined }
 ```
 
-## Omit fields from being tracked in history
+#### **Omit fields from being tracked in history**
 
 Some fields you may not want to track in history and they can be ignored by zundo middleware.
 The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history. By default, nothing is omitted.
@@ -97,7 +97,7 @@ const useStore = create<StoreState>(
 );
 ```
 
-## Allow unchanged states to be stored
+#### **Allow unchanged states to be stored**
 
 Sometimes you may want to track states in history even if nothing has actually changed. Set `allowUnchanged` to be `true` to allow unchanged states to be stored. By default, it is `false` (well, technically it is `undefined`).
 
@@ -147,8 +147,14 @@ type UndoState = {
   // Will clear
   clear?: (() => void) | undefined;
   getState?: (() => UndoStoreState) | undefined;
+  // history is enabled by default
+  setIsUndoHistoryEnabled?: ((isEnabled: boolean) => void) | undefined;
 };
 ```
+
+#### **Enable or Disable History**
+
+Sometimes you may want to disable storing states in history, for example, when animating a point across the screen and you only want to store the beginning and end points in history. Use `setIsUndoHistoryEnabled`, returned from `useStore` to set programmatically set `true` or `false`.
 
 #### Usage
 
