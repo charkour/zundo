@@ -1,7 +1,7 @@
 import { GetState, SetState, StateCreator, StoreApi } from 'zustand/vanilla';
 import { createUndoStore, UndoStoreState } from './factory';
 import { filterState } from './utils';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 export type UndoState = Partial<
   Pick<UndoStoreState, 'undo' | 'redo' | 'clear'> & {
