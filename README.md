@@ -31,9 +31,9 @@ interface StoreState extends UndoState {
 }
 
 // creates a store with undo/redo capability
-const useStoreWithUndo = create<StoreState>(set => ({
+const useStoreWithUndo = create<StoreState>((set) => ({
   bears: 0,
-  increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   removeAllBears: () => set({ bears: 0 }),
 }));
 ```
@@ -44,14 +44,8 @@ Use your store anywhere, including `undo`, `redo`, and `clear`!
 
 ```tsx
 const App = () => {
-  const {
-    bears,
-    increasePopulation,
-    removeAllBears,
-    undo,
-    redo,
-    clear,
-  } = useStoreWithUndo();
+  const { bears, increasePopulation, removeAllBears, undo, redo, clear } =
+    useStoreWithUndo();
 
   return (
     <>
@@ -75,9 +69,9 @@ import { undoMiddleware, UndoState } from 'zundo';
 import create from 'zustand';
 
 const useStoreWithUndo = create<StoreState>(
-  undoMiddleware(set => ({
+  undoMiddleware((set) => ({
     bears: 0,
-    increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
+    increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
     removeAllBears: () => set({ bears: 0 }),
   }))
 );
@@ -86,13 +80,13 @@ const useStoreWithUndo = create<StoreState>(
 ### Middleware Options
 
 ```tsx
-options: { omit: string[], allowUnchanged: boolean } = { omit: [], allowUnchanged: undefined } 
+options: { omit: string[], allowUnchanged: boolean } = { omit: [], allowUnchanged: undefined }
 ```
 
 ## Omit fields from being tracked in history
 
 Some fields you may not want to track in history and they can be ignored by zundo middleware.
-The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history. By default, nothing is omitted. 
+The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history. By default, nothing is omitted.
 
 ```tsx
 const useStore = create<StoreState>(
@@ -206,4 +200,12 @@ type UndoStoreState = {
 
 ## Contributing
 
+[pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies.
+
 Issues and PRs are welcome. I'd like to hear your comments and critiques. We can discuss ways to make this package better. Thanks :)
+
+## Versioning
+
+View the [releases](https://github.com/charkour/zundo/releases) for the change log. This generally follows sem-ver, but breaking changes may occur in v1.
+
+Publish using `np --no-cleanup`.
