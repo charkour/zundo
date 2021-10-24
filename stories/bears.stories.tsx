@@ -19,7 +19,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreState extends UndoState {
+export interface StoreState extends UndoState {
   bears: number;
   ignored: number;
   increasePopulation: () => void;
@@ -29,19 +29,25 @@ interface StoreState extends UndoState {
 }
 
 // create a store with undo middleware
-const useStore = create<StoreState>(
+export const useStore = create<StoreState>(
   undoMiddleware(
-    set => ({
+    (set) => ({
       bears: 0,
       ignored: 0,
       increasePopulation: () =>
-        set(state => ({ bears: state.bears + 1, ignored: state.ignored + 1 })),
+        set((state) => ({
+          bears: state.bears + 1,
+          ignored: state.ignored + 1,
+        })),
       decreasePopulation: () =>
-        set(state => ({ bears: state.bears - 1, ignored: state.ignored - 1 })),
-      doNothing: () => set(state  => ({ ...state })),
+        set((state) => ({
+          bears: state.bears - 1,
+          ignored: state.ignored - 1,
+        })),
+      doNothing: () => set((state) => ({ ...state })),
       removeAllBears: () => set({ bears: 0 }),
     }),
-    { omit: ['ignored'] }
+    { omit: ['ignored'], historyDepthLimit: 10 }
   )
 );
 
@@ -84,15 +90,27 @@ const App = () => {
       <br />
       <button onClick={clear}>clear</button>
       <br />
-      <button onClick={() => { setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(false) }}>Disable History</button>
-      <button onClick={() => { setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(true) }}>Enable History</button>
+      <button
+        onClick={() => {
+          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(false);
+        }}
+      >
+        Disable History
+      </button>
+      <button
+        onClick={() => {
+          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(true);
+        }}
+      >
+        Enable History
+      </button>
       <br />
       <button onClick={doNothing}>do nothing</button>
     </div>
   );
 };
 
-const Template: Story<{}> = args => <App {...args} />;
+const Template: Story<{}> = (args) => <App {...args} />;
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing
