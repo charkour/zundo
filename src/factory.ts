@@ -34,6 +34,7 @@ export const createUndoStore = () => {
       },
       clear: () => {
         set({ prevStates: [], futureStates: [] });
+        get().setStore();
       },
       setIsUndoHistoryEnabled: isEnabled => {
         const { prevStates, getStore, options } = get();
@@ -47,6 +48,7 @@ export const createUndoStore = () => {
       setStore: () => {},
       getStore: () => {},
       options: {},
+      forceUpdate: () => {},
     };
   });
 };

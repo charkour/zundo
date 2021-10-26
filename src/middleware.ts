@@ -26,6 +26,7 @@ export const undoMiddleware = <TState extends UndoState>(
 ) => (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
   const undoStore = createUndoStore();
   const { getState, setState } = undoStore;
+
   return config(
     args => {
       /* TODO: const, should call this function and inject the values once, but it does
