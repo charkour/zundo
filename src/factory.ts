@@ -18,8 +18,8 @@ export interface UndoStoreState {
   // handle on the parent store's getter
   getStore: Function;
   options?: Options;
-  debounceTimer?: NodeJS.Timeout;
-  lastStateBeforeDebounce?: any;
+  coolOffTimer?: NodeJS.Timeout;
+  isCoolingOff?: boolean;
 }
 
 // factory to create undoStore. contains memory about past and future states and has methods to traverse states
@@ -30,16 +30,10 @@ export const createUndoStore = () => {
       futureStates: [],
       isUndoHistoryEnabled: true,
       undo: () => {
-        const { lastStateBeforeDebounce, debounceTimer, prevStates } = get();
+        const { coolOffTimer } = get();
 
-        // Clear debounce if user clicks "undo" during debounce period
-        if (debounceTimer) clearTimeout(debounceTimer);
-        if (lastStateBeforeDebounce) {
-          set({
-            prevStates: [...prevStates, lastStateBeforeDebounce],
-            lastStateBeforeDebounce: undefined,
-          });
-        }
+        // Clear cool off if user clicks "undo" during debounce period
+        if (coolOffTimer) clearTimeout(coolOffTimer);
 
         handleStoreUpdates(get, 'undo');
       },

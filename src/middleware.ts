@@ -17,7 +17,7 @@ export interface Options {
   omit?: string[];
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
-  debounceDurationMs?: number;
+  coolOffDurationMs?: number;
 }
 
 // custom zustand middleware to get previous state
@@ -38,8 +38,8 @@ export const undoMiddleware = <TState extends UndoState>(
         redo,
         setIsUndoHistoryEnabled,
         isUndoHistoryEnabled,
-        lastStateBeforeDebounce,
-        debounceTimer,
+        isCoolingOff,
+        coolOffTimer
       } = getState();
       // inject helper functions to user defined store.
       set({
@@ -66,32 +66,34 @@ export const undoMiddleware = <TState extends UndoState>(
       const limit = options?.historyDepthLimit;
 
       if (shouldStoreChange) {
-        debounceTimer && clearTimeout(debounceTimer);
+        coolOffTimer && clearTimeout(coolOffTimer);
+
+        if (!isCoolingOff) {
+          const { prevStates } = getState();
+
+          if (limit && prevStates.length >= limit) {
+            // pop front
+            prevStates.shift();
+          }
+
+          setState({
+            prevStates: [...prevStates, lastState],
+            futureStates: [],
+            options,
+            setStore: set,
+            getStore: get,
+          });
+        }
 
         setState({
-          // Store the last state before a bunch of changes happen in succession
-          lastStateBeforeDebounce: lastStateBeforeDebounce
-            ? lastStateBeforeDebounce
-            : lastState,
-          debounceTimer: setTimeout(() => {
-            const { prevStates, lastStateBeforeDebounce } = getState();
-
-            if (limit && prevStates.length >= limit) {
-              // pop front
-              prevStates.shift();
-            }
-
+          isCoolingOff: true,
+          coolOffTimer: setTimeout(() => {
+      
             setState({
-              prevStates: [...prevStates, lastStateBeforeDebounce],
-              futureStates: [],
-              // Once all of the changes have happened, clear lastStateBeforeDebounce
-              lastStateBeforeDebounce: undefined,
-              options,
+              isCoolingOff: false,
             });
-          }, options?.debounceDurationMs),
-          setStore: set,
-          getStore: get,
-        });
+          }, options?.coolOffDurationMs),
+        })
       }
     },
     get,

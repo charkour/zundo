@@ -34,7 +34,7 @@ export const useStore = create<StoreState>(
           bears: state.bears + 1,
         })),
     }),
-    { debounceDurationMs: 3000 }
+    { coolOffDurationMs: 3000 }
   )
 );
 
