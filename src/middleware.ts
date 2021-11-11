@@ -17,6 +17,7 @@ export interface Options {
   omit?: string[];
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
+  debounceDurationMs?: number
 }
 
 // custom zustand middleware to get previous state
@@ -37,6 +38,8 @@ export const undoMiddleware = <TState extends UndoState>(
         redo,
         setIsUndoHistoryEnabled,
         isUndoHistoryEnabled,
+        lastStateBeforeDebounce,
+        debounceTimer
       } = getState();
       // inject helper functions to user defined store.
       set({
@@ -63,18 +66,30 @@ export const undoMiddleware = <TState extends UndoState>(
       const limit = options?.historyDepthLimit;
 
       if (shouldStoreChange) {
-        const prevStates = getState().prevStates;
-        if (limit && prevStates.length >= limit) {
-          // pop front
-          prevStates.shift();
-        }
+        debounceTimer && clearTimeout(debounceTimer);
+
         setState({
-          prevStates: [...prevStates, lastState],
+          // Store the last state before a bunch of changes happen in succession
+          lastStateBeforeDebounce: lastStateBeforeDebounce ? lastStateBeforeDebounce : lastState,
+          debounceTimer: setTimeout(() => {
+            const { prevStates, lastStateBeforeDebounce } = getState();
+  
+            if (limit && prevStates.length >= limit) {
+              // pop front
+              prevStates.shift();
+            }
+            
+            setState({
+              prevStates: [...prevStates, lastStateBeforeDebounce],
+              futureStates: [],
+              // Once all of the changes have happened, clear lastStateBeforeDebounce
+              lastStateBeforeDebounce: undefined,
+              options,
+            });
+          }, options?.debounceDurationMs),
           setStore: set,
-          futureStates: [],
           getStore: get,
-          options,
-        });
+        })
       }
     },
     get,
