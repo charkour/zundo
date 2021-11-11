@@ -33,7 +33,7 @@ export const createUndoStore = () => {
         const { lastStateBeforeDebounce, debounceTimer, prevStates } = get();
 
         // Clear debounce if user clicks "undo" during debounce period
-        if (debounceTimer) clearTimeout(debounceTimer)
+        if (debounceTimer) clearTimeout(debounceTimer);
         if (lastStateBeforeDebounce) {
           set({
             prevStates: [...prevStates, lastStateBeforeDebounce],
@@ -50,7 +50,7 @@ export const createUndoStore = () => {
         set({ prevStates: [], futureStates: [] });
         get().setStore();
       },
-      setIsUndoHistoryEnabled: isEnabled => {
+      setIsUndoHistoryEnabled: (isEnabled) => {
         const { prevStates, getStore, options } = get();
         const currState = filterState(getStore(), options?.omit);
 
