@@ -32,8 +32,11 @@ export const createUndoStore = () => {
       undo: () => {
         const { coolOffTimer } = get();
 
-        // Clear cool off if user clicks "undo" during debounce period
+        // Clear cool off if user clicks "undo" during cool-off period
         if (coolOffTimer) clearTimeout(coolOffTimer);
+        set({
+          isCoolingOff: false,
+        });
 
         handleStoreUpdates(get, 'undo');
       },

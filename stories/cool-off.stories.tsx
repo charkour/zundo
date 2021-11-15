@@ -4,7 +4,7 @@ import { undoMiddleware, UndoState } from '../src';
 import create from 'zustand';
 
 const meta: Meta = {
-  title: 'debounce',
+  title: 'Cool Off',
   argTypes: {
     children: {
       control: {
@@ -51,7 +51,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>🐻 ♻️ Zundo! (3 second debounce)</h1>
+      <h1>🐻 ♻️ Zundo! (3 second cool-off)</h1>
       previous states: {JSON.stringify(getState && getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
