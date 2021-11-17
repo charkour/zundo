@@ -87,7 +87,7 @@ export const undoMiddleware = <TState extends UndoState>(
 
         setState({
           isCoolingOff: true,
-          coolOffTimer: setTimeout(() => {
+          coolOffTimer: window.setTimeout(() => {
       
             setState({
               isCoolingOff: false,
