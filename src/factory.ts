@@ -8,6 +8,7 @@ export interface UndoStoreState {
   prevStates: any[];
   futureStates: any[];
   isUndoHistoryEnabled: boolean;
+
   undo: () => void;
   redo: () => void;
   clear: () => void;
@@ -17,6 +18,8 @@ export interface UndoStoreState {
   // handle on the parent store's getter
   getStore: Function;
   options?: Options;
+  coolOffTimer?: NodeJS.Timeout;
+  isCoolingOff?: boolean;
 }
 
 // factory to create undoStore. contains memory about past and future states and has methods to traverse states
@@ -27,6 +30,14 @@ export const createUndoStore = () => {
       futureStates: [],
       isUndoHistoryEnabled: true,
       undo: () => {
+        const { coolOffTimer } = get();
+
+        // Clear cool off if user clicks "undo" during cool-off period
+        if (coolOffTimer) clearTimeout(coolOffTimer);
+        set({
+          isCoolingOff: false,
+        });
+
         handleStoreUpdates(get, 'undo');
       },
       redo: () => {
@@ -36,7 +47,7 @@ export const createUndoStore = () => {
         set({ prevStates: [], futureStates: [] });
         get().setStore();
       },
-      setIsUndoHistoryEnabled: isEnabled => {
+      setIsUndoHistoryEnabled: (isEnabled) => {
         const { prevStates, getStore, options } = get();
         const currState = filterState(getStore(), options?.omit);
 

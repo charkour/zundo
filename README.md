@@ -182,6 +182,12 @@ const useStoreWithUndo = create<StoreState>();
 // (set, get, api)
 ```
 
+#### **Cool-off period**
+
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. Use `coolOffDurationMs` to set how long (in millesconds) to stop new changes from being stored in history after an initial change has happened.
+
+Please note: Even if you don't set `coolOffDurationMs`, if multiple state changes happen inside of the same frame (e.g. you called `setSomething` multiple times in the same function call), only one item will be stored in history.
+
 ### `UseStore`
 
 It is an interface from `zustand` where `T` is your `StoreState`. Very similar to the type definition shown below. It is the type of any `useStore` hook. Used when passing the `useStore` hook as a prop.

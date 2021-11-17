@@ -17,6 +17,7 @@ export interface Options {
   omit?: string[];
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
+  coolOffDurationMs?: number;
 }
 
 // custom zustand middleware to get previous state
@@ -28,7 +29,7 @@ export const undoMiddleware = <TState extends UndoState>(
   const { getState, setState } = undoStore;
 
   return config(
-    args => {
+    (args) => {
       /* TODO: const, should call this function and inject the values once, but it does
       it on every action call currently. */
       const {
@@ -37,6 +38,8 @@ export const undoMiddleware = <TState extends UndoState>(
         redo,
         setIsUndoHistoryEnabled,
         isUndoHistoryEnabled,
+        isCoolingOff,
+        coolOffTimer
       } = getState();
       // inject helper functions to user defined store.
       set({
@@ -63,18 +66,34 @@ export const undoMiddleware = <TState extends UndoState>(
       const limit = options?.historyDepthLimit;
 
       if (shouldStoreChange) {
-        const prevStates = getState().prevStates;
-        if (limit && prevStates.length >= limit) {
-          // pop front
-          prevStates.shift();
+        coolOffTimer && clearTimeout(coolOffTimer);
+
+        if (!isCoolingOff) {
+          const { prevStates } = getState();
+
+          if (limit && prevStates.length >= limit) {
+            // pop front
+            prevStates.shift();
+          }
+
+          setState({
+            prevStates: [...prevStates, lastState],
+            futureStates: [],
+            options,
+            setStore: set,
+            getStore: get,
+          });
         }
+
         setState({
-          prevStates: [...prevStates, lastState],
-          setStore: set,
-          futureStates: [],
-          getStore: get,
-          options,
-        });
+          isCoolingOff: true,
+          coolOffTimer: setTimeout(() => {
+      
+            setState({
+              isCoolingOff: false,
+            });
+          }, options?.coolOffDurationMs),
+        })
       }
     },
     get,

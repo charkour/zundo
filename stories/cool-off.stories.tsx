@@ -4,7 +4,7 @@ import { undoMiddleware, UndoState } from '../src';
 import create from 'zustand';
 
 const meta: Meta = {
-  title: 'bears',
+  title: 'Cool Off',
   argTypes: {
     children: {
       control: {
@@ -21,11 +21,7 @@ export default meta;
 
 export interface StoreState extends UndoState {
   bears: number;
-  ignored: number;
   increasePopulation: () => void;
-  removeAllBears: () => void;
-  decreasePopulation: () => void;
-  doNothing: () => void;
 }
 
 // create a store with undo middleware
@@ -33,21 +29,12 @@ export const useStore = create<StoreState>(
   undoMiddleware(
     (set) => ({
       bears: 0,
-      ignored: 0,
       increasePopulation: () =>
         set((state) => ({
           bears: state.bears + 1,
-          ignored: state.ignored + 1,
         })),
-      decreasePopulation: () =>
-        set((state) => ({
-          bears: state.bears - 1,
-          ignored: state.ignored - 1,
-        })),
-      doNothing: () => set((state) => ({ ...state })),
-      removeAllBears: () => set({ bears: 0 }),
     }),
-    { omit: ['ignored'], historyDepthLimit: 10 }
+    { coolOffDurationMs: 3000 }
   )
 );
 
@@ -55,21 +42,16 @@ const App = () => {
   const store = useStore();
   const {
     bears,
-    ignored,
     increasePopulation,
-    removeAllBears,
-    decreasePopulation,
     undo,
     clear,
     redo,
-    setIsUndoHistoryEnabled,
     getState,
-    doNothing,
   } = store;
 
   return (
     <div>
-      <h1>🐻 ♻️ Zundo!</h1>
+      <h1>🐻 ♻️ Zundo! (3 second cool-off)</h1>
       previous states: {JSON.stringify(getState && getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
@@ -79,38 +61,17 @@ const App = () => {
       <br />
       bears: {bears}
       <br />
-      ignored: {ignored}
-      <br />
       <button onClick={increasePopulation}>increase</button>
       <button onClick={() => {
         increasePopulation()
         increasePopulation()
         increasePopulation()
       }}>increase +3</button>
-      <button onClick={decreasePopulation}>decrease</button>
-      <button onClick={removeAllBears}>remove</button>
       <br />
       <button onClick={undo}>undo</button>
       <button onClick={redo}>redo</button>
       <br />
       <button onClick={clear}>clear</button>
-      <br />
-      <button
-        onClick={() => {
-          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(false);
-        }}
-      >
-        Disable History
-      </button>
-      <button
-        onClick={() => {
-          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(true);
-        }}
-      >
-        Enable History
-      </button>
-      <br />
-      <button onClick={doNothing}>do nothing</button>
     </div>
   );
 };
