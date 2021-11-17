@@ -50,4 +50,25 @@ describe('zundo store', () => {
     rerender();
     expect(result.current.bears).toBe(0);
   });
+
+  test('increment many without wait (no cool off)', async () => {
+    expect(result.current.bears).toBe(0);
+    act(() => {
+      result.current.increasePopulation();
+      result.current.increasePopulation();
+      result.current.increasePopulation();
+    });
+    rerender();
+    expect(result.current.bears).toBe(3);
+  });
+
+  test('undo after many added without wait (no cool off)', async () => {
+    rerender();
+    expect(result.current.bears).toBe(3);
+    act(() => {
+      result.current.undo?.();
+    });
+    rerender();
+    expect(result.current.bears).toBe(0);
+  });
 });
