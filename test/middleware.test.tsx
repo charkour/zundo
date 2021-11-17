@@ -13,7 +13,7 @@ describe('zundo store', () => {
       rerender();
       expect(result.current.bears).toBe(i + 1);
 
-      // Wait 1 ms between actions for zundo cool-off 
+      // Wait 1 ms between actions for zundo cool-off
       await new Promise((r) => setTimeout(r, 1));
     }
   });
@@ -27,7 +27,7 @@ describe('zundo store', () => {
       rerender();
       expect(result.current.bears).toBe(i - 1);
 
-      // Wait 1 ms between actions for zundo cool-off 
+      // Wait 1 ms between actions for zundo cool-off
       await new Promise((r) => setTimeout(r, 1));
     }
   });
