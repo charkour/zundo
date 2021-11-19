@@ -18,7 +18,7 @@ export interface UndoStoreState {
   // handle on the parent store's getter
   getStore: Function;
   options?: Options;
-  coolOffTimer?: NodeJS.Timeout;
+  coolOffTimer?: number;
   isCoolingOff?: boolean;
 }
 

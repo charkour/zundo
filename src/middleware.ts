@@ -39,7 +39,7 @@ export const undoMiddleware = <TState extends UndoState>(
         setIsUndoHistoryEnabled,
         isUndoHistoryEnabled,
         isCoolingOff,
-        coolOffTimer
+        coolOffTimer,
       } = getState();
       // inject helper functions to user defined store.
       set({
@@ -87,13 +87,12 @@ export const undoMiddleware = <TState extends UndoState>(
 
         setState({
           isCoolingOff: true,
-          coolOffTimer: setTimeout(() => {
-      
+          coolOffTimer: window.setTimeout(() => {
             setState({
               isCoolingOff: false,
             });
           }, options?.coolOffDurationMs),
-        })
+        });
       }
     },
     get,
