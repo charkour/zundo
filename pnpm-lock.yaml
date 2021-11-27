@@ -16,6 +16,7 @@ specifiers:
   babel-loader: 8.2.3
   eslint: 8.3.0
   eslint-config-airbnb: ^19.0.1
+  eslint-config-prettier: ^8.3.0
   eslint-plugin-import: ^2.25.3
   eslint-plugin-jsx-a11y: ^6.5.1
   eslint-plugin-react: ^7.27.1
@@ -52,6 +53,7 @@ devDependencies:
   babel-loader: 8.2.3_@babel+core@7.16.0
   eslint: 8.3.0
   eslint-config-airbnb: 19.0.1_ea5cabb8f170e6410bd6f44cb743d65d
+  eslint-config-prettier: 8.3.0_eslint@8.3.0
   eslint-plugin-import: 2.25.3_eslint@8.3.0
   eslint-plugin-jsx-a11y: 6.5.1_eslint@8.3.0
   eslint-plugin-react: 7.27.1_eslint@8.3.0
@@ -7272,6 +7274,15 @@ packages:
     dependencies:
       eslint: 6.8.0
       get-stdin: 6.0.0
+    dev: true
+
+  /eslint-config-prettier/8.3.0_eslint@8.3.0:
+    resolution: {integrity: sha512-BgZuLUSeKzvlL/VUjx/Yb787VQ26RU3gGjA3iiFvdsp/2bMfVIWUVP7tjxtjS0e+HP409cPlPvNkQloz8C91ew==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+    dependencies:
+      eslint: 8.3.0
     dev: true
 
   /eslint-config-react-app/5.2.1_701309d25455d066567c672401f45a33:
