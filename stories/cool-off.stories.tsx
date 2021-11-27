@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { undoMiddleware, UndoState } from '../src';
 import create from 'zustand';
+import { undoMiddleware, UndoState } from '../src';
 
 const meta: Meta = {
   title: 'Cool Off',
@@ -34,20 +34,13 @@ export const useStore = create<StoreState>(
           bears: state.bears + 1,
         })),
     }),
-    { coolOffDurationMs: 3000 }
-  )
+    { coolOffDurationMs: 3000 },
+  ),
 );
 
-const App = () => {
+const App = function () {
   const store = useStore();
-  const {
-    bears,
-    increasePopulation,
-    undo,
-    clear,
-    redo,
-    getState,
-  } = store;
+  const { bears, increasePopulation, undo, clear, redo, getState } = store;
 
   return (
     <div>
@@ -61,22 +54,37 @@ const App = () => {
       <br />
       bears: {bears}
       <br />
-      <button onClick={increasePopulation}>increase</button>
-      <button onClick={() => {
-        increasePopulation()
-        increasePopulation()
-        increasePopulation()
-      }}>increase +3</button>
+      <button type="button" onClick={increasePopulation}>
+        increase
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          increasePopulation();
+          increasePopulation();
+          increasePopulation();
+        }}
+      >
+        increase +3
+      </button>
       <br />
-      <button onClick={undo}>undo</button>
-      <button onClick={redo}>redo</button>
+      <button type="button" onClick={undo}>
+        undo
+      </button>
+      <button type="button" onClick={redo}>
+        redo
+      </button>
       <br />
-      <button onClick={clear}>clear</button>
+      <button type="button" onClick={clear}>
+        clear
+      </button>
     </div>
   );
 };
 
-const Template: Story<{}> = (args) => <App {...args} />;
+const Template: Story<{}> = function (args) {
+  return <App {...args} />;
+};
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing

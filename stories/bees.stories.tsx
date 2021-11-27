@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import { UndoState } from '../src';
-import undo from '../src/middleware';
 import create from 'zustand';
+import { UndoState } from '../src';
+import undoMiddleware from '../src/middleware';
 
 const meta: Meta = {
   title: 'bees',
@@ -30,16 +30,16 @@ interface StoreState extends UndoState {
 
 // create a store with undo middleware
 const useStoreWithUndo = create<StoreState>(
-  undo(set => ({
+  undoMiddleware((set) => ({
     bees: 0,
     text: '',
-    incrementBees: () => set(state => ({ bees: state.bees + 1 })),
-    decrementBees: () => set(state => ({ bees: state.bees - 1 })),
-    submitText: text => set({ text }),
-  }))
+    incrementBees: () => set((state) => ({ bees: state.bees + 1 })),
+    decrementBees: () => set((state) => ({ bees: state.bees - 1 })),
+    submitText: (text) => set({ text }),
+  })),
 );
 
-const App = () => {
+const App = function () {
   const {
     bees,
     incrementBees,
@@ -59,22 +59,32 @@ const App = () => {
       <br />
       bees: {bees}
       <br />
-      <button onClick={incrementBees}>incremenet</button>
-      <button onClick={decrementBees}>decrement</button>
+      <button type="button" onClick={incrementBees}>
+        incremenet
+      </button>
+      <button type="button" onClick={decrementBees}>
+        decrement
+      </button>
       <br />
       <br />
-      <input value={inputText} onChange={e => setInputText(e.target.value)} />
+      <input value={inputText} onChange={(e) => setInputText(e.target.value)} />
       <br />
-      <button onClick={() => submitText(inputText)}>submit text</button>
+      <button type="button" onClick={() => submitText(inputText)}>
+        submit text
+      </button>
       <br />
       text: {text}
       <br />
-      <button onClick={undo}>undo</button>
+      <button type="button" onClick={undo}>
+        undo
+      </button>
     </div>
   );
 };
 
-const Template: Story<{}> = args => <App {...args} />;
+const Template: Story<{}> = function (args) {
+  return <App {...args} />;
+};
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { undoMiddleware, UndoState } from '../src';
 import create from 'zustand';
+import { undoMiddleware, UndoState } from '../src';
 
 const meta: Meta = {
   title: 'bears',
@@ -47,11 +47,11 @@ export const useStore = create<StoreState>(
       doNothing: () => set((state) => ({ ...state })),
       removeAllBears: () => set({ bears: 0 }),
     }),
-    { omit: ['ignored'], historyDepthLimit: 10 }
-  )
+    { omit: ['ignored'], historyDepthLimit: 10 },
+  ),
 );
 
-const App = () => {
+const App = function () {
   const store = useStore();
   const {
     bears,
@@ -81,41 +81,64 @@ const App = () => {
       <br />
       ignored: {ignored}
       <br />
-      <button onClick={increasePopulation}>increase</button>
-      <button onClick={() => {
-        increasePopulation()
-        increasePopulation()
-        increasePopulation()
-      }}>increase +3</button>
-      <button onClick={decreasePopulation}>decrease</button>
-      <button onClick={removeAllBears}>remove</button>
+      <button type="button" onClick={increasePopulation}>
+        increase
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          increasePopulation();
+          increasePopulation();
+          increasePopulation();
+        }}
+      >
+        increase +3
+      </button>
+      <button type="button" onClick={decreasePopulation}>
+        decrease
+      </button>
+      <button type="button" onClick={removeAllBears}>
+        remove
+      </button>
       <br />
-      <button onClick={undo}>undo</button>
-      <button onClick={redo}>redo</button>
+      <button type="button" onClick={undo}>
+        undo
+      </button>
+      <button type="button" onClick={redo}>
+        redo
+      </button>
       <br />
-      <button onClick={clear}>clear</button>
+      <button type="button" onClick={clear}>
+        clear
+      </button>
       <br />
       <button
+        type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(false);
+          setIsUndoHistoryEnabled?.(false);
         }}
       >
         Disable History
       </button>
       <button
+        type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled && setIsUndoHistoryEnabled(true);
+          setIsUndoHistoryEnabled?.(true);
         }}
       >
         Enable History
       </button>
       <br />
-      <button onClick={doNothing}>do nothing</button>
+      <button type="button" onClick={doNothing}>
+        do nothing
+      </button>
     </div>
   );
 };
 
-const Template: Story<{}> = (args) => <App {...args} />;
+const Template: Story<{}> = function (args) {
+  return <App {...args} />;
+};
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing

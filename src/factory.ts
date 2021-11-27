@@ -1,5 +1,5 @@
 import createVanilla, { GetState } from 'zustand/vanilla';
-import { Options } from './middleware';
+import { Options } from './types';
 import { filterState } from './utils';
 
 // use immer patches? https://immerjs.github.io/immer/patches/
@@ -22,51 +22,9 @@ export interface UndoStoreState {
   isCoolingOff?: boolean;
 }
 
-// factory to create undoStore. contains memory about past and future states and has methods to traverse states
-export const createUndoStore = () => {
-  return createVanilla<UndoStoreState>((set, get) => {
-    return {
-      prevStates: [],
-      futureStates: [],
-      isUndoHistoryEnabled: true,
-      undo: () => {
-        const { coolOffTimer } = get();
-
-        // Clear cool off if user clicks "undo" during cool-off period
-        if (coolOffTimer) clearTimeout(coolOffTimer);
-        set({
-          isCoolingOff: false,
-        });
-
-        handleStoreUpdates(get, 'undo');
-      },
-      redo: () => {
-        handleStoreUpdates(get, 'redo');
-      },
-      clear: () => {
-        set({ prevStates: [], futureStates: [] });
-        get().setStore();
-      },
-      setIsUndoHistoryEnabled: (isEnabled) => {
-        const { prevStates, getStore, options } = get();
-        const currState = filterState(getStore(), options?.omit);
-
-        set({
-          isUndoHistoryEnabled: isEnabled,
-          prevStates: isEnabled ? prevStates : [...prevStates, currState],
-        });
-      },
-      setStore: () => {},
-      getStore: () => {},
-      options: {},
-      forceUpdate: () => {},
-    };
-  });
-};
-
 const handleStoreUpdates = (
   get: GetState<UndoStoreState>,
-  action: 'undo' | 'redo'
+  action: 'undo' | 'redo',
 ) => {
   const { prevStates, futureStates, setStore, getStore, options } = get();
 
@@ -86,3 +44,42 @@ const handleStoreUpdates = (
     setStore(currentStoreState);
   }
 };
+
+// factory to create undoStore. contains memory about past and future states and has methods to traverse states
+export const createUndoStore = () =>
+  createVanilla<UndoStoreState>((set, get) => ({
+    prevStates: [],
+    futureStates: [],
+    isUndoHistoryEnabled: true,
+    undo: () => {
+      const { coolOffTimer } = get();
+
+      // Clear cool off if user clicks "undo" during cool-off period
+      if (coolOffTimer) clearTimeout(coolOffTimer);
+      set({
+        isCoolingOff: false,
+      });
+
+      handleStoreUpdates(get, 'undo');
+    },
+    redo: () => {
+      handleStoreUpdates(get, 'redo');
+    },
+    clear: () => {
+      set({ prevStates: [], futureStates: [] });
+      get().setStore();
+    },
+    setIsUndoHistoryEnabled: (isEnabled) => {
+      const { prevStates, getStore, options } = get();
+      const currState = filterState(getStore(), options?.omit);
+
+      set({
+        isUndoHistoryEnabled: isEnabled,
+        prevStates: isEnabled ? prevStates : [...prevStates, currState],
+      });
+    },
+    setStore: () => {},
+    getStore: () => {},
+    options: {},
+    forceUpdate: () => {},
+  }));
