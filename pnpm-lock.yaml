@@ -16,6 +16,7 @@ specifiers:
   babel-loader: 8.2.3
   eslint: 8.3.0
   eslint-config-airbnb: ^19.0.1
+  eslint-config-airbnb-typescript: ^16.0.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-import: ^2.25.3
   eslint-plugin-jsx-a11y: ^6.5.1
@@ -53,6 +54,7 @@ devDependencies:
   babel-loader: 8.2.3_@babel+core@7.16.0
   eslint: 8.3.0
   eslint-config-airbnb: 19.0.1_ea5cabb8f170e6410bd6f44cb743d65d
+  eslint-config-airbnb-typescript: 16.0.0_069bfbc98d3cac76be829d6acfcc8e7e
   eslint-config-prettier: 8.3.0_eslint@8.3.0
   eslint-plugin-import: 2.25.3_eslint@8.3.0
   eslint-plugin-jsx-a11y: 6.5.1_eslint@8.3.0
@@ -7244,6 +7246,20 @@ packages:
       object.assign: 4.1.2
       object.entries: 1.1.5
       semver: 6.3.0
+    dev: true
+
+  /eslint-config-airbnb-typescript/16.0.0_069bfbc98d3cac76be829d6acfcc8e7e:
+    resolution: {integrity: sha512-qDOyD0YYZo5Us1YvOnWig2Ly/+IlQKmMZpnqKnJgVtHdK8SkjaSyVBHKbD41dEaQxk8vRVGBC94PuR2ceSwbLQ==}
+    peerDependencies:
+      '@typescript-eslint/eslint-plugin': ^5.0.0
+      '@typescript-eslint/parser': ^5.0.0
+    dependencies:
+      '@typescript-eslint/eslint-plugin': 5.4.0_5c8ff4cecd5a55e744866c0654edac32
+      '@typescript-eslint/parser': 5.4.0_eslint@8.3.0+typescript@4.5.2
+      eslint-config-airbnb-base: 15.0.0_a32f4f7b9ceb1e357b5ea9f682f0210a
+    transitivePeerDependencies:
+      - eslint
+      - eslint-plugin-import
     dev: true
 
   /eslint-config-airbnb/19.0.1_ea5cabb8f170e6410bd6f44cb743d65d:
