@@ -28,6 +28,7 @@
   "scripts": {
     "build": "tsdx build",
     "build-storybook": "build-storybook",
+    "preinstall": "npx only-allow pnpm",
     "lint": "npm run lint:fix",
     "lint:fix": "eslint --fix src/* stories/* && prettier src stories --write",
     "pre-commit": "lint-staged",
