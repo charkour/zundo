@@ -29,7 +29,7 @@
     "build": "tsdx build",
     "build-storybook": "build-storybook",
     "lint": "npm run lint:fix",
-    "lint:fix": "eslint --fix src/* stories/*; prettier src stories --write",
+    "lint:fix": "eslint --fix src/* stories/* && prettier src stories --write",
     "pre-commit": "lint-staged",
     "prepare": "husky install && tsdx build",
     "publish": "np --no-cleanup",
