@@ -1,6 +1,6 @@
 {
   "name": "zundo",
-  "version": "1.4.1",
+  "version": "1.5.1",
   "private": false,
   "description": "🍜 undo/redo middleware for zustand",
   "keywords": [
@@ -28,55 +28,58 @@
   "scripts": {
     "build": "tsdx build",
     "build-storybook": "build-storybook",
-    "lint": "tsdx lint",
-    "lint:fix": "tsdx lint --fix",
-    "prepare": "tsdx build",
+    "preinstall": "npx only-allow pnpm",
+    "lint": "npm run lint:fix",
+    "lint:fix": "eslint --fix src/* stories/* && prettier src stories --write",
+    "pre-commit": "lint-staged",
+    "prepare": "husky install && tsdx build",
+    "publish": "np --no-cleanup",
     "start": "tsdx watch",
     "storybook": "start-storybook -p 6006",
-    "test": "tsdx test --passWithNoTests",
-    "publish": "np --no-cleanup"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint --fix"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
+    "test": "tsdx test --passWithNoTests"
   },
   "dependencies": {
-    "lodash.isequal": "^4.5.0"
+    "lodash.isequal": "4.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@storybook/addon-essentials": "^6.3.8",
-    "@storybook/addon-info": "^5.3.21",
-    "@storybook/addon-links": "^6.3.8",
-    "@storybook/addons": "^6.3.8",
-    "@storybook/react": "^6.3.8",
+    "@babel/core": "7.16.0",
+    "@storybook/addon-essentials": "6.4.0",
+    "@storybook/addon-info": "5.3.21",
+    "@storybook/addon-links": "6.4.0",
+    "@storybook/addons": "6.4.0",
+    "@storybook/react": "6.4.0",
     "@testing-library/react-hooks": "7.0.2",
     "@types/lodash.isequal": "4.5.5",
-    "@types/react": "^17.0.20",
-    "@types/react-dom": "^17.0.9",
-    "babel-loader": "^8.2.2",
-    "husky": "^6.0.0",
-    "np": "^7.5.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-is": "^17.0.2",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.4.2",
-    "zustand": "^3.5.10"
+    "@types/react": "17.0.37",
+    "@types/react-dom": "17.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "babel-loader": "8.2.3",
+    "eslint": "8.3.0",
+    "eslint-config-airbnb": "^19.0.1",
+    "eslint-config-airbnb-typescript": "^16.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "husky": "7.0.4",
+    "lint-staged": "^12.1.2",
+    "np": "7.6.0",
+    "prettier": "2.5.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-is": "17.0.2",
+    "tsdx": "0.14.1",
+    "tslib": "2.3.1",
+    "typescript": "4.5.2",
+    "zustand": "3.6.5"
   },
   "peerDependencies": {
     "react": ">=16",
     "zustand": "^3.0.0"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   }
 }
