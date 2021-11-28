@@ -1,6 +1,6 @@
 {
   "name": "zundo",
-  "version": "1.5.2",
+  "version": "1.5.7",
   "private": false,
   "description": "🍜 undo/redo middleware for zustand",
   "keywords": [
@@ -28,12 +28,10 @@
   "scripts": {
     "build": "tsdx build",
     "build-storybook": "build-storybook",
-    "preinstall": "npx only-allow pnpm",
     "lint": "npm run lint:fix",
     "lint:fix": "eslint --fix src/* stories/* && prettier src stories --write",
     "pre-commit": "lint-staged",
     "prepare": "husky install && tsdx build",
-    "publish": "np --no-cleanup",
     "start": "tsdx watch",
     "storybook": "start-storybook -p 6006",
     "test": "tsdx test --passWithNoTests"
