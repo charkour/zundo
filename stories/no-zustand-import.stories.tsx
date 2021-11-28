@@ -34,7 +34,7 @@ const useStoreWithUndo = create<StoreState>((set) => ({
   submitText: (text) => set({ text }),
 }));
 
-const App = function () {
+const App = () => {
   const {
     bees,
     incrementBees,
@@ -77,9 +77,7 @@ const App = function () {
   );
 };
 
-const Template: Story<{}> = function (args) {
-  return <App {...args} />;
-};
+const Template: Story<{}> = (args) => <App {...args} />;
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing

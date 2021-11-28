@@ -26,9 +26,15 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "prefer-arrow-callback": "error",
         "import/prefer-default-export": "off",
-        "import/no-default-export": "warn",
+        "import/no-default-export": "off",
         "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
-        "react/jsx-props-no-spreading": "off"
+        "import/no-named-as-default": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/function-component-definition": ["error", {
+            "namedComponents": "arrow-function",
+            "unnamedComponents": "arrow-function"
+        }]
     }
 }

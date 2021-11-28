@@ -46,7 +46,7 @@ interface SectionProps {
   useStore: UseStore<StoreState>;
 }
 
-const Section = function ({ useStore }: SectionProps) {
+const Section = ({ useStore }: SectionProps) => {
   const {
     bees,
     incrementBees,
@@ -95,18 +95,14 @@ const Section = function ({ useStore }: SectionProps) {
   );
 };
 
-const App = function () {
-  return (
-    <>
-      <Section useStore={useStoreWithUndo} />
-      <Section useStore={useStoreWithUndo2} />
-    </>
-  );
-};
+const App = () => (
+  <>
+    <Section useStore={useStoreWithUndo} />
+    <Section useStore={useStoreWithUndo2} />
+  </>
+);
 
-const Template: Story<{}> = function (args) {
-  return <App {...args} />;
-};
+const Template: Story<{}> = (args) => <App {...args} />;
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing
