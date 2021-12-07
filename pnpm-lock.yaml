@@ -11,19 +11,19 @@ specifiers:
   '@types/lodash.isequal': 4.5.5
   '@types/react': 17.0.37
   '@types/react-dom': 17.0.11
-  '@typescript-eslint/eslint-plugin': ^5.6.0
-  '@typescript-eslint/parser': ^5.6.0
+  '@typescript-eslint/eslint-plugin': 5.6.0
+  '@typescript-eslint/parser': 5.6.0
   babel-loader: 8.2.3
   eslint: 8.4.1
-  eslint-config-airbnb: ^19.0.2
-  eslint-config-airbnb-typescript: ^16.1.0
-  eslint-config-prettier: ^8.3.0
-  eslint-plugin-import: ^2.25.3
-  eslint-plugin-jsx-a11y: ^6.5.1
-  eslint-plugin-react: ^7.27.1
-  eslint-plugin-react-hooks: ^4.3.0
+  eslint-config-airbnb: 19.0.2
+  eslint-config-airbnb-typescript: 16.1.0
+  eslint-config-prettier: 8.3.0
+  eslint-plugin-import: 2.25.3
+  eslint-plugin-jsx-a11y: 6.5.1
+  eslint-plugin-react: 7.27.1
+  eslint-plugin-react-hooks: 4.3.0
   husky: 7.0.4
-  lint-staged: ^12.1.2
+  lint-staged: 12.1.2
   lodash.isequal: 4.5.0
   np: 7.6.0
   prettier: 2.5.1
