@@ -47,7 +47,7 @@ export const useStore = create<StoreState>(
       doNothing: () => set((state) => ({ ...state })),
       removeAllBears: () => set({ bears: 0 }),
     }),
-    { omit: ['ignored'], historyDepthLimit: 10 },
+    { exclude: ['ignored'], historyDepthLimit: 10 },
   ),
 );
 

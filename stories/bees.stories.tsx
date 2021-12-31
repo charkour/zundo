@@ -30,18 +30,25 @@ interface StoreState extends UndoState {
 
 // create a store with undo middleware
 const useStoreWithUndo = create<StoreState>(
-  undoMiddleware((set) => ({
-    bees: 0,
-    text: '',
-    incrementBees: () => set((state) => ({ bees: state.bees + 1 })),
-    decrementBees: () => set((state) => ({ bees: state.bees - 1 })),
-    submitText: (text) => set({ text }),
-  })),
+  undoMiddleware(
+    (set) => ({
+      ignored: 0,
+      bees: 0,
+      text: '',
+      incrementBees: () =>
+        set((state) => ({ bees: state.bees + 1, ignored: state.ignored + 1 })),
+      decrementBees: () =>
+        set((state) => ({ bees: state.bees - 1, ignored: state.ignored - 1 })),
+      submitText: (text) => set({ text }),
+    }),
+    { include: ['bees', 'text'] },
+  ),
 );
 
 const App = () => {
   const {
     bees,
+    ignored,
     incrementBees,
     decrementBees,
     submitText,
@@ -58,6 +65,8 @@ const App = () => {
       <br />
       <br />
       bees: {bees}
+      <br />
+      ignored: {ignored}
       <br />
       <button type="button" onClick={incrementBees}>
         incremenet

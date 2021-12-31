@@ -43,12 +43,12 @@ export const undoMiddleware =
         });
 
         // Get the last state before updating state
-        const lastState = filterState({ ...get() }, options?.omit);
+        const lastState = filterState({ ...get() }, options);
 
         set(args);
 
         // Get the current state after updating state
-        const currState = filterState({ ...get() }, options?.omit);
+        const currState = filterState({ ...get() }, options);
 
         // Only store changes if state isn't equal (or option has been set)
         const shouldStoreChange =

@@ -39,7 +39,7 @@ const handleStoreUpdates = (
       // pop front
       otherActionStates.shift();
     }
-    otherActionStates.push(filterState(getStore(), options?.omit));
+    otherActionStates.push(filterState(getStore(), options));
     const currentStoreState = currentActionStates.pop();
     setStore(currentStoreState);
   }
@@ -71,7 +71,7 @@ export const createUndoStore = () =>
     },
     setIsUndoHistoryEnabled: (isEnabled) => {
       const { prevStates, getStore, options } = get();
-      const currState = filterState(getStore(), options?.omit);
+      const currState = filterState(getStore(), options);
 
       set({
         isUndoHistoryEnabled: isEnabled,

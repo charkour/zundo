@@ -73,29 +73,41 @@ const useStoreWithUndo = create<StoreState>(
     bears: 0,
     increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
     removeAllBears: () => set({ bears: 0 }),
-  }))
+  })),
 );
 ```
 
 ### Middleware Options
 
 ```tsx
-options: { omit?: string[], allowUnchanged?: boolean, historyDepthLimit?: number }
+options: { exclude?: string[], include?: string[], allowUnchanged?: boolean, historyDepthLimit?: number }
 ```
 
-#### **Omit fields from being tracked in history**
+#### **Exclude fields from being tracked in history**
 
-Some fields you may not want to track in history and they can be ignored by zundo middleware.
-The second `options` parameter for `undoMiddleware` contains an `omit` field which is an array of string of keys on `StoreState` to be omitted from being tracked in history. By default, nothing is omitted (empty array).
+Use the `exclude` option, which accepts an array of keys to not track. Alternatively you can use the `include` option which will result in only those keys being tracked.
+
+_If for some reason you use both parameters, any key included in both will be excluded._
 
 ```tsx
-const useStore = create<StoreState>(
+// Only field1 and field2 will be tracked
+const useStoreA = create<StoreState>(
   undoMiddleware(
     set => ({ ... }),
-    { omit: ['field1', 'field2'] }
+    { include: ['field1', 'field2'] }
+  )
+);
+
+// Everything besides field1 and field2 will be tracked
+const useStoreB = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { exclude: ['field1', 'field2'] }
   )
 );
 ```
+
+_Note: `exclude` replaces the option `omit` which will deprecated in future versions._
 
 #### **Allow unchanged states to be stored**
 
