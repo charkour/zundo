@@ -91,10 +91,10 @@ const App = () => {
         remove
       </button>
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={() => undo?.()}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={() => redo?.()}>
         redo
       </button>
       <br />

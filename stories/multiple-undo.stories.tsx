@@ -85,10 +85,10 @@ const Section = ({ useStore }: SectionProps) => {
       <br />
       text: {text}
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={() => undo?.()}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={() => redo?.()}>
         redo
       </button>
     </div>

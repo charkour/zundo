@@ -9,8 +9,8 @@ export interface UndoStoreState {
   futureStates: any[];
   isUndoHistoryEnabled: boolean;
 
-  undo: () => void;
-  redo: () => void;
+  undo: (steps?: number) => void;
+  redo: (steps?: number) => void;
   clear: () => void;
   setIsUndoHistoryEnabled: (isEnabled: boolean) => void;
   // handle on the parent store's setter
@@ -25,22 +25,40 @@ export interface UndoStoreState {
 const handleStoreUpdates = (
   get: GetState<UndoStoreState>,
   action: 'undo' | 'redo',
+  steps?: number,
 ) => {
   const { prevStates, futureStates, setStore, getStore, options } = get();
 
+  const actionSteps = steps || 1;
   const isUndo = action === 'undo';
   const currentActionStates = isUndo ? prevStates : futureStates;
   const otherActionStates = isUndo ? futureStates : prevStates;
   const limit = options?.historyDepthLimit;
 
   if (currentActionStates.length > 0) {
-    // check history limit
-    if (limit && otherActionStates.length >= limit) {
-      // pop front
-      otherActionStates.shift();
+    if (limit) {
+      for (let i = 0; i < actionSteps; i += 1) {
+        // check history limit
+        if (otherActionStates.length >= limit) {
+          // pop front
+          otherActionStates.shift();
+        }
+      }
     }
     otherActionStates.push(filterState(getStore(), options));
-    const currentStoreState = currentActionStates.pop();
+    for (let i = 0; i < actionSteps - 1; i += 1) {
+      const stateIndex = currentActionStates.length - (i + 1);
+      if (stateIndex > 0 && stateIndex < currentActionStates.length) {
+        otherActionStates.push(currentActionStates[stateIndex]);
+      }
+    }
+    let currentStoreState;
+    for (let i = 0; i < actionSteps; i += 1) {
+      const state = currentActionStates.pop();
+      if (state !== undefined) {
+        currentStoreState = state;
+      }
+    }
     setStore(currentStoreState);
   }
 };
@@ -51,7 +69,7 @@ export const createUndoStore = () =>
     prevStates: [],
     futureStates: [],
     isUndoHistoryEnabled: true,
-    undo: () => {
+    undo: (steps?: number) => {
       const { coolOffTimer } = get();
 
       // Clear cool off if user clicks "undo" during cool-off period
@@ -60,10 +78,10 @@ export const createUndoStore = () =>
         isCoolingOff: false,
       });
 
-      handleStoreUpdates(get, 'undo');
+      handleStoreUpdates(get, 'undo', steps);
     },
-    redo: () => {
-      handleStoreUpdates(get, 'redo');
+    redo: (steps?: number) => {
+      handleStoreUpdates(get, 'redo', steps);
     },
     clear: () => {
       set({ prevStates: [], futureStates: [] });

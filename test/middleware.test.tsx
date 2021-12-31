@@ -71,4 +71,35 @@ describe('zundo store', () => {
     rerender();
     expect(result.current.bears).toBe(0);
   });
+
+  test('undo with multiple steps', async () => {
+    expect(result.current.bears).toBe(0);
+    for (let i = 0; i < 6; i++) {
+      expect(result.current.bears).toBe(i);
+      act(() => {
+        result.current.increasePopulation();
+      });
+      rerender();
+      expect(result.current.bears).toBe(i + 1);
+
+      // Wait 1 ms between actions for zundo cool-off
+      await new Promise((r) => setTimeout(r, 1));
+    }
+    rerender();
+    expect(result.current.bears).toBe(6);
+    act(() => {
+      result.current.undo?.(5);
+    });
+    rerender();
+    expect(result.current.bears).toBe(1);
+  });
+
+  test('redo with multiple steps', async () => {
+    expect(result.current.bears).toBe(1);
+    act(() => {
+      result.current.redo?.(4);
+    });
+    rerender();
+    expect(result.current.bears).toBe(5);
+  });
 });

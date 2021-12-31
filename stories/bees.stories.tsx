@@ -85,7 +85,7 @@ const App = () => {
       <br />
       text: {text}
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={() => undo?.()}>
         undo
       </button>
     </div>

@@ -52,8 +52,8 @@ const App = () => {
       bears: {bears}
       <button onClick={increasePopulation}>increase</button>
       <button onClick={removeAllBears}>remove</button>
-      <button onClick={undo}>undo</button>
-      <button onClick={redo}>redo</button>
+      <button onClick={() => undo?.()}>undo</button>
+      <button onClick={() => redo?.()}>redo</button>
       <button onClick={clear}>clear</button>
     </>
   );
@@ -149,8 +149,8 @@ Create from `zundo` will return a store hook that has undo/redo capabilities. In
 
 This works for multiple undoable stores in the same app.
 
-- `undo`: call function to apply previous state (if there are previous states)
-- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states."
+- `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
+- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
 - `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
 
 Dispatching a new state will clear all of the future states.
@@ -166,9 +166,9 @@ A type to extend when creating a global store with undo/redo capabilities.
 ```tsx
 type UndoState = {
   // Will go back one state
-  undo?: (() => void) | undefined;
+  undo?: ((steps?: number) => void) | undefined;
   // Will go forward one state
-  redo?: (() => void) | undefined;
+  redo?: ((steps?: number) => void) | undefined;
   // Will clear
   clear?: (() => void) | undefined;
   getState?: (() => UndoStoreState) | undefined;
@@ -223,8 +223,8 @@ An interface for the store that tracks states.
 type UndoStoreState = {
   prevStates: any[];
   futureStates: any[];
-  undo: () => void;
-  redo: () => void;
+  undo: (steps?: number) => void;
+  redo: (steps?: number) => void;
   clear: () => void;
   setStore: Function;
   getStore: Function;
