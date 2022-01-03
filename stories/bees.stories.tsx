@@ -21,6 +21,7 @@ const meta: Meta = {
 export default meta;
 
 interface StoreState extends UndoState {
+  ignored: number;
   bees: number;
   text: string;
   incrementBees: () => void;
