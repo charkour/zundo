@@ -1,7 +1,11 @@
 export interface Options {
-  // TODO: improve this type. ignored should only be fields on TState
-  omit?: string[];
+  include?: string[];
+  exclude?: string[];
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
   coolOffDurationMs?: number;
+  /**
+   * @deprecated Use exclude instead.
+   */
+  omit?: string[];
 }
