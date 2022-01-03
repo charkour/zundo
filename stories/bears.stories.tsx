@@ -60,7 +60,7 @@ const App = () => {
     removeAllBears,
     decreasePopulation,
     undo,
-    clear,
+    clearUndoHistory,
     redo,
     setIsUndoHistoryEnabled,
     getState,
@@ -124,7 +124,7 @@ const App = () => {
         redo x3
       </button>
       <br />
-      <button type="button" onClick={clear}>
+      <button type="button" onClick={clearUndoHistory}>
         clear
       </button>
       <br />

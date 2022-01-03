@@ -7,7 +7,7 @@ import { Options } from './types';
 export type UndoState = Partial<
   Pick<
     UndoStoreState,
-    'undo' | 'redo' | 'clear' | 'setIsUndoHistoryEnabled'
+    'undo' | 'redo' | 'clearUndoHistory' | 'setIsUndoHistoryEnabled'
   > & {
     getState: () => UndoStoreState;
   }
@@ -26,7 +26,7 @@ export const undoMiddleware =
       it on every action call currently. */
         const {
           undo,
-          clear,
+          clearUndoHistory,
           redo,
           setIsUndoHistoryEnabled,
           isUndoHistoryEnabled,
@@ -36,7 +36,7 @@ export const undoMiddleware =
         // inject helper functions to user defined store.
         set({
           undo,
-          clear,
+          clearUndoHistory,
           redo,
           getState,
           setIsUndoHistoryEnabled,

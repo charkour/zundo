@@ -60,7 +60,7 @@ const App = () => {
     removeAllBears,
     decreasePopulation,
     undo,
-    clear,
+    clearUndoHistory,
     redo,
     getState,
     doNothing,
@@ -98,7 +98,7 @@ const App = () => {
         redo
       </button>
       <br />
-      <button type="button" onClick={clear}>
+      <button type="button" onClick={clearUndoHistory}>
         clear
       </button>
       <br />

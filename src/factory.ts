@@ -11,7 +11,7 @@ export interface UndoStoreState {
 
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
-  clear: () => void;
+  clearUndoHistory: () => void;
   setIsUndoHistoryEnabled: (isEnabled: boolean) => void;
   // handle on the parent store's setter
   setStore: Function;
@@ -83,7 +83,7 @@ export const createUndoStore = () =>
     redo: (steps?: number) => {
       handleStoreUpdates(get, 'redo', steps);
     },
-    clear: () => {
+    clearUndoHistory: () => {
       set({ prevStates: [], futureStates: [] });
       get().setStore();
     },

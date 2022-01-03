@@ -40,12 +40,18 @@ const useStoreWithUndo = create<StoreState>((set) => ({
 
 ## Then bind your components
 
-Use your store anywhere, including `undo`, `redo`, and `clear`!
+Use your store anywhere, including `undo`, `redo`, and `clearUndoHistory`!
 
 ```tsx
 const App = () => {
-  const { bears, increasePopulation, removeAllBears, undo, redo, clear } =
-    useStoreWithUndo();
+  const {
+    bears,
+    increasePopulation,
+    removeAllBears,
+    undo,
+    redo,
+    clearUndoHistory,
+  } = useStoreWithUndo();
 
   return (
     <>
@@ -54,7 +60,7 @@ const App = () => {
       <button onClick={removeAllBears}>remove</button>
       <button onClick={() => undo?.()}>undo</button>
       <button onClick={() => redo?.()}>redo</button>
-      <button onClick={clear}>clear</button>
+      <button onClick={clearUndoHistory}>clear</button>
     </>
   );
 };
@@ -145,13 +151,13 @@ This works for multiple undoable stores in the same app.
 
 ### `create`
 
-Create from `zundo` will return a store hook that has undo/redo capabilities. In addition to what fields are in the provided in your `StoreState`, the functions `undo`, `redo`, `clear`, and `getState` are added as well.
+Create from `zundo` will return a store hook that has undo/redo capabilities. In addition to what fields are in the provided in your `StoreState`, the functions `undo`, `redo`, `clearUndoHistory`, and `getState` are added as well.
 
 This works for multiple undoable stores in the same app.
 
 - `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
 - `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
-- `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
+- `clearUndoHistory`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
 
 Dispatching a new state will clear all of the future states.
 
@@ -169,8 +175,8 @@ type UndoState = {
   undo?: ((steps?: number) => void) | undefined;
   // Will go forward one state
   redo?: ((steps?: number) => void) | undefined;
-  // Will clear
-  clear?: (() => void) | undefined;
+  // Will clear history
+  clearUndoHistory?: (() => void) | undefined;
   getState?: (() => UndoStoreState) | undefined;
   // history is enabled by default
   setIsUndoHistoryEnabled?: ((isEnabled: boolean) => void) | undefined;
@@ -225,7 +231,7 @@ type UndoStoreState = {
   futureStates: any[];
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
-  clear: () => void;
+  clearUndoHistory: () => void;
   setStore: Function;
   getStore: Function;
 };
