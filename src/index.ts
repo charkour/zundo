@@ -3,12 +3,12 @@ import undoMiddleware from './middleware';
 import { Options } from './types';
 
 export { UndoState, undoMiddleware } from './middleware';
-export { UseStore } from 'zustand';
+export { UseBoundStore } from 'zustand';
 
 // create a store with undo/redo functionality
-export const create = <TState extends State>(
-  config: StateCreator<TState>,
+export const create = <UserState extends State>(
+  config: StateCreator<UserState>,
   options?: Options,
-) => createStore<TState>(undoMiddleware(config, options));
+) => createStore(undoMiddleware<UserState>(config, options));
 
 export default create;

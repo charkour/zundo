@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import create from 'zustand';
-import { undoMiddleware, UndoState } from '../src';
+import { undoMiddleware } from '../src';
 
 const meta: Meta = {
   title: 'Cool Off',
@@ -19,14 +19,14 @@ const meta: Meta = {
 
 export default meta;
 
-export interface StoreState extends UndoState {
+export interface StoreState {
   bears: number;
   increasePopulation: () => void;
 }
 
 // create a store with undo middleware
-export const useStore = create<StoreState>(
-  undoMiddleware(
+export const useStore = create(
+  undoMiddleware<StoreState>(
     (set) => ({
       bears: 0,
       increasePopulation: () =>
@@ -40,15 +40,15 @@ export const useStore = create<StoreState>(
 
 const App = () => {
   const store = useStore();
-  const { bears, increasePopulation, undo, clear, redo, getState } = store;
+  const { bears, increasePopulation, zundo } = store;
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo! (3 second cool-off)</h1>
-      previous states: {JSON.stringify(getState && getState().prevStates)}
+      previous states: {JSON.stringify(zundo?.getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
-      future states: {JSON.stringify(getState && getState().futureStates)}
+      future states: {JSON.stringify(zundo?.getState().futureStates)}
       <br />
       current state: {JSON.stringify(store)}
       <br />
@@ -68,14 +68,14 @@ const App = () => {
         increase +3
       </button>
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={zundo?.undo}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={zundo?.redo}>
         redo
       </button>
       <br />
-      <button type="button" onClick={clear}>
+      <button type="button" onClick={zundo?.clear}>
         clear
       </button>
     </div>

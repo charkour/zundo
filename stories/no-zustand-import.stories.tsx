@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import create, { UndoState } from '../src';
+import create from '../src';
 
 const meta: Meta = {
   title: 'no zustand import',
@@ -18,7 +18,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreState extends UndoState {
+interface StoreState {
   bees: number;
   text: string;
   incrementBees: () => void;
@@ -35,21 +35,14 @@ const useStoreWithUndo = create<StoreState>((set) => ({
 }));
 
 const App = () => {
-  const {
-    bees,
-    incrementBees,
-    decrementBees,
-    submitText,
-    text,
-    undo,
-    getState,
-  } = useStoreWithUndo();
+  const { bees, incrementBees, decrementBees, submitText, text, zundo } =
+    useStoreWithUndo();
   const [inputText, setInputText] = useState('');
 
   return (
     <div>
       <h1>🐻 ♻️ Zustand undo!</h1>
-      actions stack: {JSON.stringify(getState && getState().prevStates)}
+      actions stack: {JSON.stringify(zundo?.getState().prevStates)}
       <br />
       <br />
       bees: {bees}
@@ -70,7 +63,7 @@ const App = () => {
       <br />
       text: {text}
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={zundo?.undo}>
         undo
       </button>
     </div>

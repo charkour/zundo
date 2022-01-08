@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import create, { UndoState, UseStore } from '../src';
+import create, { UseBoundStore, UndoState } from '../src';
 
 const meta: Meta = {
   title: 'multiple undo stores',
@@ -18,7 +18,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreState extends UndoState {
+interface StoreState {
   bees: number;
   text: string;
   incrementBees: () => void;
@@ -43,28 +43,20 @@ const useStoreWithUndo2 = create<StoreState>((set) => ({
 }));
 
 interface SectionProps {
-  useStore: UseStore<StoreState>;
+  useStore: UseBoundStore<StoreState & UndoState<StoreState>>;
 }
 
 const Section = ({ useStore }: SectionProps) => {
-  const {
-    bees,
-    incrementBees,
-    decrementBees,
-    submitText,
-    text,
-    undo,
-    redo,
-    getState,
-  } = useStore();
+  const { bees, incrementBees, decrementBees, submitText, text, zundo } =
+    useStore();
   const [inputText, setInputText] = useState('');
 
   return (
     <div>
       <h1>🐻 ♻️ Zustand undo!</h1>
-      actions stack: {JSON.stringify(getState && getState().prevStates)}
+      actions stack: {JSON.stringify(zundo?.getState().prevStates)}
       <br />
-      past actions stack: {JSON.stringify(getState && getState().futureStates)}
+      past actions stack: {JSON.stringify(zundo?.getState().futureStates)}
       <br />
       <br />
       bees: {bees}
@@ -85,10 +77,10 @@ const Section = ({ useStore }: SectionProps) => {
       <br />
       text: {text}
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={zundo?.undo}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={zundo?.redo}>
         redo
       </button>
     </div>

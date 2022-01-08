@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import create from 'zustand';
-import { undoMiddleware, UndoState } from '../src';
+import { undoMiddleware } from '../src';
 
 const meta: Meta = {
   title: 'bears',
@@ -18,8 +18,7 @@ const meta: Meta = {
 };
 
 export default meta;
-
-export interface StoreState extends UndoState {
+interface StoreState {
   bears: number;
   ignored: number;
   increasePopulation: () => void;
@@ -29,8 +28,8 @@ export interface StoreState extends UndoState {
 }
 
 // create a store with undo middleware
-export const useStore = create<StoreState>(
-  undoMiddleware(
+const useStore = create(
+  undoMiddleware<StoreState>(
     (set) => ({
       bears: 0,
       ignored: 0,
@@ -59,21 +58,17 @@ const App = () => {
     increasePopulation,
     removeAllBears,
     decreasePopulation,
-    undo,
-    clear,
-    redo,
-    setIsUndoHistoryEnabled,
-    getState,
+    zundo,
     doNothing,
   } = store;
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
-      previous states: {JSON.stringify(getState && getState().prevStates)}
+      previous states: {JSON.stringify(zundo?.getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
-      future states: {JSON.stringify(getState && getState().futureStates)}
+      future states: {JSON.stringify(zundo?.getState().futureStates)}
       <br />
       current state: {JSON.stringify(store)}
       <br />
@@ -101,21 +96,21 @@ const App = () => {
         remove
       </button>
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={zundo?.undo}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={zundo?.redo}>
         redo
       </button>
       <br />
-      <button type="button" onClick={clear}>
+      <button type="button" onClick={zundo?.clear}>
         clear
       </button>
       <br />
       <button
         type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled?.(false);
+          zundo?.setIsUndoHistoryEnabled(false);
         }}
       >
         Disable History
@@ -123,7 +118,7 @@ const App = () => {
       <button
         type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled?.(true);
+          zundo?.setIsUndoHistoryEnabled(true);
         }}
       >
         Enable History

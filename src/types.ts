@@ -4,8 +4,4 @@ export interface Options {
   allowUnchanged?: boolean;
   historyDepthLimit?: number;
   coolOffDurationMs?: number;
-  /**
-   * @deprecated Use exclude instead.
-   */
-  omit?: string[];
 }

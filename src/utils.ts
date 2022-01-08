@@ -1,16 +1,20 @@
+import { State } from 'zustand/vanilla';
 import { Options } from './types';
 
-// TODO: make this a better type
-export const filterState = (state: any, options?: Options) => {
-  const excluded: string[] | undefined = options?.exclude || options?.omit;
-  const included: string[] | undefined = options?.include;
+const keys = Object.keys as <T extends object>(
+  obj: T,
+) => Array<Extract<keyof T, string>>;
 
-  const filteredState: any = {};
+export const filterState = <UserStateWithUndo extends State>(
+  state: UserStateWithUndo,
+  { include, exclude }: Options,
+): UserStateWithUndo => {
+  const filteredState: UserStateWithUndo = {} as UserStateWithUndo;
 
-  Object.keys(state).forEach((key: string) => {
+  keys(state).forEach((key) => {
     if (
-      !(excluded && excluded.includes(key)) &&
-      (!included || included.includes(key))
+      !(exclude && exclude.includes(key)) &&
+      (!include || include.includes(key))
     ) {
       filteredState[key] = state[key];
     }
