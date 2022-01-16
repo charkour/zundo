@@ -6,7 +6,9 @@ enable time-travel in your apps. undo/redo middleware for [zustand](https://gith
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
-![zundo demo](./zundo.gif)
+<div style="width: 100%; display: flex;">
+<img src="./zundo-mascot.png" style="max-width: 300px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
+</div>
 
 See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 
@@ -252,3 +254,7 @@ Issues and PRs are welcome. I'd like to hear your comments and critiques. We can
 View the [releases](https://github.com/charkour/zundo/releases) for the change log. This generally follows sem-ver, but breaking changes may occur in v1.
 
 Publish using `np --no-cleanup`.
+
+## Credits
+
+- Illustration - [@theivoson](https://twitter.com/theivoson)
