@@ -1,10 +1,11 @@
 {
   "name": "zundo",
-  "version": "1.5.9",
+  "version": "2.0.0",
   "private": false,
   "description": "🍜 undo/redo middleware for zustand",
   "keywords": [
     "undo",
+    "history",
     "middleware",
     "zustand"
   ],

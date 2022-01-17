@@ -40,7 +40,8 @@ export const useStore = create<StoreState>(
 
 const App = () => {
   const store = useStore();
-  const { bears, increasePopulation, undo, clear, redo, getState } = store;
+  const { bears, increasePopulation, undo, clearUndoHistory, redo, getState } =
+    store;
 
   return (
     <div>
@@ -68,14 +69,14 @@ const App = () => {
         increase +3
       </button>
       <br />
-      <button type="button" onClick={undo}>
+      <button type="button" onClick={() => undo?.()}>
         undo
       </button>
-      <button type="button" onClick={redo}>
+      <button type="button" onClick={() => redo?.()}>
         redo
       </button>
       <br />
-      <button type="button" onClick={clear}>
+      <button type="button" onClick={clearUndoHistory}>
         clear
       </button>
     </div>
