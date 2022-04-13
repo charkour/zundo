@@ -21,7 +21,7 @@ export const undoMiddleware =
     const { getState, setState } = undoStore;
 
     return config(
-      (args) => {
+      (...args) => {
         /* TODO: const, should call this function and inject the values once, but it does
       it on every action call currently. */
         const {
@@ -44,8 +44,8 @@ export const undoMiddleware =
 
         // Get the last state before updating state
         const lastState = filterState({ ...get() }, options);
-
-        set(args);
+        
+        set(...args);
 
         // Get the current state after updating state
         const currState = filterState({ ...get() }, options);
