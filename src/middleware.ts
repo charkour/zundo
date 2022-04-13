@@ -1,5 +1,6 @@
-import { GetState, SetState, StateCreator, StoreApi } from 'zustand/vanilla';
+import { GetState, StateCreator, StoreApi } from 'zustand/vanilla';
 import isEqual from 'lodash.isequal';
+import { NamedSet } from 'zustand/middleware';
 import { createUndoStore, UndoStoreState } from './factory';
 import { filterState } from './utils';
 import { Options } from './types';
@@ -15,15 +16,16 @@ export type UndoState = Partial<
 
 // custom zustand middleware to get previous state
 export const undoMiddleware =
-  <TState extends UndoState>(config: StateCreator<TState>, options?: Options) =>
-  (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
+  <TState extends UndoState>(
+    config: StateCreator<TState, NamedSet<TState>>,
+    options?: Options,
+  ) =>
+  (set: NamedSet<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
     const undoStore = createUndoStore();
     const { getState, setState } = undoStore;
 
     return config(
       (...args) => {
-        /* TODO: const, should call this function and inject the values once, but it does
-      it on every action call currently. */
         const {
           undo,
           clear,
@@ -33,18 +35,25 @@ export const undoMiddleware =
           isCoolingOff,
           coolOffTimer,
         } = getState();
-        // inject helper functions to user defined store.
-        set({
-          undo,
-          clear,
-          redo,
-          getState,
-          setIsUndoHistoryEnabled,
-        });
+
+        if (!get().undo) {
+          // inject helper functions to user defined store.
+          set(
+            {
+              undo,
+              clear,
+              redo,
+              getState,
+              setIsUndoHistoryEnabled,
+            },
+            false,
+            'injectZundoHelpers',
+          );
+        }
 
         // Get the last state before updating state
         const lastState = filterState({ ...get() }, options);
-        
+
         set(...args);
 
         // Get the current state after updating state
