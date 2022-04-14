@@ -41,7 +41,7 @@ const handleStoreUpdates = (
     }
     otherActionStates.push(filterState(getStore(), options));
     const currentStoreState = currentActionStates.pop();
-    setStore(currentStoreState);
+    setStore(currentStoreState, false, action);
   }
 };
 
