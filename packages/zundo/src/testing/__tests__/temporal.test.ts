@@ -1,4 +1,4 @@
-import { createTemporalStore } from '../temporal';
+import { createTemporalStore } from '../../temporal';
 import createVanilla from 'zustand/vanilla';
 import create from 'zustand';
 
