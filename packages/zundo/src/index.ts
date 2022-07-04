@@ -5,11 +5,7 @@ import {
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createTemporalStore, TemporalStore } from './temporal';
-type Temporal<TState extends State> = Pick<
-  ReturnType<TemporalStore<TState>['getState']>,
-  'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
->;
+import { createTemporalStore, Temporal } from './temporal';
 
 type Zundo = <
   TState extends State,

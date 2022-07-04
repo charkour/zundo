@@ -5,7 +5,7 @@ import createVanilla, {
   SetState,
 } from 'zustand/vanilla';
 
-export interface TemporalState<TState extends State> extends State {
+interface TemporalState<TState extends State> extends State {
   pastStates: TState[];
   futureStates: TState[];
 
@@ -14,8 +14,11 @@ export interface TemporalState<TState extends State> extends State {
   clear: () => void;
 }
 
-export type TemporalStore<TState extends State> = StoreApi<
-  TemporalState<TState>
+type TemporalStore<TState extends State> = StoreApi<TemporalState<TState>>;
+
+export type Temporal<TState extends State> = Pick<
+  ReturnType<TemporalStore<TState>['getState']>,
+  'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
 >;
 
 export const createTemporalStore = <TState extends State>(
