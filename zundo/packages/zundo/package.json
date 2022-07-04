@@ -1,0 +1,42 @@
+{
+  "name": "zundo",
+  "version": "2.0.0-beta.1",
+  "private": false,
+  "description": "🍜 undo/redo middleware for zustand",
+  "keywords": [
+    "undo",
+    "history",
+    "middleware",
+    "zustand"
+  ],
+  "homepage": "https://github.com/charkour/zundo",
+  "bugs": {
+    "url": "https://github.com/charkour/zundo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charkour/zundo.git"
+  },
+  "license": "MIT",
+  "author": "Charles Kornoelje",
+  "main": "dist/index.js",
+  "module": "dist/zundo.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "zustand": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "devDependencies": {
+    "tsup": "^6.1.3"
+  }
+}
