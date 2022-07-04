@@ -20,8 +20,8 @@ type Zundo = <
 ) => StateCreator<TState, Mps, [['temporal', Temporal<TState>], ...Mcs]>;
 
 declare module 'zustand' {
-  interface StoreMutators<State, StoreAddition> {
-    temporal: Write<Cast<State, object>, { temporal: StoreAddition }>;
+  interface StoreMutators<S, A> {
+    temporal: Write<Cast<S, object>, { temporal: A }>;
   }
 }
 
