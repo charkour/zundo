@@ -3,13 +3,13 @@ import { zundo } from 'zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 
-interface State {
+interface MyState {
   count: number;
   increment: () => void;
   decrement: () => void;
 }
 
-const withZundo = zundo<State>((set) => ({
+const withZundo = zundo<MyState>((set) => ({
   count: 0,
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -20,11 +20,8 @@ const originalStore = createVanilla(withZundo);
 const useStore = create(originalStore);
 
 export default function Web() {
-  const store = useStore();
-  const temporal = useStore.temporal;
-  const { getState } = temporal;
-  const { futureStates, pastStates, undo } = getState();
-  const { count, increment, decrement } = store;
+  const { count, increment, decrement } = useStore();
+  const { undo, futureStates, pastStates } = useStore.temporal;
 
   return (
     <div>

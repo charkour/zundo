@@ -6,22 +6,22 @@ import {
   StoreApi,
 } from 'zustand';
 import { createTemporalStore, TemporalStore } from './temporal';
+type Temporal<TState extends State> = Pick<
+  ReturnType<TemporalStore<TState>['getState']>,
+  'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
+>;
 
 type Zundo = <
   TState extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
-  config: StateCreator<
-    TState,
-    [...Mps, ['temporal', TemporalStore<TState>]],
-    Mcs
-  >,
-) => StateCreator<TState, Mps, [['temporal', TemporalStore<TState>], ...Mcs]>;
+  config: StateCreator<TState, [...Mps, ['temporal', Temporal<TState>]], Mcs>,
+) => StateCreator<TState, Mps, [['temporal', Temporal<TState>], ...Mcs]>;
 
 declare module 'zustand' {
-  interface StoreMutators<S, A> {
-    temporal: Write<Cast<S, object>, { temporal: A }>;
+  interface StoreMutators<State, StoreAddition> {
+    temporal: Write<Cast<State, object>, { temporal: StoreAddition }>;
   }
 }
 
@@ -31,14 +31,17 @@ type ZundoImpl = <TState extends State>(
 
 const zundoImpl: ZundoImpl = (config) => (set, get, _store) => {
   type TState = ReturnType<typeof config>;
-  type A = TemporalStore<TState>;
-  console.log(set, get, _store);
+  type StoreAddition = Temporal<TState>;
 
   const temporalStore = createTemporalStore<TState>(set, get);
-  const { pastStates } = temporalStore.getState();
+  const { undo, redo, clear, pastStates, futureStates } =
+    temporalStore.getState();
 
-  const store = _store as Mutate<StoreApi<TState>, [['temporal', A]]>;
-  store.temporal = temporalStore;
+  const store = _store as Mutate<
+    StoreApi<TState>,
+    [['temporal', StoreAddition]]
+  >;
+  store.temporal = { undo, redo, clear, pastStates, futureStates };
 
   const modifiedSetter: typeof set = (state, replace) => {
     pastStates.push(get());
