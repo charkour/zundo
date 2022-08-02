@@ -5,15 +5,17 @@ import {
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createTemporalStore, Temporal } from './temporal';
+import { createTemporalStore, Temporal, ZundoOptions } from './temporal';
 
 type Zundo = <
   TState extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  UState extends State = TState,
 >(
-  config: StateCreator<TState, [...Mps, ['temporal', Temporal<TState>]], Mcs>,
-) => StateCreator<TState, Mps, [['temporal', Temporal<TState>], ...Mcs]>;
+  config: StateCreator<TState, [...Mps, ['temporal', unknown]], Mcs>,
+  options?: ZundoOptions<TState, UState>,
+) => StateCreator<TState, Mps, [['temporal', Temporal<UState>], ...Mcs]>;
 
 declare module 'zustand' {
   interface StoreMutators<S, A> {
@@ -23,29 +25,37 @@ declare module 'zustand' {
 
 type ZundoImpl = <TState extends State>(
   config: PopArgument<StateCreator<TState, [], []>>,
+  options: ZundoOptions<TState>,
 ) => PopArgument<StateCreator<TState, [], []>>;
 
-const zundoImpl: ZundoImpl = (config) => (set, get, _store) => {
-  type TState = ReturnType<typeof config>;
-  type StoreAddition = Temporal<TState>;
+const zundoImpl: ZundoImpl =
+  (
+    config,
+    options = {
+      partialize: (state) => state,
+    },
+  ) =>
+  (set, get, _store) => {
+    type TState = ReturnType<typeof config>;
+    type StoreAddition = Temporal<TState>;
 
-  const temporalStore = createTemporalStore<TState>(set, get);
-  const { undo, redo, clear, pastStates, futureStates } =
-    temporalStore.getState();
+    const temporalStore = createTemporalStore<TState>(set, get, options);
+    const { undo, redo, clear, pastStates, futureStates } =
+      temporalStore.getState();
 
-  const store = _store as Mutate<
-    StoreApi<TState>,
-    [['temporal', StoreAddition]]
-  >;
-  store.temporal = { undo, redo, clear, pastStates, futureStates };
+    const store = _store as Mutate<
+      StoreApi<TState>,
+      [['temporal', StoreAddition]]
+    >;
+    store.temporal = { undo, redo, clear, pastStates, futureStates };
 
-  const modifiedSetter: typeof set = (state, replace) => {
-    pastStates.push(get());
-    set(state, replace);
+    const modifiedSetter: typeof set = (state, replace) => {
+      pastStates.push(options.partialize(get()));
+      set(state, replace);
+    };
+
+    return config(modifiedSetter, get, _store);
   };
-
-  return config(modifiedSetter, get, _store);
-};
 
 export const zundo = zundoImpl as unknown as Zundo;
 
@@ -55,6 +65,6 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never;
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U;
+export type Write<T extends object, U extends object> = Omit<T, keyof U> & U;
 
 type Cast<T, U> = T extends U ? T : U;

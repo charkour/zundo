@@ -16,18 +16,19 @@ describe('Temporal', () => {
       count: 0,
       increment: () =>
         set((state) => ({
-          count: state.count + 1
+          count: state.count + 1,
         })),
-      decrement: () =>   set((state) => ({
-        count: state.count - 1
-      })),
+      decrement: () =>
+        set((state) => ({
+          count: state.count - 1,
+        })),
     };
   });
 
-  it('should work', () => {
-    const temporalStore = createTemporalStore(store.setState, store.getState);
-    const { undo, redo, clear, pastStates, futureStates } =
-      temporalStore.getState();
+  const temporalStore = createTemporalStore(store.setState, store.getState);
+  const { undo, redo, clear, pastStates, futureStates } =
+    temporalStore.getState();
+  it('should have the objects defined', () => {
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
     expect(clear).toBeDefined();
@@ -39,9 +40,5 @@ describe('Temporal', () => {
       store.getState().increment();
     });
     expect(store.getState().count).toBe(1);
-  });
-
-  it('should work', () => {
-    expect(store.getState().count).toBe(0);
   });
 });

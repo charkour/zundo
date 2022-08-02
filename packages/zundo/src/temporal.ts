@@ -21,9 +21,16 @@ export type Temporal<TState extends State> = Pick<
   'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
 >;
 
+export interface ZundoOptions<State, TemporalState = State> {
+  partialize: (state: State) => TemporalState;
+}
+
 export const createTemporalStore = <TState extends State>(
   userSet: SetState<TState>,
   userGet: GetState<TState>,
+  { partialize }: ZundoOptions<TState> = {
+    partialize: (state) => state,
+  },
 ) => {
   return createVanilla<TemporalState<TState>>()(() => {
     const pastStates: TState[] = [];
@@ -36,7 +43,7 @@ export const createTemporalStore = <TState extends State>(
 
       const pastState = pastStates.pop();
       if (pastState) {
-        futureStates.push(userGet());
+        futureStates.push(partialize(userGet()));
         userSet(pastState);
       }
     };
@@ -48,7 +55,7 @@ export const createTemporalStore = <TState extends State>(
 
       const futureState = futureStates.pop();
       if (futureState) {
-        pastStates.push(userGet());
+        pastStates.push(partialize(userGet()));
         userSet(futureState);
       }
     };
