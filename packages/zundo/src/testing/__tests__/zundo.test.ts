@@ -63,7 +63,6 @@ describe('Zundo', () => {
     act(() => {
       undo();
     });
-    console.log(store.getState());
     expect(store.getState().count).toBe(0);
   });
 
@@ -142,11 +141,94 @@ describe('Zundo', () => {
       undo();
     });
     expect(pastStates.length).toBe(1);
-    expect(futureStates)
+    expect(futureStates);
     act(() => {
       clear();
     });
     expect(pastStates.length).toBe(0);
     expect(futureStates.length).toBe(0);
+  });
+
+  it('should undo multiple states', () => {
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    expect(pastStates.length).toBe(0);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(3);
+    act(() => {
+      undo(2);
+    });
+    expect(pastStates.length).toBe(1);
+    expect(store.getState().count).toBe(1);
+    act(() => {
+      undo();
+    });
+    expect(pastStates.length).toBe(0);
+    expect(store.getState().count).toBe(0);
+  });
+
+  it('should redo multiple states', () => {
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    expect(pastStates.length).toBe(0);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(3);
+    act(() => {
+      undo(2);
+    });
+    expect(pastStates.length).toBe(1);
+    expect(store.getState().count).toBe(1);
+    expect(futureStates.length).toBe(2);
+    act(() => {
+      redo(2);
+    });
+    expect(pastStates.length).toBe(3);
+    expect(store.getState().count).toBe(3);
+  });
+
+  it('properly tracks state values after clearing', () => {
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    expect(pastStates.length).toBe(0);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(3);
+    act(() => {
+      clear();
+    });
+    expect(pastStates.length).toBe(0);
+    expect(store.getState().count).toBe(3);
+    act(() => {
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(1);
+    expect(store.getState().count).toBe(4);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(4);
+    expect(store.getState().count).toBe(7);
+    act(() => {
+      undo(3);
+    });
+    expect(pastStates.length).toBe(1);
+    expect(store.getState().count).toBe(4);
+    expect(futureStates.length).toBe(3);
+    act(() => {
+      clear();
+    });
+    expect(pastStates.length).toBe(0);
+    expect(futureStates.length).toBe(0);
+    expect(store.getState().count).toBe(4);
   });
 });

@@ -25,7 +25,7 @@ describe('Temporal', () => {
     };
   });
 
-  const temporalStore = createTemporalStore(store.setState, store.getState);
+  const temporalStore = createTemporalStore(store.setState, store.getState, { partialize: (state) => (state) });
   const { undo, redo, clear, pastStates, futureStates } =
     temporalStore.getState();
   it('should have the objects defined', () => {
