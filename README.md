@@ -80,7 +80,13 @@ const useStoreWithUndo = create<StoreState>(
 ### Middleware Options
 
 ```tsx
-options: { exclude?: string[], include?: string[], allowUnchanged?: boolean, historyDepthLimit?: number }
+options: {
+  exclude?: string[],
+  include?: string[],
+  allowUnchanged?: boolean,
+  historyDepthLimit?: number,
+  coolOffDurationMs?: number,
+}
 ```
 
 #### **Exclude fields from being tracked in history**
