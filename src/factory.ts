@@ -1,26 +1,8 @@
 import createVanilla, { GetState } from 'zustand/vanilla';
-import { Options } from './types';
+import { UndoStoreState } from './types';
 import { filterState } from './utils';
 
 // use immer patches? https://immerjs.github.io/immer/patches/
-
-export interface UndoStoreState {
-  prevStates: any[];
-  futureStates: any[];
-  isUndoHistoryEnabled: boolean;
-
-  undo: () => void;
-  redo: () => void;
-  clear: () => void;
-  setIsUndoHistoryEnabled: (isEnabled: boolean) => void;
-  // handle on the parent store's setter
-  setStore: Function;
-  // handle on the parent store's getter
-  getStore: Function;
-  options?: Options;
-  coolOffTimer?: number;
-  isCoolingOff?: boolean;
-}
 
 const handleStoreUpdates = (
   get: GetState<UndoStoreState>,
