@@ -48,6 +48,7 @@
     "@storybook/addons": "6.4.8",
     "@storybook/react": "6.4.8",
     "@testing-library/react-hooks": "7.0.2",
+    "@types/jest": "^28.1.6",
     "@types/lodash.isequal": "4.5.5",
     "@types/react": "17.0.37",
     "@types/react-dom": "17.0.11",
