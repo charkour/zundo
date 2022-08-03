@@ -3,7 +3,7 @@ vi.mock('zustand/vanilla');
 import { Write, zundo } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
-import { Temporal } from '../../temporal';
+import { TemporalState } from '../../temporal';
 
 interface MyState {
   count: number;
@@ -16,9 +16,11 @@ describe('Middleware options', () => {
   let store: Write<
     StoreApi<MyState>,
     {
-      temporal: Temporal<{
-        count: number;
-      }>;
+      temporal: StoreApi<
+        TemporalState<{
+          count: number;
+        }>
+      >;
     }
   >;
   // Recreate store for each test
@@ -52,7 +54,8 @@ describe('Middleware options', () => {
 
   describe('partialize', () => {
     it('should partialize the past states', () => {
-      const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+      const { undo, redo, clear, pastStates, futureStates } =
+        store.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
       act(() => {
@@ -70,7 +73,8 @@ describe('Middleware options', () => {
     });
 
     it('should partialize the future states', () => {
-      const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+      const { undo, redo, clear, pastStates, futureStates } =
+        store.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
 
@@ -83,7 +87,12 @@ describe('Middleware options', () => {
       expect(futureStates[0]).toEqual({
         count: 2,
       });
-      expect(store.getState()).toEqual({ count: 1, count2: 2, increment: expect.any(Function), decrement: expect.any(Function) });
+      expect(store.getState()).toEqual({
+        count: 1,
+        count2: 2,
+        increment: expect.any(Function),
+        decrement: expect.any(Function),
+      });
       act(() => {
         undo();
       });
@@ -91,7 +100,54 @@ describe('Middleware options', () => {
       expect(futureStates[1]).toEqual({
         count: 1,
       });
-      expect(store.getState()).toEqual({ count: 0, count2: 2, increment: expect.any(Function), decrement: expect.any(Function) });
+      expect(store.getState()).toEqual({
+        count: 0,
+        count2: 2,
+        increment: expect.any(Function),
+        decrement: expect.any(Function),
+      });
+    });
+  });
+
+  describe('temporal state', () => {
+    it('should initialize state to tracking', () => {
+      const { state } = store.temporal.getState();
+      expect(state).toBe('tracking');
+    });
+
+    it('should switch to paused', () => {
+      const { pause } = store.temporal.getState();
+      act(() => {
+        pause();
+      });
+      expect(store.temporal.getState().state).toBe('paused');
+    });
+
+    it('should switch to tracking', () => {
+      const { resume, pause } = store.temporal.getState();
+      act(() => {
+        pause();
+        resume();
+      });
+      expect(store.temporal.getState().state).toBe('tracking');
+    });
+
+    it('does not track state when paused', () => {
+      const { pause, resume } = store.temporal.getState();
+      act(() => {
+        pause();
+        store.getState().increment();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(0);
+      act(() => {
+        resume();
+        store.getState().increment();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(1);
+      expect(store.temporal.getState().pastStates[0]).toEqual({
+        count: 1,
+      });
+      expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
   });
 });

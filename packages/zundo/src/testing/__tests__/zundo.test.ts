@@ -3,7 +3,7 @@ vi.mock('zustand/vanilla');
 import { Write, zundo } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
-import { Temporal } from '../../temporal';
+import { TemporalState } from '../../temporal';
 
 interface MyState {
   count: number;
@@ -15,7 +15,7 @@ describe('Zundo', () => {
   let store: Write<
     StoreApi<MyState>,
     {
-      temporal: Temporal<MyState>;
+      temporal: StoreApi<TemporalState<MyState>>;
     }
   >;
   // Recreate store for each test
@@ -38,7 +38,7 @@ describe('Zundo', () => {
   });
 
   it('should have the objects defined', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
     expect(clear).toBeDefined();
@@ -53,7 +53,7 @@ describe('Zundo', () => {
   });
 
   it('should undo', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(store.getState().count).toBe(0);
     act(() => {
       store.getState().increment();
@@ -67,7 +67,7 @@ describe('Zundo', () => {
   });
 
   it('should redo', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(store.getState().count).toBe(0);
     act(() => {
       store.getState().increment();
@@ -85,7 +85,7 @@ describe('Zundo', () => {
   });
 
   it('should update pastStates', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -106,7 +106,7 @@ describe('Zundo', () => {
   });
 
   it('should update futureStates', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(futureStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -127,7 +127,7 @@ describe('Zundo', () => {
   });
 
   it('should clear', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -150,7 +150,7 @@ describe('Zundo', () => {
   });
 
   it('should undo multiple states', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -171,7 +171,7 @@ describe('Zundo', () => {
   });
 
   it('should redo multiple states', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -193,7 +193,7 @@ describe('Zundo', () => {
   });
 
   it('properly tracks state values after clearing', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal;
+    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();

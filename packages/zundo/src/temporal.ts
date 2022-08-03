@@ -1,20 +1,17 @@
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 
-interface TemporalState<TState extends object> {
+export interface TemporalState<TState extends object> {
   pastStates: TState[];
   futureStates: TState[];
 
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
   clear: () => void;
+
+  state: 'paused' | 'tracking';
+  pause: () => void;
+  resume: () => void;
 }
-
-type TemporalStore<TState extends object> = StoreApi<TemporalState<TState>>;
-
-export type Temporal<TState extends object> = Pick<
-  ReturnType<TemporalStore<TState>['getState']>,
-  'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
->;
 
 export interface ZundoOptions<State, TemporalState = State> {
   partialize: (state: State) => TemporalState;
@@ -25,7 +22,7 @@ export const createTemporalStore = <TState extends object>(
   userGet: StoreApi<TState>['getState'],
   { partialize }: ZundoOptions<TState>,
 ) => {
-  return createVanilla<TemporalState<TState>>()(() => {
+  return createVanilla<TemporalState<TState>>()((set, get) => {
     const pastStates: TState[] = [];
     const futureStates: TState[] = [];
 
@@ -66,12 +63,25 @@ export const createTemporalStore = <TState extends object>(
       futureStates.length = 0;
     };
 
+    const state = 'tracking';
+
+    const pause = () => {
+      set({ state: 'paused' });
+    };
+
+    const resume = () => {
+      set({ state: 'tracking' });
+    };
+
     return {
       pastStates,
       futureStates,
       undo,
       redo,
       clear,
+      state,
+      pause,
+      resume,
     };
   });
 };

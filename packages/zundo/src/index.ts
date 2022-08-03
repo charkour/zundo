@@ -4,7 +4,7 @@ import {
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createTemporalStore, Temporal, ZundoOptions } from './temporal';
+import { createTemporalStore, TemporalState, ZundoOptions } from './temporal';
 
 type Zundo = <
   TState extends object,
@@ -14,7 +14,11 @@ type Zundo = <
 >(
   config: StateCreator<TState, [...Mps, ['temporal', unknown]], Mcs>,
   options?: ZundoOptions<TState, UState>,
-) => StateCreator<TState, Mps, [['temporal', Temporal<UState>], ...Mcs]>;
+) => StateCreator<
+  TState,
+  Mps,
+  [['temporal', StoreApi<TemporalState<UState>>], ...Mcs]
+>;
 
 declare module 'zustand' {
   interface StoreMutators<S, A> {
@@ -36,20 +40,20 @@ const zundoImpl: ZundoImpl =
   ) =>
   (set, get, _store) => {
     type TState = ReturnType<typeof config>;
-    type StoreAddition = Temporal<TState>;
+    type StoreAddition = StoreApi<TemporalState<TState>>;
 
     const temporalStore = createTemporalStore<TState>(set, get, options);
-    const { undo, redo, clear, pastStates, futureStates } =
-      temporalStore.getState();
+    const { getState } = temporalStore;
 
     const store = _store as Mutate<
       StoreApi<TState>,
       [['temporal', StoreAddition]]
     >;
-    store.temporal = { undo, redo, clear, pastStates, futureStates };
+    store.temporal = temporalStore;
 
     const modifiedSetter: typeof set = (state, replace) => {
-      pastStates.push(options.partialize(get()));
+      getState().state === 'tracking' &&
+        getState().pastStates.push(options.partialize(get()));
       set(state, replace);
     };
 
