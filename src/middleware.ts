@@ -1,4 +1,4 @@
-import { GetState, SetState, StateCreator, StoreApi } from 'zustand/vanilla';
+import { StateCreator, StoreApi } from 'zustand/vanilla';
 import isEqual from 'lodash.isequal';
 import { createUndoStore, UndoStoreState } from './factory';
 import { filterState } from './utils';
@@ -16,12 +16,17 @@ export type UndoState = Partial<
 // custom zustand middleware to get previous state
 export const undoMiddleware =
   <TState extends UndoState>(config: StateCreator<TState>, options?: Options) =>
-  (set: SetState<TState>, get: GetState<TState>, api: StoreApi<TState>) => {
+  (
+    set: StoreApi<TState>['setState'],
+    get: StoreApi<TState>['getState'],
+    api: StoreApi<TState>,
+    $$storeMutations: any,
+  ) => {
     const undoStore = createUndoStore();
     const { getState, setState } = undoStore;
 
     return config(
-      (args) => {
+      (args: any) => {
         /* TODO: const, should call this function and inject the values once, but it does
       it on every action call currently. */
         const {
@@ -40,7 +45,7 @@ export const undoMiddleware =
           redo,
           getState,
           setIsUndoHistoryEnabled,
-        });
+        } as TState);
 
         // Get the last state before updating state
         const lastState = filterState({ ...get() }, options);
@@ -90,6 +95,7 @@ export const undoMiddleware =
       },
       get,
       api,
+      $$storeMutations,
     );
   };
 
