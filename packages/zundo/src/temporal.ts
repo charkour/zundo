@@ -1,8 +1,4 @@
-import createVanilla, {
-  GetState,
-  StoreApi,
-  SetState,
-} from 'zustand/vanilla';
+import createVanilla, { StoreApi } from 'zustand/vanilla';
 
 interface TemporalState<TState extends object> {
   pastStates: TState[];
@@ -25,8 +21,8 @@ export interface ZundoOptions<State, TemporalState = State> {
 }
 
 export const createTemporalStore = <TState extends object>(
-  userSet: SetState<TState>,
-  userGet: GetState<TState>,
+  userSet: StoreApi<TState>['setState'],
+  userGet: StoreApi<TState>['getState'],
   { partialize }: ZundoOptions<TState>,
 ) => {
   return createVanilla<TemporalState<TState>>()(() => {
