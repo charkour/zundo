@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Meta, Story } from '@storybook/react';
-import create, { UndoState, UseStore } from '../src';
+import { StoreApi, UseBoundStore } from 'zustand';
+import create, { UndoState } from '../src';
 
 const meta: Meta = {
   title: 'multiple undo stores',
@@ -43,7 +44,7 @@ const useStoreWithUndo2 = create<StoreState>((set) => ({
 }));
 
 interface SectionProps {
-  useStore: UseStore<StoreState>;
+  useStore: UseBoundStore<StoreApi<StoreState>>;
 }
 
 const Section = ({ useStore }: SectionProps) => {
