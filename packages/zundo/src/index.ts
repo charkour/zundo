@@ -1,5 +1,4 @@
 import {
-  State,
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
@@ -8,10 +7,10 @@ import {
 import { createTemporalStore, Temporal, ZundoOptions } from './temporal';
 
 type Zundo = <
-  TState extends State,
+  TState extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  UState extends State = TState,
+  UState extends object = TState,
 >(
   config: StateCreator<TState, [...Mps, ['temporal', unknown]], Mcs>,
   options?: ZundoOptions<TState, UState>,
@@ -23,7 +22,7 @@ declare module 'zustand' {
   }
 }
 
-type ZundoImpl = <TState extends State>(
+type ZundoImpl = <TState extends object>(
   config: PopArgument<StateCreator<TState, [], []>>,
   options: ZundoOptions<TState>,
 ) => PopArgument<StateCreator<TState, [], []>>;

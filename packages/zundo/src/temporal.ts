@@ -1,11 +1,10 @@
 import createVanilla, {
   GetState,
-  State,
   StoreApi,
   SetState,
 } from 'zustand/vanilla';
 
-interface TemporalState<TState extends State> extends State {
+interface TemporalState<TState extends object> {
   pastStates: TState[];
   futureStates: TState[];
 
@@ -14,9 +13,9 @@ interface TemporalState<TState extends State> extends State {
   clear: () => void;
 }
 
-type TemporalStore<TState extends State> = StoreApi<TemporalState<TState>>;
+type TemporalStore<TState extends object> = StoreApi<TemporalState<TState>>;
 
-export type Temporal<TState extends State> = Pick<
+export type Temporal<TState extends object> = Pick<
   ReturnType<TemporalStore<TState>['getState']>,
   'undo' | 'redo' | 'clear' | 'pastStates' | 'futureStates'
 >;
@@ -25,7 +24,7 @@ export interface ZundoOptions<State, TemporalState = State> {
   partialize: (state: State) => TemporalState;
 }
 
-export const createTemporalStore = <TState extends State>(
+export const createTemporalStore = <TState extends object>(
   userSet: SetState<TState>,
   userGet: GetState<TState>,
   { partialize }: ZundoOptions<TState>,
@@ -46,7 +45,6 @@ export const createTemporalStore = <TState extends State>(
       if (pastState) {
         futureStates.push(partialize(userGet()));
         userSet(pastState);
-        // TODO: call set?
       }
       futureStates.push(...skippedPastStates);
     };
@@ -63,7 +61,6 @@ export const createTemporalStore = <TState extends State>(
       if (futureState) {
         pastStates.push(partialize(userGet()));
         userSet(futureState);
-        // TODO: call set?
       }
       pastStates.push(...skippedFutureStates);
     };
@@ -71,7 +68,6 @@ export const createTemporalStore = <TState extends State>(
     const clear = () => {
       pastStates.length = 0;
       futureStates.length = 0;
-      // TODO: call set?
     };
 
     return {
