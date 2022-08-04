@@ -34,16 +34,16 @@ export type UndoMiddleware = <
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
-  initializer: StateCreator<T, [...Mps, ['zundo', never]], Mcs>,
+  initializer: StateCreator<T, [...Mps, ['temporal', never]], Mcs>,
   options?: A,
-) => StateCreator<T, Mps, [['zundo', never], ...Mcs]>;
+) => StateCreator<T, Mps, [['temporal', never], ...Mcs]>;
 
 type WithUndo<S> = Write<Cast<S, object>, StoreUndo>;
 
 declare module 'zustand/vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface StoreMutators<S, A> {
-    zundo: WithUndo<S>;
+    temporal: WithUndo<S>;
   }
 }
 

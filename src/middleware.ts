@@ -19,9 +19,9 @@ const undoMiddlewareImpl: UndoMiddlewareImpl =
 
     const { undo, redo, clear, setIsUndoHistoryEnabled } = getState();
 
-    const store = _store as Mutate<StoreApi<T>, [['zundo', UndoState]]>;
+    const store = _store as Mutate<StoreApi<T>, [['temporal', UndoState]]>;
 
-    store.zundo = {
+    store.temporal = {
       undo,
       redo,
       clear,
@@ -30,12 +30,13 @@ const undoMiddlewareImpl: UndoMiddlewareImpl =
     };
 
     return f(
-      (args: any) => {
+      (...args: any) => {
         const { isUndoHistoryEnabled, isCoolingOff, coolOffTimer } = getState();
         // Get the last state before updating state
         const lastState = filterState({ ...get() }, options);
 
-        set(args);
+        // @ts-ignore
+        set(...args);
 
         // Get the current state after updating state
         const currState = filterState({ ...get() }, options);

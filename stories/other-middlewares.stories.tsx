@@ -4,7 +4,7 @@ import create from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-import { undoMiddleware, UndoState } from '../src';
+import { undoMiddleware } from '../src';
 
 const meta: Meta = {
   title: 'Other Middlewares',
@@ -22,7 +22,7 @@ const meta: Meta = {
 
 export default meta;
 
-export interface StoreState extends UndoState {
+export interface StoreState {
   bears: number;
   increasePopulation: () => void;
 }
@@ -47,7 +47,7 @@ const App = () => {
   const { increasePopulation, bears } = useStore();
 
   const { undo, redo, clear, setIsUndoHistoryEnabled, getState } =
-    useStore.zundo;
+    useStore.temporal;
 
   return (
     <div>
