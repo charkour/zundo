@@ -25,7 +25,7 @@ export type UndoState = Pick<
 };
 
 type StoreUndo = {
-  zundo: UndoState;
+  temporal: UndoState;
 };
 
 export type UndoMiddleware = <
