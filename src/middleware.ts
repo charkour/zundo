@@ -1,3 +1,4 @@
+// @ts-nocheck 
 import { Mutate, StoreApi } from 'zustand';
 import isEqual from 'lodash.isequal';
 import { createUndoStore } from './factory';
