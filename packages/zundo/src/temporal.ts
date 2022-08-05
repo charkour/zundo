@@ -16,6 +16,7 @@ export interface TemporalState<TState extends object> {
 export interface ZundoOptions<State, TemporalState = State> {
   partialize?: (state: State) => TemporalState;
   limit?: number;
+  equality?: (a: State, b: State) => boolean;
 }
 
 export const createTemporalStore = <TState extends object>(

@@ -35,9 +35,10 @@ type ZundoImpl = <TState extends object>(
 const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   const options = {
     partialize: (state: TState) => state,
+    equality: (a: TState, b: TState) => false,
     ...baseOptions,
   };
-  const { partialize, limit } = options;
+  const { partialize, limit, equality } = options;
 
   type TState = ReturnType<typeof config>;
   type StoreAddition = StoreApi<TemporalState<TState>>;
@@ -53,14 +54,16 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
 
   const modifiedSetter: typeof set = (state, replace) => {
     const { state: trackingState, pastStates, futureStates } = getState();
-    if (trackingState === 'tracking') {
+    const pastState = partialize(get());
+    set(state, replace);
+    const currentState = partialize(get());
+    if (trackingState === 'tracking' && !equality(currentState, pastState)) {
       if (limit && pastStates.length >= limit) {
         pastStates.shift();
       }
-      pastStates.push(partialize(get()));
+      pastStates.push(pastState);
       futureStates.length = 0;
     }
-    set(state, replace);
   };
 
   return config(modifiedSetter, get, _store);

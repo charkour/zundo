@@ -4,12 +4,14 @@ import { Write, zundo } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import { TemporalState, ZundoOptions } from '../../temporal';
+import shallow from 'zustand/shallow';
 
 interface MyState {
   count: number;
   count2: number;
   increment: () => void;
   decrement: () => void;
+  doNothing: () => void;
 }
 
 const createStore = (
@@ -30,6 +32,7 @@ const createStore = (
             count: state.count - 1,
             count2: state.count2 - 1,
           })),
+        doNothing: () => set((state) => ({ ...state })),
       };
     }, options),
   );
@@ -67,12 +70,14 @@ describe('Middleware options', () => {
         count2: 0,
         increment: expect.any(Function),
         decrement: expect.any(Function),
+        doNothing: expect.any(Function),
       });
       expect(pastStates[1]).toEqual({
         count: 1,
         count2: 1,
         increment: expect.any(Function),
         decrement: expect.any(Function),
+        doNothing: expect.any(Function),
       });
       expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
@@ -126,6 +131,7 @@ describe('Middleware options', () => {
         count2: 2,
         increment: expect.any(Function),
         decrement: expect.any(Function),
+        doNothing: expect.any(Function),
       });
       act(() => {
         undo();
@@ -139,6 +145,7 @@ describe('Middleware options', () => {
         count2: 2,
         increment: expect.any(Function),
         decrement: expect.any(Function),
+        doNothing: expect.any(Function),
       });
     });
   });
@@ -216,7 +223,6 @@ describe('Middleware options', () => {
         increment();
         increment();
       });
-      console.log(storeWithLimit.temporal.getState().pastStates.length);
       expect(storeWithLimit.temporal.getState().pastStates.length).toBe(3);
       expect(storeWithLimit.temporal.getState().pastStates[0]).toContain({
         count: 2,
@@ -225,5 +231,70 @@ describe('Middleware options', () => {
         count: 4,
       });
     });
+  });
+
+  describe('equality function', () => {
+    it('should use the equality function when set', () => {
+      const storeWithEquality = createStore({
+        equality: (state1, state2) => state1.count === state2.count,
+      });
+      const { doNothing, increment } = storeWithEquality.getState();
+      act(() => {
+        doNothing();
+        doNothing();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(0);
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(1);
+      act(() => {
+        doNothing();
+        increment();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(2);
+    });
+
+    it('should use an external equality function', () => {
+      const storeWithEquality = createStore({
+        equality: shallow,
+      });
+      const { doNothing, increment } = storeWithEquality.getState();
+      act(() => {
+        doNothing();
+        doNothing();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(0);
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(1);
+      act(() => {
+        doNothing();
+        increment();
+      });
+      expect(storeWithEquality.temporal.getState().pastStates.length).toBe(2);
+    });
+
+    it('should not prevent history if there is no equality function', () => {
+      const { doNothing, increment } = store.getState();
+      act(() => {
+        doNothing();
+        doNothing();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(4);
+      act(() => {
+        doNothing();
+        increment();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(6);
+    })
   });
 });
