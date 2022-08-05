@@ -21,7 +21,7 @@ const useStore = create(originalStore);
 
 export default function Web() {
   const { count, increment, decrement } = useStore();
-  const { undo, futureStates, pastStates } = useStore.temporal;
+  const { undo, futureStates, pastStates } = useStore.temporal.getState();
 
   return (
     <div>
@@ -32,10 +32,10 @@ export default function Web() {
         <span>{count}</span>
         <div>
           <h2>Future States</h2>
-          {JSON.stringify(futureStates)}
+          <div>{JSON.stringify(futureStates)}</div>
           <h2>Previous States</h2>
-          {JSON.stringify(pastStates)}
-          <button onClick={undo}>Undo</button>
+          <div>{JSON.stringify(pastStates)}</div>
+          <button onClick={() => undo()}>Undo</button>
         </div>
       </div>
       <Button />
