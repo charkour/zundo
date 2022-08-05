@@ -12,32 +12,26 @@ interface MyState {
   decrement: () => void;
 }
 
-const createStore = (options?: ZundoOptions<MyState>) => {
+const createStore = (
+  options?: ZundoOptions<MyState, Pick<MyState, 'count'>>,
+) => {
   return createVanilla<MyState>()(
-    zundo(
-      (set) => {
-        return {
-          count: 0,
-          count2: 0,
-          increment: () =>
-            set((state) => ({
-              count: state.count + 1,
-              count2: state.count2 + 1,
-            })),
-          decrement: () =>
-            set((state) => ({
-              count: state.count - 1,
-              count2: state.count2 - 1,
-            })),
-        };
-      },
-      {
-        partialize: (state) => ({
-          count: state.count,
-        }),
-        ...options,
-      },
-    ),
+    zundo((set) => {
+      return {
+        count: 0,
+        count2: 0,
+        increment: () =>
+          set((state) => ({
+            count: state.count + 1,
+            count2: state.count2 + 1,
+          })),
+        decrement: () =>
+          set((state) => ({
+            count: state.count - 1,
+            count2: state.count2 - 1,
+          })),
+      };
+    }, options),
   );
 };
 
@@ -58,7 +52,7 @@ describe('Middleware options', () => {
   });
 
   describe('partialize', () => {
-    it('should partialize the past states', () => {
+    it('should not partialize by default', () => {
       const { undo, redo, clear, pastStates, futureStates } =
         store.temporal.getState();
       expect(pastStates.length).toBe(0);
@@ -70,29 +64,64 @@ describe('Middleware options', () => {
       expect(pastStates.length).toBe(2);
       expect(pastStates[0]).toEqual({
         count: 0,
+        count2: 0,
+        increment: expect.any(Function),
+        decrement: expect.any(Function),
       });
       expect(pastStates[1]).toEqual({
         count: 1,
+        count2: 1,
+        increment: expect.any(Function),
+        decrement: expect.any(Function),
       });
       expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
 
-    it('should partialize the future states', () => {
+    it('should partialize the past states', () => {
+      const storeWithPartialize = createStore({
+        partialize: (state) => ({
+          count: state.count,
+        }),
+      });
       const { undo, redo, clear, pastStates, futureStates } =
-        store.temporal.getState();
+        storeWithPartialize.temporal.getState();
+      expect(pastStates.length).toBe(0);
+      expect(futureStates.length).toBe(0);
+      act(() => {
+        storeWithPartialize.getState().increment();
+        storeWithPartialize.getState().increment();
+      });
+      expect(pastStates.length).toBe(2);
+      expect(pastStates[0]).toEqual({
+        count: 0,
+      });
+      expect(pastStates[1]).toEqual({
+        count: 1,
+      });
+      expect(storeWithPartialize.getState()).toContain({ count: 2, count2: 2 });
+    });
+
+    it('should partialize the future states', () => {
+      const storeWithPartialize = createStore({
+        partialize: (state) => ({
+          count: state.count,
+        }),
+      });
+      const { undo, redo, clear, pastStates, futureStates } =
+        storeWithPartialize.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
 
       act(() => {
-        store.getState().increment();
-        store.getState().increment();
+        storeWithPartialize.getState().increment();
+        storeWithPartialize.getState().increment();
         undo();
       });
       expect(futureStates.length).toBe(1);
       expect(futureStates[0]).toEqual({
         count: 2,
       });
-      expect(store.getState()).toEqual({
+      expect(storeWithPartialize.getState()).toEqual({
         count: 1,
         count2: 2,
         increment: expect.any(Function),
@@ -105,7 +134,7 @@ describe('Middleware options', () => {
       expect(futureStates[1]).toEqual({
         count: 1,
       });
-      expect(store.getState()).toEqual({
+      expect(storeWithPartialize.getState()).toEqual({
         count: 0,
         count2: 2,
         increment: expect.any(Function),
@@ -144,13 +173,15 @@ describe('Middleware options', () => {
         store.getState().increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(0);
+      expect(store.getState()).toContain({ count: 1, count2: 1 });
       act(() => {
         resume();
         store.getState().increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.temporal.getState().pastStates[0]).toEqual({
+      expect(store.temporal.getState().pastStates[0]).toContain({
         count: 1,
+        count2: 1,
       });
       expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
@@ -167,10 +198,10 @@ describe('Middleware options', () => {
         increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(5);
-      expect(store.temporal.getState().pastStates[0]).toEqual({
+      expect(store.temporal.getState().pastStates[0]).toContain({
         count: 0,
       });
-      expect(store.temporal.getState().pastStates[2]).toEqual({
+      expect(store.temporal.getState().pastStates[2]).toContain({
         count: 2,
       });
     });
@@ -187,10 +218,10 @@ describe('Middleware options', () => {
       });
       console.log(storeWithLimit.temporal.getState().pastStates.length);
       expect(storeWithLimit.temporal.getState().pastStates.length).toBe(3);
-      expect(storeWithLimit.temporal.getState().pastStates[0]).toEqual({
+      expect(storeWithLimit.temporal.getState().pastStates[0]).toContain({
         count: 2,
       });
-      expect(storeWithLimit.temporal.getState().pastStates[2]).toEqual({
+      expect(storeWithLimit.temporal.getState().pastStates[2]).toContain({
         count: 4,
       });
     });
