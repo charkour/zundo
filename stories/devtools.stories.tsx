@@ -1,10 +1,11 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import create from 'zustand';
-import { undoMiddleware, UndoState } from '../src';
+import { devtools } from 'zustand/middleware';
+import { undoMiddleware } from '../src';
 
 const meta: Meta = {
-  title: 'allow unchanged',
+  title: 'devtools',
   argTypes: {
     children: {
       control: {
@@ -19,7 +20,7 @@ const meta: Meta = {
 
 export default meta;
 
-interface StoreState extends UndoState {
+export interface StoreState {
   bears: number;
   ignored: number;
   increasePopulation: () => void;
@@ -29,25 +30,36 @@ interface StoreState extends UndoState {
 }
 
 // create a store with undo middleware
-const useStore = create<StoreState>(
-  undoMiddleware(
-    (set) => ({
-      bears: 0,
-      ignored: 0,
-      increasePopulation: () =>
-        set((state) => ({
-          bears: state.bears + 1,
-          ignored: state.ignored + 1,
-        })),
-      decreasePopulation: () =>
-        set((state) => ({
-          bears: state.bears - 1,
-          ignored: state.ignored - 1,
-        })),
-      doNothing: () => set((state) => ({ ...state })),
-      removeAllBears: () => set({ bears: 0 }),
-    }),
-    { exclude: ['ignored'], allowUnchanged: true },
+const useStore = create<StoreState>()(
+  devtools(
+    undoMiddleware(
+      (set) => ({
+        bears: 0,
+        ignored: 0,
+        increasePopulation: () =>
+          set(
+            (state) => ({
+              bears: state.bears + 1,
+              ignored: state.ignored + 1,
+            }),
+            false,
+            'increasePopulation',
+          ),
+        decreasePopulation: () =>
+          set(
+            (state) => ({
+              bears: state.bears - 1,
+              ignored: state.ignored - 1,
+            }),
+            false,
+            'decreasePopulation',
+          ),
+        doNothing: () => set((state) => ({ ...state })),
+        removeAllBears: () => set({ bears: 0 }),
+      }),
+      { exclude: ['ignored'], historyDepthLimit: 10 },
+    ),
+    { name: 'Zundo Example' },
   ),
 );
 
@@ -59,23 +71,21 @@ const App = () => {
     increasePopulation,
     removeAllBears,
     decreasePopulation,
-    undo,
-    clear,
-    redo,
-    getState,
     doNothing,
   } = store;
 
+  const { undo, redo, clear, setIsUndoHistoryEnabled, getState } =
+  useStore.temporal;
+
   return (
     <div>
-      <h1>🐻 ♻️ Zundo! (allow unchanged state option)</h1>
-      previous states: {JSON.stringify(getState && getState().prevStates)}
+      <h1>🐻 ♻️ Zundo!</h1>
+      previous states: {JSON.stringify(getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
-      future states: {JSON.stringify(getState && getState().futureStates)}
+      future states: {JSON.stringify(getState().futureStates)}
       <br />
       current state: {JSON.stringify(store)}
-      <br />
       <br />
       bears: {bears}
       <br />
@@ -83,6 +93,16 @@ const App = () => {
       <br />
       <button type="button" onClick={increasePopulation}>
         increase
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          increasePopulation();
+          increasePopulation();
+          increasePopulation();
+        }}
+      >
+        increase +3
       </button>
       <button type="button" onClick={decreasePopulation}>
         decrease
@@ -100,6 +120,23 @@ const App = () => {
       <br />
       <button type="button" onClick={clear}>
         clear
+      </button>
+      <br />
+      <button
+        type="button"
+        onClick={() => {
+          setIsUndoHistoryEnabled(false);
+        }}
+      >
+        Disable History
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setIsUndoHistoryEnabled(true);
+        }}
+      >
+        Enable History
       </button>
       <br />
       <button type="button" onClick={doNothing}>

@@ -1,56 +1,43 @@
-import { StateCreator, StoreApi } from 'zustand/vanilla';
+// @ts-nocheck 
+import { Mutate, StoreApi } from 'zustand';
 import isEqual from 'lodash.isequal';
-import { createUndoStore, UndoStoreState } from './factory';
+import { createUndoStore } from './factory';
 import { filterState } from './utils';
-import { Options } from './types';
-
-export type UndoState = Partial<
-  Pick<
-    UndoStoreState,
-    'undo' | 'redo' | 'clear' | 'setIsUndoHistoryEnabled'
-  > & {
-    getState: () => UndoStoreState;
-  }
->;
+import {
+  Options,
+  UndoMiddleware,
+  UndoMiddlewareImpl,
+  UndoState,
+} from './types';
 
 // custom zustand middleware to get previous state
-export const undoMiddleware =
-  <TState extends UndoState>(config: StateCreator<TState>, options?: Options) =>
-  (
-    set: StoreApi<TState>['setState'],
-    get: StoreApi<TState>['getState'],
-    api: StoreApi<TState>,
-    $$storeMutations: any,
-  ) => {
+const undoMiddlewareImpl: UndoMiddlewareImpl =
+  (f, options?: Options) => (set, get, _store) => {
+    type T = ReturnType<typeof f>;
+
     const undoStore = createUndoStore();
     const { getState, setState } = undoStore;
 
-    return config(
-      (args: any) => {
-        /* TODO: const, should call this function and inject the values once, but it does
-      it on every action call currently. */
-        const {
-          undo,
-          clear,
-          redo,
-          setIsUndoHistoryEnabled,
-          isUndoHistoryEnabled,
-          isCoolingOff,
-          coolOffTimer,
-        } = getState();
-        // inject helper functions to user defined store.
-        set({
-          undo,
-          clear,
-          redo,
-          getState,
-          setIsUndoHistoryEnabled,
-        } as TState);
+    const { undo, redo, clear, setIsUndoHistoryEnabled } = getState();
 
+    const store = _store as Mutate<StoreApi<T>, [['temporal', UndoState]]>;
+
+    store.temporal = {
+      undo,
+      redo,
+      clear,
+      setIsUndoHistoryEnabled,
+      getState,
+    };
+
+    return f(
+      (...args: any) => {
+        const { isUndoHistoryEnabled, isCoolingOff, coolOffTimer } = getState();
         // Get the last state before updating state
         const lastState = filterState({ ...get() }, options);
 
-        set(args);
+        // @ts-ignore
+        set(...args);
 
         // Get the current state after updating state
         const currState = filterState({ ...get() }, options);
@@ -94,9 +81,10 @@ export const undoMiddleware =
         }
       },
       get,
-      api,
-      $$storeMutations,
+      _store,
     );
   };
+
+export const undoMiddleware = undoMiddlewareImpl as unknown as UndoMiddleware;
 
 export default undoMiddleware;

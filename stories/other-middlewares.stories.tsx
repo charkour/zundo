@@ -1,10 +1,13 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import create from 'zustand';
-import { undoMiddleware, UndoState } from '../src';
+import { subscribeWithSelector } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+
+import { undoMiddleware } from '../src';
 
 const meta: Meta = {
-  title: 'bears',
+  title: 'Other Middlewares',
   argTypes: {
     children: {
       control: {
@@ -19,67 +22,42 @@ const meta: Meta = {
 
 export default meta;
 
-export interface StoreState extends UndoState {
+export interface StoreState {
   bears: number;
-  ignored: number;
   increasePopulation: () => void;
-  removeAllBears: () => void;
-  decreasePopulation: () => void;
-  doNothing: () => void;
 }
 
 // create a store with undo middleware
-export const useStore = create<StoreState>(
-  undoMiddleware(
-    (set) => ({
-      bears: 0,
-      ignored: 0,
-      increasePopulation: () =>
-        set((state) => ({
-          bears: state.bears + 1,
-          ignored: state.ignored + 1,
-        })),
-      decreasePopulation: () =>
-        set((state) => ({
-          bears: state.bears - 1,
-          ignored: state.ignored - 1,
-        })),
-      doNothing: () => set((state) => ({ ...state })),
-      removeAllBears: () => set({ bears: 0 }),
-    }),
-    { exclude: ['ignored'], historyDepthLimit: 10 },
+const useStore = create<StoreState>()(
+  subscribeWithSelector(
+    undoMiddleware(
+      immer((set) => ({
+        bears: 0,
+        increasePopulation: () =>
+          set((state) => {
+            // eslint-disable-next-line no-param-reassign
+            state.bears += 1;
+          }),
+      })),
+    ),
   ),
 );
 
 const App = () => {
-  const store = useStore();
-  const {
-    bears,
-    ignored,
-    increasePopulation,
-    removeAllBears,
-    decreasePopulation,
-    undo,
-    clear,
-    redo,
-    setIsUndoHistoryEnabled,
-    getState,
-    doNothing,
-  } = store;
+  const { increasePopulation, bears } = useStore();
+
+  const { undo, redo, clear, setIsUndoHistoryEnabled, getState } =
+    useStore.temporal;
 
   return (
     <div>
       <h1>🐻 ♻️ Zundo!</h1>
-      previous states: {JSON.stringify(getState && getState().prevStates)}
+      previous states: {JSON.stringify(getState().prevStates)}
       <br />
       {/* TODO: make the debug testing better */}
-      future states: {JSON.stringify(getState && getState().futureStates)}
-      <br />
-      current state: {JSON.stringify(store)}
+      future states: {JSON.stringify(getState().futureStates)}
       <br />
       bears: {bears}
-      <br />
-      ignored: {ignored}
       <br />
       <button type="button" onClick={increasePopulation}>
         increase
@@ -93,12 +71,6 @@ const App = () => {
         }}
       >
         increase +3
-      </button>
-      <button type="button" onClick={decreasePopulation}>
-        decrease
-      </button>
-      <button type="button" onClick={removeAllBears}>
-        remove
       </button>
       <br />
       <button type="button" onClick={undo}>
@@ -115,7 +87,7 @@ const App = () => {
       <button
         type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled?.(false);
+          setIsUndoHistoryEnabled(false);
         }}
       >
         Disable History
@@ -123,14 +95,10 @@ const App = () => {
       <button
         type="button"
         onClick={() => {
-          setIsUndoHistoryEnabled?.(true);
+          setIsUndoHistoryEnabled(true);
         }}
       >
         Enable History
-      </button>
-      <br />
-      <button type="button" onClick={doNothing}>
-        do nothing
       </button>
     </div>
   );
