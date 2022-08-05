@@ -14,14 +14,20 @@ export interface TemporalState<TState extends object> {
 }
 
 export interface ZundoOptions<State, TemporalState = State> {
-  partialize: (state: State) => TemporalState;
+  partialize?: (state: State) => TemporalState;
+  limit?: number;
 }
 
 export const createTemporalStore = <TState extends object>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  { partialize }: ZundoOptions<TState>,
+  baseOptions?: ZundoOptions<TState>,
 ) => {
+  const options = {
+    partialize: (state: TState) => state,
+    ...baseOptions
+  };
+  const { partialize } = options;
   return createVanilla<TemporalState<TState>>()((set, get) => {
     const pastStates: TState[] = [];
     const futureStates: TState[] = [];

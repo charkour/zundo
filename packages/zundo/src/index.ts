@@ -5,6 +5,7 @@ import {
   StoreApi,
 } from 'zustand';
 import { createTemporalStore, TemporalState, ZundoOptions } from './temporal';
+export type { ZundoOptions, TemporalState } from './temporal';
 
 type Zundo = <
   TState extends object,
@@ -31,34 +32,39 @@ type ZundoImpl = <TState extends object>(
   options: ZundoOptions<TState>,
 ) => PopArgument<StateCreator<TState, [], []>>;
 
-const zundoImpl: ZundoImpl =
-  (
-    config,
-    options = {
-      partialize: (state) => state,
-    },
-  ) =>
-  (set, get, _store) => {
-    type TState = ReturnType<typeof config>;
-    type StoreAddition = StoreApi<TemporalState<TState>>;
-
-    const temporalStore = createTemporalStore<TState>(set, get, options);
-    const { getState } = temporalStore;
-
-    const store = _store as Mutate<
-      StoreApi<TState>,
-      [['temporal', StoreAddition]]
-    >;
-    store.temporal = temporalStore;
-
-    const modifiedSetter: typeof set = (state, replace) => {
-      getState().state === 'tracking' &&
-        getState().pastStates.push(options.partialize(get()));
-      set(state, replace);
-    };
-
-    return config(modifiedSetter, get, _store);
+const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
+  const options = {
+    partialize: (state: TState) => state,
+    ...baseOptions,
   };
+  const { partialize, limit } = options;
+
+  type TState = ReturnType<typeof config>;
+  type StoreAddition = StoreApi<TemporalState<TState>>;
+
+  const temporalStore = createTemporalStore<TState>(set, get, options);
+  const { getState, setState } = temporalStore;
+
+  const store = _store as Mutate<
+    StoreApi<TState>,
+    [['temporal', StoreAddition]]
+  >;
+  store.temporal = temporalStore;
+
+  const modifiedSetter: typeof set = (state, replace) => {
+    const { state: trackingState, pastStates, futureStates } = getState();
+    if (trackingState === 'tracking') {
+      if (limit && pastStates.length >= limit) {
+        pastStates.shift();
+      }
+      pastStates.push(partialize(get()));
+      futureStates.length = 0;
+    }
+    set(state, replace);
+  };
+
+  return config(modifiedSetter, get, _store);
+};
 
 export const zundo = zundoImpl as unknown as Zundo;
 

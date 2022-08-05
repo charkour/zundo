@@ -38,7 +38,8 @@ describe('Zundo', () => {
   });
 
   it('should have the objects defined', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
     expect(clear).toBeDefined();
@@ -53,7 +54,8 @@ describe('Zundo', () => {
   });
 
   it('should undo', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(store.getState().count).toBe(0);
     act(() => {
       store.getState().increment();
@@ -67,7 +69,8 @@ describe('Zundo', () => {
   });
 
   it('should redo', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(store.getState().count).toBe(0);
     act(() => {
       store.getState().increment();
@@ -85,7 +88,8 @@ describe('Zundo', () => {
   });
 
   it('should update pastStates', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -106,7 +110,8 @@ describe('Zundo', () => {
   });
 
   it('should update futureStates', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(futureStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -127,7 +132,8 @@ describe('Zundo', () => {
   });
 
   it('should clear', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -150,7 +156,8 @@ describe('Zundo', () => {
   });
 
   it('should undo multiple states', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -171,7 +178,8 @@ describe('Zundo', () => {
   });
 
   it('should redo multiple states', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -193,7 +201,8 @@ describe('Zundo', () => {
   });
 
   it('properly tracks state values after clearing', () => {
-    const { undo, redo, clear, pastStates, futureStates } = store.temporal.getState();
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -205,6 +214,9 @@ describe('Zundo', () => {
       clear();
     });
     expect(pastStates.length).toBe(0);
+    expect(futureStates.length).toBe(0);
+    expect(pastStates).toEqual([]);
+    expect(futureStates).toEqual([]);
     expect(store.getState().count).toBe(3);
     act(() => {
       store.getState().increment();
@@ -229,6 +241,34 @@ describe('Zundo', () => {
     });
     expect(pastStates.length).toBe(0);
     expect(futureStates.length).toBe(0);
+    expect(pastStates).toEqual([]);
+    expect(futureStates).toEqual([]);
     expect(store.getState().count).toBe(4);
+  });
+
+  it('should clear future states when set is called', () => {
+    const { undo, redo, clear, pastStates, futureStates } =
+      store.temporal.getState();
+    expect(pastStates.length).toBe(0);
+    expect(futureStates.length).toBe(0);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(3);
+    expect(futureStates.length).toBe(0);
+    act(() => {
+      undo(2);
+    });
+    expect(pastStates.length).toBe(1);
+    expect(futureStates.length).toBe(2);
+    act(() => {
+      store.getState().increment();
+      store.getState().increment();
+      store.getState().increment();
+    });
+    expect(pastStates.length).toBe(4);
+    expect(futureStates.length).toBe(0);
   });
 });
