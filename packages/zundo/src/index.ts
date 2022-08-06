@@ -4,8 +4,10 @@ import {
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createTemporalStore, TemporalState, ZundoOptions } from './temporal';
-export type { ZundoOptions, TemporalState } from './temporal';
+import { createTemporalStore, TemporalStateWithInternals, ZundoOptions } from './temporal';
+export type { ZundoOptions } from './temporal';
+export { createTemporalStore };
+export type TemporalState<TState extends object> = Omit<TemporalStateWithInternals<TState>, '__internal'>;
 
 type Zundo = <
   TState extends object,
@@ -53,7 +55,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   store.temporal = temporalStore;
 
   const modifiedSetter: typeof set = (state, replace) => {
-    const { state: trackingState, pastStates, futureStates } = getState();
+    const { state: trackingState, pastStates, futureStates, __internal } = getState();
     const pastState = partialize(get());
     set(state, replace);
     const currentState = partialize(get());
@@ -63,6 +65,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
       }
       pastStates.push(pastState);
       futureStates.length = 0;
+      __internal.onSave?.(pastState, currentState);
     }
   };
 

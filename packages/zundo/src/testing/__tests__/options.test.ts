@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
-import { Write, zundo } from '../../index';
+import { TemporalState, Write, zundo, ZundoOptions } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
-import { TemporalState, ZundoOptions } from '../../temporal';
 import shallow from 'zustand/shallow';
+import { TemporalStateWithInternals } from '../../temporal';
 
 interface MyState {
   count: number;
@@ -295,6 +295,105 @@ describe('Middleware options', () => {
         increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(6);
+    });
+  });
+
+  describe('onSave', () => {
+
+
+    it('should call the onSave function when set through options', () => {
+      global.console.info = vi.fn();
+      const storeWithOnSave = createStore({
+        onSave: (pastStates) => {
+          console.info(pastStates);
+        },
+      });
+      const { doNothing, increment } = storeWithOnSave.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(2);
+      expect(console.info).toHaveBeenCalledTimes(2);
+    });
+
+    it('should call the onSave function when set through the temporal state', () => {
+      global.console.warn = vi.fn();
+      const { doNothing, increment } = store.getState();
+      const { setOnSave } = store.temporal.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+      expect(console.warn).toHaveBeenCalledTimes(0);
+      act(() => {
+        setOnSave((pastStates, currentState) => {
+          console.warn(pastStates, currentState);
+        });
+      });
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(4);
+      expect(console.warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('should call a new onSave function after being set', () => {
+      global.console.info = vi.fn();
+      global.console.log = vi.fn();
+      global.console.error = vi.fn();
+      const storeWithOnSave = createStore({
+        onSave: (pastStates) => {
+          console.info(pastStates);
+        },
+      });
+      const { doNothing, increment } = storeWithOnSave.getState();
+      const { setOnSave } = storeWithOnSave.temporal.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(2);
+      expect(console.info).toHaveBeenCalledTimes(2);
+      expect(console.log).toHaveBeenCalledTimes(0);
+      expect(console.error).toHaveBeenCalledTimes(0);
+      act(() => {
+        setOnSave((pastStates, currentState) => {
+          console.log(pastStates, currentState);
+        });
+      });
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(4);
+      expect(console.info).toHaveBeenCalledTimes(2);
+      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenCalledTimes(0);
+      act(() => {
+        setOnSave((pastStates, currentState) => {
+          console.error(pastStates, currentState);
+        });
+      });
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(6);
+      expect(console.info).toHaveBeenCalledTimes(2);
+      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenCalledTimes(2);
     })
+  });
+
+  describe('secret internals', () => {
+    it('should have a secret internal state', () => {
+      const { __internal } =
+        store.temporal.getState() as TemporalStateWithInternals<MyState>;
+      expect(__internal).toBeDefined();
+    });
+    // TODO: add more here
   });
 });

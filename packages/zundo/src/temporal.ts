@@ -1,6 +1,11 @@
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 
-export interface TemporalState<TState extends object> {
+type onSave<State extends object> = (
+  pastState: State,
+  currentState: State,
+) => void;
+
+export interface TemporalStateWithInternals<TState extends object> {
   pastStates: TState[];
   futureStates: TState[];
 
@@ -11,12 +16,18 @@ export interface TemporalState<TState extends object> {
   state: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
+
+  setOnSave: (onSave: onSave<TState>) => void;
+  __internal: {
+    onSave: onSave<TState>;
+  };
 }
 
-export interface ZundoOptions<State, TemporalState = State> {
+export interface ZundoOptions<State extends object, TemporalState = State> {
   partialize?: (state: State) => TemporalState;
   limit?: number;
   equality?: (a: State, b: State) => boolean;
+  onSave?: onSave<State>;
 }
 
 export const createTemporalStore = <TState extends object>(
@@ -26,69 +37,64 @@ export const createTemporalStore = <TState extends object>(
 ) => {
   const options = {
     partialize: (state: TState) => state,
-    ...baseOptions
+    onSave: () => {},
+    ...baseOptions,
   };
-  const { partialize } = options;
-  return createVanilla<TemporalState<TState>>()((set, get) => {
+  const { partialize, onSave } = options;
+  return createVanilla<TemporalStateWithInternals<TState>>()((set) => {
     const pastStates: TState[] = [];
     const futureStates: TState[] = [];
-
-    const undo = (steps = 1) => {
-      if (pastStates.length === 0) {
-        return;
-      }
-
-      const skippedPastStates = pastStates.splice(
-        pastStates.length - (steps - 1),
-      );
-      const pastState = pastStates.pop();
-      if (pastState) {
-        futureStates.push(partialize(userGet()));
-        userSet(pastState);
-      }
-      futureStates.push(...skippedPastStates);
-    };
-
-    const redo = (steps = 1) => {
-      if (futureStates.length === 0) {
-        return;
-      }
-
-      const skippedFutureStates = futureStates.splice(
-        futureStates.length - (steps - 1),
-      );
-      const futureState = futureStates.pop();
-      if (futureState) {
-        pastStates.push(partialize(userGet()));
-        userSet(futureState);
-      }
-      pastStates.push(...skippedFutureStates);
-    };
-
-    const clear = () => {
-      pastStates.length = 0;
-      futureStates.length = 0;
-    };
-
-    const state = 'tracking';
-
-    const pause = () => {
-      set({ state: 'paused' });
-    };
-
-    const resume = () => {
-      set({ state: 'tracking' });
-    };
 
     return {
       pastStates,
       futureStates,
-      undo,
-      redo,
-      clear,
-      state,
-      pause,
-      resume,
+      undo: (steps = 1) => {
+        if (pastStates.length === 0) {
+          return;
+        }
+
+        const skippedPastStates = pastStates.splice(
+          pastStates.length - (steps - 1),
+        );
+        const pastState = pastStates.pop();
+        if (pastState) {
+          futureStates.push(partialize(userGet()));
+          userSet(pastState);
+        }
+        futureStates.push(...skippedPastStates);
+      },
+      redo: (steps = 1) => {
+        if (futureStates.length === 0) {
+          return;
+        }
+
+        const skippedFutureStates = futureStates.splice(
+          futureStates.length - (steps - 1),
+        );
+        const futureState = futureStates.pop();
+        if (futureState) {
+          pastStates.push(partialize(userGet()));
+          userSet(futureState);
+        }
+        pastStates.push(...skippedFutureStates);
+      },
+      clear: () => {
+        pastStates.length = 0;
+        futureStates.length = 0;
+      },
+      state: 'tracking',
+      pause: () => {
+        set({ state: 'paused' });
+      },
+      resume: () => {
+        set({ state: 'tracking' });
+      },
+      setOnSave: (onSave) => {
+        set({ __internal: { onSave } });
+      },
+      __internal: {
+        onSave,
+      },
     };
   });
 };
