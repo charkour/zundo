@@ -299,8 +299,6 @@ describe('Middleware options', () => {
   });
 
   describe('onSave', () => {
-
-
     it('should call the onSave function when set through options', () => {
       global.console.info = vi.fn();
       const storeWithOnSave = createStore({
@@ -385,7 +383,7 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
       expect(console.log).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledTimes(2);
-    })
+    });
   });
 
   describe('secret internals', () => {
@@ -394,6 +392,73 @@ describe('Middleware options', () => {
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
       expect(__internal).toBeDefined();
     });
-    // TODO: add more here
+    it('should call onSave cb without adding a new state when onSave is set by user', () => {
+      global.console.error = vi.fn();
+      const { setOnSave } = store.temporal.getState();
+      act(() => {
+        setOnSave((pastStates, currentState) => {
+          console.error(pastStates, currentState);
+        });
+      });
+      const { __internal } =
+        store.temporal.getState() as TemporalStateWithInternals<MyState>;
+      const { onSave } = __internal;
+      act(() => {
+        onSave(store.getState(), store.getState());
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(0);
+      expect(console.error).toHaveBeenCalledTimes(1);
+    });
+    it('should call onSave cb without adding a new state when onSave is set at store init', () => {
+      global.console.info = vi.fn();
+      const storeWithOnSave = createStore({
+        onSave: (pastStates) => {
+          console.info(pastStates);
+        },
+      });
+      const { __internal } =
+        storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>;
+      const { onSave } = __internal;
+      act(() => {
+        onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
+      expect(console.error).toHaveBeenCalledTimes(1);
+    });
+    it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
+      global.console.dir = vi.fn();
+      global.console.trace = vi.fn();
+      const storeWithOnSave = createStore({
+        onSave: (pastStates) => {
+          console.dir(pastStates);
+        },
+      });
+      act(() => {
+        (
+          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
+        ).__internal.onSave(
+          storeWithOnSave.getState(),
+          storeWithOnSave.getState(),
+        );
+      });
+      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
+      expect(console.dir).toHaveBeenCalledTimes(1);
+      expect(console.trace).toHaveBeenCalledTimes(0);
+
+      const { setOnSave } = storeWithOnSave.temporal.getState();
+      act(() => {
+        setOnSave((pastStates, currentState) => {
+          console.trace(pastStates, currentState);
+        });
+      });
+      act(() => {
+        (
+          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
+        ).__internal.onSave(store.getState(), store.getState());
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(0);
+      expect(console.dir).toHaveBeenCalledTimes(1);
+      expect(console.trace).toHaveBeenCalledTimes(1);
+    });
   });
 });
