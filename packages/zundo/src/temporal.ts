@@ -1,11 +1,8 @@
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 
-type onSave<State extends object> = (
-  pastState: State,
-  currentState: State,
-) => void;
+type onSave<State> = (pastState: State, currentState: State) => void;
 
-export interface TemporalStateWithInternals<TState extends object> {
+export interface TemporalStateWithInternals<TState> {
   pastStates: TState[];
   futureStates: TState[];
 
@@ -24,7 +21,7 @@ export interface TemporalStateWithInternals<TState extends object> {
   };
 }
 
-export interface ZundoOptions<State extends object, TemporalState = State> {
+export interface ZundoOptions<State, TemporalState = State> {
   partialize?: (state: State) => TemporalState;
   limit?: number;
   equality?: (a: State, b: State) => boolean;
@@ -37,7 +34,7 @@ export interface ZundoOptions<State extends object, TemporalState = State> {
 }
 
 // TODO: rename this to factory
-export const createTemporalStore = <TState extends object>(
+export const createTemporalStore = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   baseOptions?: ZundoOptions<TState>,
@@ -104,12 +101,7 @@ export const createTemporalStore = <TState extends object>(
       __internal: {
         onSave,
         handleUserSet: (pastState: TState) => {
-          const {
-            trackingState,
-            pastStates,
-            futureStates,
-            __internal,
-          } = get();
+          const { trackingState, pastStates, futureStates, __internal } = get();
           const currentState = partialize(userGet());
           if (
             trackingState === 'tracking' &&

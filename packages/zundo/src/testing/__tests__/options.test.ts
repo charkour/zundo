@@ -6,6 +6,7 @@ import { act } from 'react-dom/test-utils';
 import shallow from 'zustand/shallow';
 import { TemporalStateWithInternals } from '../../temporal';
 import throttle from 'lodash.throttle';
+import { persist } from 'zustand/middleware';
 
 interface MyState {
   count: number;
@@ -418,7 +419,7 @@ describe('Middleware options', () => {
 
     it('should correctly use throttling', () => {
       global.console.error = vi.fn();
-      vi.useFakeTimers()
+      vi.useFakeTimers();
       const storeWithHandleSet = createStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>((state) => {

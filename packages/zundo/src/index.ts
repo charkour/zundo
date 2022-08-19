@@ -11,16 +11,16 @@ import {
 } from './temporal';
 export type { ZundoOptions } from './temporal';
 export { createTemporalStore };
-export type TemporalState<TState extends object> = Omit<
+export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
   '__internal'
 >;
 
 type Zundo = <
-  TState extends object,
+  TState,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  UState extends object = TState,
+  UState = TState,
 >(
   config: StateCreator<TState, [...Mps, ['temporal', unknown]], Mcs>,
   options?: ZundoOptions<TState, UState>,
@@ -30,13 +30,13 @@ type Zundo = <
   [['temporal', StoreApi<TemporalState<UState>>], ...Mcs]
 >;
 
-declare module 'zustand' {
+declare module 'zustand/vanilla' {
   interface StoreMutators<S, A> {
-    temporal: Write<Cast<S, object>, { temporal: A }>;
+    temporal: Write<S, { temporal: A }>;
   }
 }
 
-type ZundoImpl = <TState extends object>(
+type ZundoImpl = <TState>(
   config: PopArgument<StateCreator<TState, [], []>>,
   options: ZundoOptions<TState>,
 ) => PopArgument<StateCreator<TState, [], []>>;
@@ -53,7 +53,6 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   type StoreAddition = StoreApi<TemporalState<TState>>;
 
   const temporalStore = createTemporalStore<TState>(set, get, options);
-  const { getState, setState } = temporalStore;
 
   const store = _store as Mutate<
     StoreApi<TState>,
@@ -62,7 +61,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   store.temporal = temporalStore;
 
   const curriedUserLandSet = userlandSetFactory(
-    getState().__internal.handleUserSet,
+    temporalStore.getState().__internal.handleUserSet,
   );
 
   const modifiedSetter: typeof set = (state, replace) => {
@@ -84,6 +83,4 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never;
 
-export type Write<T extends object, U extends object> = Omit<T, keyof U> & U;
-
-type Cast<T, U> = T extends U ? T : U;
+export type Write<T, U> = Omit<T, keyof U> & U;
