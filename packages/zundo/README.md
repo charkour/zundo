@@ -7,7 +7,7 @@ enable time-travel in your apps. undo/redo middleware for [zustand](https://gith
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
 <div style="width: 100%; display: flex;">
-<img src="./zundo-mascot.png" style="max-width: 300px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
+<img src="zundo-mascot.png" style="max-width: 300px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
 </div>
 
 See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
