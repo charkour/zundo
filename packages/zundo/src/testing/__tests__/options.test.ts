@@ -5,6 +5,7 @@ import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import shallow from 'zustand/shallow';
 import { TemporalStateWithInternals } from '../../temporal';
+import throttle from 'lodash.throttle';
 
 interface MyState {
   count: number;
@@ -152,7 +153,7 @@ describe('Middleware options', () => {
 
   describe('temporal state', () => {
     it('should initialize state to tracking', () => {
-      const { state } = store.temporal.getState();
+      const { trackingState: state } = store.temporal.getState();
       expect(state).toBe('tracking');
     });
 
@@ -161,7 +162,7 @@ describe('Middleware options', () => {
       act(() => {
         pause();
       });
-      expect(store.temporal.getState().state).toBe('paused');
+      expect(store.temporal.getState().trackingState).toBe('paused');
     });
 
     it('should switch to tracking', () => {
@@ -170,7 +171,7 @@ describe('Middleware options', () => {
         pause();
         resume();
       });
-      expect(store.temporal.getState().state).toBe('tracking');
+      expect(store.temporal.getState().trackingState).toBe('tracking');
     });
 
     it('does not track state when paused', () => {
@@ -386,79 +387,139 @@ describe('Middleware options', () => {
     });
   });
 
+  describe('handleSet', () => {
+    it('should work by default', () => {
+      const { doNothing, increment } = store.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+    });
+
+    it('should call function if set', () => {
+      global.console.info = vi.fn();
+      const storeWithHandleSet = createStore({
+        handleSet: (handleSet) => {
+          return (state) => {
+            console.info('handleSet called');
+            handleSet(state);
+          };
+        },
+      });
+      const { doNothing, increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.info).toHaveBeenCalledTimes(2);
+    });
+
+    it('should correctly use throttling', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers()
+      const storeWithHandleSet = createStore({
+        handleSet: (handleSet) => {
+          return throttle<typeof handleSet>((state) => {
+            console.error('handleSet called');
+            handleSet(state);
+          }, 1000);
+        },
+      });
+      const { doNothing, increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
+      expect(console.error).toHaveBeenCalledTimes(1);
+      act(() => {
+        doNothing();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.error).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
       const { __internal } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
       expect(__internal).toBeDefined();
     });
-    it('should call onSave cb without adding a new state when onSave is set by user', () => {
-      global.console.error = vi.fn();
-      const { setOnSave } = store.temporal.getState();
-      act(() => {
-        setOnSave((pastStates, currentState) => {
-          console.error(pastStates, currentState);
+    describe('onSave', () => {
+      it('should call onSave cb without adding a new state when onSave is set by user', () => {
+        global.console.error = vi.fn();
+        const { setOnSave } = store.temporal.getState();
+        act(() => {
+          setOnSave((pastStates, currentState) => {
+            console.error(pastStates, currentState);
+          });
         });
+        const { __internal } =
+          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { onSave } = __internal;
+        act(() => {
+          onSave(store.getState(), store.getState());
+        });
+        expect(store.temporal.getState().pastStates.length).toBe(0);
+        expect(console.error).toHaveBeenCalledTimes(1);
       });
-      const { __internal } =
-        store.temporal.getState() as TemporalStateWithInternals<MyState>;
-      const { onSave } = __internal;
-      act(() => {
-        onSave(store.getState(), store.getState());
+      it('should call onSave cb without adding a new state when onSave is set at store init', () => {
+        global.console.info = vi.fn();
+        const storeWithOnSave = createStore({
+          onSave: (pastStates) => {
+            console.info(pastStates);
+          },
+        });
+        const { __internal } =
+          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { onSave } = __internal;
+        act(() => {
+          onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
+        });
+        expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
+        expect(console.error).toHaveBeenCalledTimes(1);
       });
-      expect(store.temporal.getState().pastStates.length).toBe(0);
-      expect(console.error).toHaveBeenCalledTimes(1);
-    });
-    it('should call onSave cb without adding a new state when onSave is set at store init', () => {
-      global.console.info = vi.fn();
-      const storeWithOnSave = createStore({
-        onSave: (pastStates) => {
-          console.info(pastStates);
-        },
-      });
-      const { __internal } =
-        storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>;
-      const { onSave } = __internal;
-      act(() => {
-        onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
-      });
-      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
-      expect(console.error).toHaveBeenCalledTimes(1);
-    });
-    it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
-      global.console.dir = vi.fn();
-      global.console.trace = vi.fn();
-      const storeWithOnSave = createStore({
-        onSave: (pastStates) => {
-          console.dir(pastStates);
-        },
-      });
-      act(() => {
-        (
-          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-        ).__internal.onSave(
-          storeWithOnSave.getState(),
-          storeWithOnSave.getState(),
-        );
-      });
-      expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
-      expect(console.dir).toHaveBeenCalledTimes(1);
-      expect(console.trace).toHaveBeenCalledTimes(0);
+      it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
+        global.console.dir = vi.fn();
+        global.console.trace = vi.fn();
+        const storeWithOnSave = createStore({
+          onSave: (pastStates) => {
+            console.dir(pastStates);
+          },
+        });
+        act(() => {
+          (
+            storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
+          ).__internal.onSave(
+            storeWithOnSave.getState(),
+            storeWithOnSave.getState(),
+          );
+        });
+        expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
+        expect(console.dir).toHaveBeenCalledTimes(1);
+        expect(console.trace).toHaveBeenCalledTimes(0);
 
-      const { setOnSave } = storeWithOnSave.temporal.getState();
-      act(() => {
-        setOnSave((pastStates, currentState) => {
-          console.trace(pastStates, currentState);
+        const { setOnSave } = storeWithOnSave.temporal.getState();
+        act(() => {
+          setOnSave((pastStates, currentState) => {
+            console.trace(pastStates, currentState);
+          });
         });
+        act(() => {
+          (
+            storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
+          ).__internal.onSave(store.getState(), store.getState());
+        });
+        expect(store.temporal.getState().pastStates.length).toBe(0);
+        expect(console.dir).toHaveBeenCalledTimes(1);
+        expect(console.trace).toHaveBeenCalledTimes(1);
       });
-      act(() => {
-        (
-          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-        ).__internal.onSave(store.getState(), store.getState());
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(0);
-      expect(console.dir).toHaveBeenCalledTimes(1);
-      expect(console.trace).toHaveBeenCalledTimes(1);
     });
+
+    // describe('handleUserSet', () => {});
   });
 });

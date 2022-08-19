@@ -13,13 +13,14 @@ export interface TemporalStateWithInternals<TState extends object> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  state: 'paused' | 'tracking';
+  trackingState: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
 
   setOnSave: (onSave: onSave<TState>) => void;
   __internal: {
     onSave: onSave<TState>;
+    handleUserSet: (pastState: TState) => void;
   };
 }
 
@@ -27,9 +28,15 @@ export interface ZundoOptions<State extends object, TemporalState = State> {
   partialize?: (state: State) => TemporalState;
   limit?: number;
   equality?: (a: State, b: State) => boolean;
+  /* called when saved */
   onSave?: onSave<State>;
+  /* Middleware for the temporal setter */
+  handleSet?: (
+    handleSet: StoreApi<State>['setState'],
+  ) => StoreApi<State>['setState'];
 }
 
+// TODO: rename this to factory
 export const createTemporalStore = <TState extends object>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
@@ -37,11 +44,13 @@ export const createTemporalStore = <TState extends object>(
 ) => {
   const options = {
     partialize: (state: TState) => state,
+    equality: (a: TState, b: TState) => false,
     onSave: () => {},
     ...baseOptions,
   };
-  const { partialize, onSave } = options;
-  return createVanilla<TemporalStateWithInternals<TState>>()((set) => {
+  const { partialize, onSave, limit, equality } = options;
+
+  return createVanilla<TemporalStateWithInternals<TState>>()((set, get) => {
     const pastStates: TState[] = [];
     const futureStates: TState[] = [];
 
@@ -82,18 +91,38 @@ export const createTemporalStore = <TState extends object>(
         pastStates.length = 0;
         futureStates.length = 0;
       },
-      state: 'tracking',
+      trackingState: 'tracking',
       pause: () => {
-        set({ state: 'paused' });
+        set({ trackingState: 'paused' });
       },
       resume: () => {
-        set({ state: 'tracking' });
+        set({ trackingState: 'tracking' });
       },
       setOnSave: (onSave) => {
-        set({ __internal: { onSave } });
+        set((state) => ({ __internal: { ...state.__internal, onSave } }));
       },
       __internal: {
         onSave,
+        handleUserSet: (pastState: TState) => {
+          const {
+            trackingState,
+            pastStates,
+            futureStates,
+            __internal,
+          } = get();
+          const currentState = partialize(userGet());
+          if (
+            trackingState === 'tracking' &&
+            !equality(currentState, pastState)
+          ) {
+            if (limit && pastStates.length >= limit) {
+              pastStates.shift();
+            }
+            pastStates.push(pastState);
+            futureStates.length = 0;
+            __internal.onSave?.(pastState, currentState);
+          }
+        },
       },
     };
   });

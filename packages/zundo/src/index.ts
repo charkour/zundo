@@ -4,10 +4,17 @@ import {
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createTemporalStore, TemporalStateWithInternals, ZundoOptions } from './temporal';
+import {
+  createTemporalStore,
+  TemporalStateWithInternals,
+  ZundoOptions,
+} from './temporal';
 export type { ZundoOptions } from './temporal';
 export { createTemporalStore };
-export type TemporalState<TState extends object> = Omit<TemporalStateWithInternals<TState>, '__internal'>;
+export type TemporalState<TState extends object> = Omit<
+  TemporalStateWithInternals<TState>,
+  '__internal'
+>;
 
 type Zundo = <
   TState extends object,
@@ -37,10 +44,10 @@ type ZundoImpl = <TState extends object>(
 const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   const options = {
     partialize: (state: TState) => state,
-    equality: (a: TState, b: TState) => false,
+    handleSet: (handleSetCb: typeof set) => handleSetCb,
     ...baseOptions,
   };
-  const { partialize, limit, equality } = options;
+  const { partialize, handleSet: userlandSetFactory } = options;
 
   type TState = ReturnType<typeof config>;
   type StoreAddition = StoreApi<TemporalState<TState>>;
@@ -54,24 +61,21 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   >;
   store.temporal = temporalStore;
 
+  const curriedUserLandSet = userlandSetFactory(
+    getState().__internal.handleUserSet,
+  );
+
   const modifiedSetter: typeof set = (state, replace) => {
-    const { state: trackingState, pastStates, futureStates, __internal } = getState();
+    // TODO: get() can eventually be replaced with the state in the callback
     const pastState = partialize(get());
     set(state, replace);
-    const currentState = partialize(get());
-    if (trackingState === 'tracking' && !equality(currentState, pastState)) {
-      if (limit && pastStates.length >= limit) {
-        pastStates.shift();
-      }
-      pastStates.push(pastState);
-      futureStates.length = 0;
-      __internal.onSave?.(pastState, currentState);
-    }
+    curriedUserLandSet(pastState);
   };
 
   return config(modifiedSetter, get, _store);
 };
 
+// TODO: rename this to temporal
 export const zundo = zundoImpl as unknown as Zundo;
 
 type PopArgument<T extends (...a: never[]) => unknown> = T extends (

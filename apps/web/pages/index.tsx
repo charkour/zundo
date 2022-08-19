@@ -1,5 +1,6 @@
+import throttle from 'lodash.throttle';
 import { Button } from 'ui';
-import { zundo } from 'zundo';
+import { zundo, ZundoOptions } from 'zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 
@@ -9,11 +10,20 @@ interface MyState {
   decrement: () => void;
 }
 
-const withZundo = zundo<MyState>((set) => ({
-  count: 0,
-  increment: () => set((state) => ({ count: state.count + 1 })),
-  decrement: () => set((state) => ({ count: state.count - 1 })),
-}));
+const withZundo = zundo<MyState>(
+  (set) => ({
+    count: 0,
+    increment: () => set((state) => ({ count: state.count + 1 })),
+    decrement: () => set((state) => ({ count: state.count - 1 })),
+  }),
+  {
+    handleSet: (handleSet) =>
+      throttle<typeof handleSet>((state) => {
+        console.error('handleSet called');
+        handleSet(state);
+      }, 1000),
+  },
+);
 
 const originalStore = createVanilla(withZundo);
 
