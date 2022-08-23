@@ -255,6 +255,10 @@ type UndoStoreState = {
 
 Issues and PRs are welcome. I'd like to hear your comments and critiques. We can discuss ways to make this package better. Thanks :)
 
+## Author
+
+- Charles Kornoelje ([@_charkour](https://twitter.com/_charkour)) - [Tekton](www.tekton.com)
+
 ## Versioning
 
 View the [releases](https://github.com/charkour/zundo/releases) for the change log. This generally follows sem-ver, but breaking changes may occur in v1.
