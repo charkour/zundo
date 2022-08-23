@@ -16,12 +16,12 @@
     "react-dom": "18.2.0",
     "ui": "workspace:*",
     "zundo": "workspace:*",
-    "zustand": "4.1.0"
+    "zustand": "4.1.1"
   },
   "devDependencies": {
-    "@types/node": "^16.0.0",
-    "@types/react": "18.0.14",
-    "eslint": "8.19.0",
+    "@types/node": "16.11.7",
+    "@types/react": "18.0.17",
+    "eslint": "8.22.0",
     "eslint-config-custom": "workspace:*",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "workspace:*",
