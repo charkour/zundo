@@ -24,19 +24,23 @@
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "src"
+    "src",
+    "package.json"
   ],
   "scripts": {
     "build": "tsup",
-    "test": "vitest",
-    "dev": "vitest --watch"
+    "test": "vitest && npm run size",
+    "dev": "vitest --watch",
+    "size": "size-limit"
   },
   "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.0.1",
     "@types/lodash.throttle": "4.1.7",
     "@types/react-dom": "18.0.6",
     "lodash.throttle": "4.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "size-limit": "^8.0.1",
     "tsconfig": "workspace:*",
     "tsup": "6.2.2",
     "typescript": "4.7.4",
@@ -48,5 +52,11 @@
   },
   "engines": {
     "node": ">=12"
-  }
+  },
+  "size-limit": [
+    {
+      "limit": "1 kB",
+      "path": "dist/index.js"
+    }
+  ]
 }
