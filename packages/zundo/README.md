@@ -7,7 +7,7 @@ enable time-travel in your apps. undo/redo middleware for [zustand](https://gith
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
 <div style="width: 100%; display: flex;">
-<img src="zundo-mascot.png" style="max-width: 300px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
+<img src="zundo-mascot.png" style="max-width: 100px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
 </div>
 
 See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
@@ -15,69 +15,33 @@ See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 ## Install
 
 ```sh
-npm i zustand zundo
+npm i zustand zundo@beta
 ```
 
-## First create a store with undo middleware
+## Background
+
+- Solves the issue of managing state in complex user applications
+- Leverages zustand for state management, keeping the internals small
+- Middleware can be used with multiple stores in the same app
+
+## First create a store with temporal middleware
 
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
-import create, { UndoState } from 'zundo';
+import { zundo } from 'zundo'
+import create from 'zustand'
 
 // define the store (typescript)
-interface StoreState extends UndoState {
+interface StoreState {
   bears: number;
   increasePopulation: () => void;
   removeAllBears: () => void;
 }
 
 // creates a store with undo/redo capability
-const useStoreWithUndo = create<StoreState>((set) => ({
-  bears: 0,
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-}));
-```
-
-## Then bind your components
-
-Use your store anywhere, including `undo`, `redo`, and `clearUndoHistory`!
-
-```tsx
-const App = () => {
-  const {
-    bears,
-    increasePopulation,
-    removeAllBears,
-    undo,
-    redo,
-    clearUndoHistory,
-  } = useStoreWithUndo();
-
-  return (
-    <>
-      bears: {bears}
-      <button onClick={increasePopulation}>increase</button>
-      <button onClick={removeAllBears}>remove</button>
-      <button onClick={() => undo?.()}>undo</button>
-      <button onClick={() => redo?.()}>redo</button>
-      <button onClick={clearUndoHistory}>clear</button>
-    </>
-  );
-};
-```
-
-## Alternatively, use the middleware
-
-Instead of using `create` from `zundo`, use the `zundo` middleware and the `zustand` create.
-
-```tsx
-import { undoMiddleware, UndoState } from 'zundo';
-import create from 'zustand';
-
-const useStoreWithUndo = create<StoreState>(
-  undoMiddleware((set) => ({
+const useStoreWithUndo = create<StoreState>()(
+  zundo((set) => ({
     bears: 0,
     increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
     removeAllBears: () => set({ bears: 0 }),
@@ -85,111 +49,136 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
+## Then bind your components
+
+Use your store anywhere, including `undo`, `redo`, and `clear`!
+
+```tsx
+const App = () => {
+  const {
+    bears,
+    increasePopulation,
+    removeAllBears,
+  } = useStoreWithUndo();
+  const {
+    undo,
+    redo,
+    clear
+  } = useStoreWithUndo.temporal.getState();
+
+  return (
+    <>
+      bears: {bears}
+      <button onClick={increasePopulation}>increase</button>
+      <button onClick={removeAllBears}>remove</button>
+      <button onClick={() => undo()}>undo</button>
+      <button onClick={() => redo()}>redo</button>
+      <button onClick={() => clear()}>clear</button>
+    </>
+  );
+};
+```
+
 ### Middleware Options
 
 ```tsx
-options: {
-  exclude?: string[],
-  include?: string[],
-  allowUnchanged?: boolean,
-  historyDepthLimit?: number,
-  coolOffDurationMs?: number,
+interface ZundoOptions<State, TemporalState = State> {
+  partialize?: (state: State) => TemporalState;
+  limit?: number;
+  equality?: (a: State, b: State) => boolean;
+  onSave?: onSave<State>;
+  handleSet?: (
+    handleSet: StoreApi<State>['setState'],
+  ) => StoreApi<State>['setState'];
 }
 ```
 
 #### **Exclude fields from being tracked in history**
 
-Use the `exclude` option, which accepts an array of keys to not track. Alternatively you can use the `include` option which will result in only those keys being tracked.
+Use the `partialize` option, which takes a callback where you can choose to omit or include specific fields.
 
 _If for some reason you use both parameters, any key included in both will be excluded._
 
 ```tsx
 // Only field1 and field2 will be tracked
 const useStoreA = create<StoreState>(
-  undoMiddleware(
+  zundo(
     set => ({ ... }),
-    { include: ['field1', 'field2'] }
+    { partialize: (state) => {
+      const { field1, field2, ...rest } = state
+      return { field1, field2 }
+    }}
   )
-);
+)
 
 // Everything besides field1 and field2 will be tracked
 const useStoreB = create<StoreState>(
   undoMiddleware(
     set => ({ ... }),
-    { exclude: ['field1', 'field2'] }
+    { partialize: (state) => {
+      const { field1, field2, ...rest } = state
+      return rest;
+    }}
   )
-);
-```
-
-_Note: `exclude` replaces the option `omit` which will deprecated in future versions._
-
-#### **Allow unchanged states to be stored**
-
-Sometimes you may want to track states in history even if nothing has actually changed. Set `allowUnchanged` to be `true` to allow unchanged states to be stored. By default, it is `false` (well, technically it is `undefined`).
-
-```tsx
-const useStore = create<StoreState>(
-  undoMiddleware(
-    set => ({ ... }),
-    { allowUnchanged: true }
-  )
-);
+)
 ```
 
 #### **Limit number of states stored**
 
-For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `historyDepthLimit` will limit the number of previous and future states stored in the `zundo` store. By default, no limit is set.
+For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `limit` will limit the number of previous and future states stored in the `zundo` store. By default, no limit is set.
 
 ```tsx
 const useStore = create<StoreState>(
-  undoMiddleware(
+  zundo(
     set => ({ ... }),
-    { historyDepthLimit: 100 }
+    { limit: 100 }
   )
 );
 ```
 
-## API
+#### **Prevent unchanged states to be stored**
 
-### `undoMiddleware(config: StateCreator<TState>)`
-
-This is middleware for `zustand` which takes in a config for the store.
-
-This works for multiple undoable stores in the same app.
-
-### `create`
-
-Create from `zundo` will return a store hook that has undo/redo capabilities. In addition to what fields are in the provided in your `StoreState`, the functions `undo`, `redo`, `clearUndoHistory`, and `getState` are added as well.
-
-This works for multiple undoable stores in the same app.
-
-- `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
-- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
-- `clearUndoHistory`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
-
-Dispatching a new state will clear all of the future states.
-
-### `createUndoStore()`
-
-Will create a store that is used by the middleware to track the internal state of type `UndoStoreState`.
-
-### `UndoState`
-
-A type to extend when creating a global store with undo/redo capabilities.
+For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. By default, all state changes to your store are tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`.
 
 ```tsx
-type UndoState = {
-  // Will go back one state
-  undo?: ((steps?: number) => void) | undefined;
-  // Will go forward one state
-  redo?: ((steps?: number) => void) | undefined;
-  // Will clear history
-  clearUndoHistory?: (() => void) | undefined;
-  getState?: (() => UndoStoreState) | undefined;
-  // history is enabled by default
-  setIsUndoHistoryEnabled?: ((isEnabled: boolean) => void) | undefined;
-};
+import shallow from 'zustand/shallow'
+
+const useStoreA = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { equality: shallow }
+  )
+);
+
+const useStoreB = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { equality: (a, b) => a.field1 !== b.field1 }
+  )
+);
 ```
+
+### Callback when temporal store is updated
+
+Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programatically setting the callback if you need lexical context.
+
+
+```tsx
+import shallow from 'zustand/shallow'
+
+const useStoreA = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { onSave: (state) => console.log('saved', state) }
+  )
+);
+```
+
+#### **Cool-off period**
+
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. Use `coolOffDurationMs` to set how long (in millesconds) to stop new changes from being stored in history after an initial change has happened.
+
+Please note: Even if you don't set `coolOffDurationMs`, if multiple state changes happen inside of the same frame (e.g. you called `setSomething` multiple times in the same function call), only one item will be stored in history.
 
 #### **Enable or Disable History**
 
@@ -208,52 +197,65 @@ const useStoreWithUndo = create<StoreState>();
 // (set, get, api)
 ```
 
-#### **Cool-off period**
 
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. Use `coolOffDurationMs` to set how long (in millesconds) to stop new changes from being stored in history after an initial change has happened.
+## API
 
-Please note: Even if you don't set `coolOffDurationMs`, if multiple state changes happen inside of the same frame (e.g. you called `setSomething` multiple times in the same function call), only one item will be stored in history.
+### `store.temporal` 
 
-### `UseStore`
+Returns the default store. `getState`, `setState`, `subscribe`, etc.
 
-It is an interface from `zustand` where `T` is your `StoreState`. Very similar to the type definition shown below. It is the type of any `useStore` hook. Used when passing the `useStore` hook as a prop.
+### `TemporalState`
 
 ```tsx
-type UseStore<T extends object> = {
-    (): T;
-    <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U> | undefined): U;
-    setState: SetState<T>;
-    getState: GetState<...>;
-    subscribe: Subscribe<...>;
-    destroy: Destroy;
+export interface TemporalStateWithInternals<TState> {
+  pastStates: TState[];
+  futureStates: TState[];
+
+  undo: (steps?: number) => void;
+  redo: (steps?: number) => void;
+  clear: () => void;
+
+  trackingState: 'paused' | 'tracking';
+  pause: () => void;
+  resume: () => void;
+
+  setOnSave: (onSave: onSave<TState>) => void;
+  __internal: {
+    onSave: onSave<TState>;
+    handleUserSet: (pastState: TState) => void;
+  };
 }
 ```
 
-### `UndoStoreState`
+### `create`
 
-An interface for the store that tracks states.
+Create from `zundo` will return a store hook that has undo/redo capabilities. In addition to what fields are in the provided in your `StoreState`, the functions `undo`, `redo`, `clearUndoHistory`, and `getState` are added as well.
 
-```tsx
-type UndoStoreState = {
-  prevStates: any[];
-  futureStates: any[];
-  undo: (steps?: number) => void;
-  redo: (steps?: number) => void;
-  clearUndoHistory: () => void;
-  setStore: Function;
-  getStore: Function;
-};
-```
+This works for multiple undoable stores in the same app.
+
+- `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
+- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
+- `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
+
+Dispatching a new state will clear all of the future states.
+
 
 ## Road Map
 
-- possibly use better data structure for storing previous states. Maybe just a diff between states?
+- [ ] create nicer API, or a helper hook in react land (useTemporal). or vanilla version of the it
+- [ ] Allow alternative storage engines for past and future states
+- [ ] See if it canUndo and canRedo
+- [ ] Set initial history, past and future states
+- [ ] create `jump` method that takes an integer
+- [ ] create a `present` object that holds the current state? perhaps
+- [ ] support history branches rather than clearing the future states
+- [ ] Pass middleware to temporal store
+- [ ] store state delta rather than full object
+- [ ] track state for multiple stores at once
 
 ## Contributing
 
-[pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies.
-
-Issues and PRs are welcome. I'd like to hear your comments and critiques. We can discuss ways to make this package better. Thanks :)
+PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies. Libray code is locted at `packages/zundo`.
 
 ## Author
 
@@ -261,28 +263,10 @@ Issues and PRs are welcome. I'd like to hear your comments and critiques. We can
 
 ## Versioning
 
-View the [releases](https://github.com/charkour/zundo/releases) for the change log. This generally follows sem-ver, but breaking changes may occur in v1.
+View the [releases](https://github.com/charkour/zundo/releases) for the change log.
 
 Publish using `np --no-cleanup`.
 
-## Credits
+## Illustration Credits
 
-- Illustration - [@theivoson](https://twitter.com/theivoson)
-
-## Dependencies
-
-### Zundo
-
-zustand: for zundo features
-react: optional for zundo features
-
-### Building
-
-tsup
-
-### Testing
-
-jest
-@types/jest
-ts-jest
-typescript
+- Ivo Ilić [@theivoson](https://twitter.com/theivoson)
