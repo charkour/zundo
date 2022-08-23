@@ -1,6 +1,6 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
-import { zundo, ZundoOptions } from 'zundo';
+import { zundo } from 'zundo/dist/zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 import { devtools, persist } from 'zustand/middleware';
@@ -27,6 +27,7 @@ interface MyState {
 //   },
 // );
 
+// TODO: doing this one by one does not work with the types.
 // const withPersist = persist(withZundo);
 
 // const originalStore = createVanilla(withZundo);
@@ -35,30 +36,32 @@ interface MyState {
 
 const useChainedStore = create<MyState>()(
   devtools(
-    immer(
-      persist(
-        (set) => ({
-          count: 0,
-          increment: () => set((state) => ({ count: state.count + 1 })),
-          decrement: () => set((state) => ({ count: state.count - 1 }))
-        }),
-        {
-          name: "test"
-        }
-      )
-    )
-  )
+    zundo(
+      immer(
+        persist(
+          (set) => ({
+            count: 0,
+            increment: () => set((state) => ({ count: state.count + 1 })),
+            decrement: () => set((state) => ({ count: state.count - 1 })),
+          }),
+          {
+            name: 'test',
+          },
+        ),
+      ),
+    ),
+  ),
 );
 
 export default function Web() {
-  // const { count, increment, decrement } = useStore();
-  // const { undo, futureStates, pastStates } = useStore.temporal.getState();
+  const { count, increment, decrement } = useChainedStore();
+  const { undo, futureStates, pastStates } = useChainedStore.temporal.getState();
 
   return (
     <div>
       <h1>Web</h1>
       <div>
-        {/* <button onClick={increment}>+</button>
+        <button onClick={increment}>+</button>
         <button onClick={decrement}>-</button>
         <span>{count}</span>
         <div>
@@ -67,7 +70,7 @@ export default function Web() {
           <h2>Previous States</h2>
           <div>{JSON.stringify(pastStates)}</div>
           <button onClick={() => undo()}>Undo</button>
-        </div> */}
+        </div>
       </div>
       <Button />
     </div>

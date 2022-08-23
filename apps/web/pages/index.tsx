@@ -1,8 +1,9 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
-import { zundo, ZundoOptions } from 'zundo';
+import { zundo } from 'zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
+import shallow from 'zustand/shallow';
 
 interface MyState {
   count: number;
@@ -19,7 +20,7 @@ const withZundo = zundo<MyState>(
   {
     handleSet: (handleSet) =>
       throttle<typeof handleSet>((state) => {
-        console.error('handleSet called');
+        console.info('handleSet called');
         handleSet(state);
       }, 1000),
   },
@@ -28,10 +29,14 @@ const withZundo = zundo<MyState>(
 const originalStore = createVanilla(withZundo);
 
 const useStore = create(originalStore);
+const useTemporalStore = create(originalStore.temporal);
 
 export default function Web() {
-  const { count, increment, decrement } = useStore();
-  const { undo, futureStates, pastStates } = useStore.temporal.getState();
+  const { count, increment, decrement } = useStore((state) => state);
+  const { futureStates, pastStates, undo } = useTemporalStore(
+    (state) => state,
+    shallow,
+  );
 
   return (
     <div>

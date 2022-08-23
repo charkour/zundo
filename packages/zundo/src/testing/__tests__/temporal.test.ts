@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 vi.mock('zustand/vanilla');
-import { createTemporalStore } from '../../index';
+import { createTemporalStore } from '../../temporal';
 import createVanilla from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 

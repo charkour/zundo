@@ -6,15 +6,10 @@ import {
 } from 'zustand';
 import {
   createTemporalStore,
-  TemporalStateWithInternals,
   ZundoOptions,
 } from './temporal';
-export type { ZundoOptions } from './temporal';
-export { createTemporalStore };
-export type TemporalState<TState> = Omit<
-  TemporalStateWithInternals<TState>,
-  '__internal'
->;
+import { PopArgument, TemporalState, Write } from './types';
+
 
 type Zundo = <
   TState,
@@ -52,6 +47,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   type TState = ReturnType<typeof config>;
   type StoreAddition = StoreApi<TemporalState<TState>>;
 
+  // TODO: this is the vanilla store
   const temporalStore = createTemporalStore<TState>(set, get, options);
 
   const store = _store as Mutate<
@@ -76,11 +72,3 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
 
 // TODO: rename this to temporal
 export const zundo = zundoImpl as unknown as Zundo;
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never;
-
-export type Write<T, U> = Omit<T, keyof U> & U;

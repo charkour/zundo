@@ -257,7 +257,7 @@ Issues and PRs are welcome. I'd like to hear your comments and critiques. We can
 
 ## Author
 
-- Charles Kornoelje ([@_charkour](https://twitter.com/_charkour)) - [Tekton](www.tekton.com)
+- Charles Kornoelje ([@\_charkour](https://twitter.com/_charkour)) - [Tekton](www.tekton.com)
 
 ## Versioning
 
