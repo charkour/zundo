@@ -1,5 +1,7 @@
 # 🍜 Zundo
 
+zundo v2 is on it's way! Checkout the progess [here](https://github.com/charkour/zundo/pull/43).
+
 enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand.
 
 [![Build Size](https://img.shields.io/bundlephobia/min/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
