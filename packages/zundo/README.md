@@ -216,41 +216,41 @@ interface TemporalState<TState> {
 }
 ```
 
-#### **`pastStates`**
+#### **Going back in time**
 
 `pastStates` is an array of previous states. The most recent previous state is at the end of the array. This is the state that will be applied when `undo` is called.
 
-#### **`futureStates`**
+#### **Forward to the future**
 
 `futureStates` is an array of future states. States are added when `undo` is called. The most recent future state is at the end of the array. This is the state that will be applied when `redo` is called. The future states are the "past past states."
 
-#### **`undo`**
+#### **Back it up**
 
 - `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
 
-#### **`redo`**
+#### **Take it back now y'all**
 
 - `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
 
-#### **`clear`**
+#### **Remove all knowledge of time**
 
 - `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
 
 Dispatching a new state will clear all of the future states.
 
-#### **`trackingState`**
+#### **Stop and start history**
 
 - `trackingState`: returns a string that indicates whether the temporal store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To pause and resume tracking, use `pause` and `resume`.
 
-#### **`pause`**
+#### **Pause tracking of history**
 
 - `pause`: call function to pause tracking state changes. This will prevent new states from being stored in history.
 
-#### **`resume`**
+#### **Resume tracking of history**
 
 - `resume`: call function to resume tracking state changes. This will allow new states to be stored in history.
 
-#### **`setOnSave`**
+#### **Programmatically add middleware to the setter**
 
 - `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context.
 
