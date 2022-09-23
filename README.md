@@ -1,1 +1,1 @@
-packages/zundo/README.md
+./packages/zundo/README.md
