@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand.
+enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <1kB
 
 [![Build Size](https://img.shields.io/bundlephobia/minzip/zundo/beta?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
@@ -17,6 +17,8 @@ See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 ```sh
 npm i zustand zundo@beta
 ```
+
+> zustand v4.1.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
 
 ## Background
 
