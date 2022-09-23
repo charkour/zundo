@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "isolatedModules": false,
+    "lib": [
+      "ESNext"
+    ],
+    "allowJs": true,
+  },
+}
