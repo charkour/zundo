@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "test": "vitest && npm run size",
+    "test": "vitest",
     "dev": "vitest --watch",
     "size": "size-limit"
   },
