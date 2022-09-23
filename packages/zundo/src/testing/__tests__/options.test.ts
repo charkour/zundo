@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
-import { zundo } from '../../index';
+import { temporal } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import shallow from 'zustand/shallow';
@@ -20,7 +20,7 @@ const createStore = (
   options?: ZundoOptions<MyState, Pick<MyState, 'count'>>,
 ) => {
   return createVanilla<MyState>()(
-    zundo((set) => {
+    temporal((set) => {
       return {
         count: 0,
         count2: 0,

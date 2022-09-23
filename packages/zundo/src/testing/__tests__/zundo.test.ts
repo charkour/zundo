@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
-import { zundo } from '../../index';
+import { temporal } from '../../index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import { TemporalState, Write } from '../../types';
@@ -21,7 +21,7 @@ describe('Zundo', () => {
   // Recreate store for each test
   beforeEach(() => {
     store = createVanilla<MyState>()(
-      zundo((set) => {
+      temporal((set) => {
         return {
           count: 0,
           increment: () =>

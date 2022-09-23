@@ -5,7 +5,7 @@ import {
   StoreApi,
 } from 'zustand';
 import {
-  createTemporalStore,
+  createVanillaTemporal,
   ZundoOptions,
 } from './temporal';
 import { PopArgument, TemporalState, Write } from './types';
@@ -47,8 +47,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   type TState = ReturnType<typeof config>;
   type StoreAddition = StoreApi<TemporalState<TState>>;
 
-  // TODO: this is the vanilla store
-  const temporalStore = createTemporalStore<TState>(set, get, options);
+  const temporalStore = createVanillaTemporal<TState>(set, get, options);
 
   const store = _store as Mutate<
     StoreApi<TState>,
@@ -70,5 +69,4 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   return config(modifiedSetter, get, _store);
 };
 
-// TODO: rename this to temporal
-export const zundo = zundoImpl as unknown as Zundo;
+export const temporal = zundoImpl as unknown as Zundo;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 vi.mock('zustand/vanilla');
-import { createTemporalStore } from '../../temporal';
+import { createVanillaTemporal } from '../../temporal';
 import createVanilla from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 
@@ -25,7 +25,7 @@ describe('Temporal', () => {
     };
   });
 
-  const temporalStore = createTemporalStore(store.setState, store.getState);
+  const temporalStore = createVanillaTemporal(store.setState, store.getState);
   const { undo, redo, clear, pastStates, futureStates } =
     temporalStore.getState();
   it('should have the objects defined', () => {

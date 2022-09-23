@@ -33,8 +33,7 @@ export interface ZundoOptions<State, TemporalState = State> {
   ) => StoreApi<State>['setState'];
 }
 
-// TODO: rename this to factory
-export const createTemporalStore = <TState>(
+export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   baseOptions?: ZundoOptions<TState>,
@@ -67,6 +66,7 @@ export const createTemporalStore = <TState>(
           futureStates.push(partialize(userGet()));
           userSet(pastState);
         }
+
         futureStates.push(...skippedPastStates);
       },
       redo: (steps = 1) => {
@@ -82,6 +82,7 @@ export const createTemporalStore = <TState>(
           pastStates.push(partialize(userGet()));
           userSet(futureState);
         }
+
         pastStates.push(...skippedFutureStates);
       },
       clear: () => {
@@ -100,7 +101,7 @@ export const createTemporalStore = <TState>(
       },
       __internal: {
         onSave,
-        handleUserSet: (pastState: TState) => {
+        handleUserSet: (pastState) => {
           const { trackingState, pastStates, futureStates, __internal } = get();
           const currentState = partialize(userGet());
           if (
