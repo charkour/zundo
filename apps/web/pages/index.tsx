@@ -1,6 +1,6 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
-import { zundo } from 'zundo';
+import { temporal } from 'zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 import shallow from 'zustand/shallow';
@@ -11,7 +11,7 @@ interface MyState {
   decrement: () => void;
 }
 
-const withZundo = zundo<MyState>(
+const withZundo = temporal<MyState>(
   (set) => ({
     count: 0,
     increment: () => set((state) => ({ count: state.count + 1 })),

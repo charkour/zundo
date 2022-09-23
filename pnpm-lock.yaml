@@ -118,6 +118,7 @@ importers:
       react: 18.2.0
       react-dom: 18.2.0
       size-limit: ^8.0.1
+      tsconfig: workspace:*
       tsup: 6.2.2
       typescript: 4.7.4
       vitest: 0.22.1
@@ -130,6 +131,7 @@ importers:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       size-limit: 8.0.1
+      tsconfig: link:../tsconfig
       tsup: 6.2.2_typescript@4.7.4
       typescript: 4.7.4
       vitest: 0.22.1
@@ -438,15 +440,7 @@ packages:
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
     dependencies:
-      '@types/react': 18.0.15
-    dev: true
-
-  /@types/react/18.0.15:
-    resolution: {integrity: sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.0
+      '@types/react': 18.0.21
     dev: true
 
   /@types/react/18.0.17:

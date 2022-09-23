@@ -1,6 +1,6 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
-import { zundo } from 'zundo/dist/zundo';
+import { temporal } from 'zundo';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 import { devtools, persist } from 'zustand/middleware';
@@ -36,7 +36,7 @@ interface MyState {
 
 const useChainedStore = create<MyState>()(
   devtools(
-    zundo(
+    temporal(
       immer(
         persist(
           (set) => ({
