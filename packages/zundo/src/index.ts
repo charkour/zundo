@@ -33,15 +33,15 @@ type ZundoImpl = <TState>(
 ) => PopArgument<StateCreator<TState, [], []>>;
 
 const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
+  type TState = ReturnType<typeof config>;
+  type StoreAddition = StoreApi<TemporalState<TState>>;
+
   const options = {
     partialize: (state: TState) => state,
     handleSet: (handleSetCb: typeof set) => handleSetCb,
     ...baseOptions,
   };
   const { partialize, handleSet: userlandSetFactory } = options;
-
-  type TState = ReturnType<typeof config>;
-  type StoreAddition = StoreApi<TemporalState<TState>>;
 
   const temporalStore = createVanillaTemporal<TState>(set, get, options);
 
@@ -53,6 +53,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   // We can hide the rest of the store in the secret internals.
   store.temporal = temporalStore;
 
+  // TODO: understand what this does. I forgot how it works.
   const curriedUserLandSet = userlandSetFactory(
     temporalStore.getState().__internal.handleUserSet,
   );
