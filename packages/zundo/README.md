@@ -2,13 +2,13 @@
 
 enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <1kB
 
+![](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
+
 [![Build Size](https://img.shields.io/bundlephobia/minzip/zundo/beta?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
-![](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
-
-See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
+Try a live [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 
 ## Install
 
@@ -21,8 +21,10 @@ npm i zustand zundo@beta
 ## Background
 
 - Solves the issue of managing state in complex user applications
+- Provides simple middleware to add undo/redo capabilities
 - Leverages zustand for state management, keeping the internals small
 - Middleware can be used with multiple stores in the same app
+- Unopinionated and extensible
 
 <div style="width: 100%; display: flex;">
 <img src="https://github.com/charkour/zundo/blob/main/zundo-mascot.png" style="margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." width=300 />
@@ -83,9 +85,19 @@ const App = () => {
 };
 ```
 
+## API
+
+### The Middleware
+
+`(config: StateCreator, options?: ZundoOptions) => StateCreator`
+
+zundo has one export: `temporal` It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API. 
+
 ### Middleware Options
 
 ```tsx
+type onSave<State> = (pastState: State, currentState: State) => void;
+
 interface ZundoOptions<State, TemporalState = State> {
   partialize?: (state: State) => TemporalState;
   limit?: number;
@@ -99,7 +111,9 @@ interface ZundoOptions<State, TemporalState = State> {
 
 #### **Exclude fields from being tracked in history**
 
-Use the `partialize` option, which takes a callback where you can choose to omit or include specific fields.
+`partialize?: (state: State) => TemporalState`
+
+Use the `partialize` option to omit or include specific fields. Pass a callback that returns the desired fields. This can also be used to exclude fields. By default, the entire state object is tracked. 
 
 ```tsx
 // Only field1 and field2 will be tracked
@@ -127,7 +141,9 @@ const useStoreB = create<StoreState>(
 
 #### **Limit number of states stored**
 
-For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `limit` will limit the number of previous and future states stored in the `temporal` store. By default, no limit is set.
+`limit?: number`
+
+For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `limit` will limit the number of previous and future states stored in the `temporal` store. When the limit is reached, the oldest state is dropped. By default, no limit is set.
 
 ```tsx
 const useStore = create<StoreState>(
@@ -140,11 +156,14 @@ const useStore = create<StoreState>(
 
 #### **Prevent unchanged states to be stored**
 
-For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. By default, all state changes to your store are tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`.
+`equality?: (a: State, b: State) => boolean`
+
+For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked. 
 
 ```tsx
 import shallow from 'zustand/shallow'
 
+// Use an existing equality function
 const useStoreA = create<StoreState>(
   temporal(
     set => ({ ... }),
@@ -152,6 +171,7 @@ const useStoreA = create<StoreState>(
   )
 );
 
+// Write your own equality function
 const useStoreB = create<StoreState>(
   temporal(
     set => ({ ... }),
@@ -162,7 +182,9 @@ const useStoreB = create<StoreState>(
 
 #### **Callback when temporal store is updated**
 
-Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programmatically setting the callback if you need lexical context.
+`onSave?: (pastState: State, currentState: State) => void`
+
+Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programmatically setting the callback if you need lexical context (see the `TemporalState` API below for more information).
 
 ```tsx
 import shallow from 'zustand/shallow'
@@ -177,7 +199,9 @@ const useStoreA = create<StoreState>(
 
 #### **Cool-off period**
 
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history.
+`handleSet?: (handleSet: StoreApi<State>['setState']) => StoreApi<State>['setState']`
+
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter funciton. 
 
 ```tsx
 const withTemporal = temporal<MyState>(
@@ -194,14 +218,15 @@ const withTemporal = temporal<MyState>(
 
 ### `useStore.temporal`
 
-Temporal is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
+When using zustand with the `temporal` middleware, a `temoral` object is attached to your vanilla or React-based store. `temporal` is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
 
-- `getState` returns the current state of the temporal store.
-- `setState` updates the state of the temporal store.
-- `subscribe` subscribes to changes in the temporal store.
-- `destroy` destroys the temporal store.
+Use `temporal.getState()` to access to temporal store!
 
-### `useStore.temporal.getState`
+> While `setState`, `subscribe`, and `destory` exist on `temporal`, you should not use them. 
+
+### `useStore.temporal.getState()`
+
+`temporal.getState()` returns the `TemporalState` which contains `undo`, `redo`, and other helpful functions and fields. 
 
 ```tsx
 interface TemporalState<TState> {
@@ -222,41 +247,59 @@ interface TemporalState<TState> {
 
 #### **Going back in time**
 
+`pastStates: TState[]`
+
 `pastStates` is an array of previous states. The most recent previous state is at the end of the array. This is the state that will be applied when `undo` is called.
 
 #### **Forward to the future**
+
+`futureStates: TState[]`
 
 `futureStates` is an array of future states. States are added when `undo` is called. The most recent future state is at the end of the array. This is the state that will be applied when `redo` is called. The future states are the "past past states."
 
 #### **Back it up**
 
-- `undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo.
+`undo: (steps?: number) => void`
+
+`undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo to go back multiple state at once.
 
 #### **Take it back now y'all**
 
-- `redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo.
+`redo: (steps?: number) => void`
+
+`redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo go forward multiple states at once.
 
 #### **Remove all knowledge of time**
 
-- `clear`: call function to remove all stored states from your undo store. _Warning:_ clearing cannot be undone.
+`clear: () => void`
 
-Dispatching a new state will clear all of the future states.
+`clear`: call function to remove all stored states from your undo store. Sets `pastStates` and `futureStates` to arrays with length of 0. _Warning:_ clearing cannot be undone.
+
+**Dispatching a new state will clear all of the future states.**
 
 #### **Stop and start history**
 
-- `trackingState`: returns a string that indicates whether the temporal store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To pause and resume tracking, use `pause` and `resume`.
+`trackingState: 'paused' | 'tracking'`
+
+`trackingState`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programatically pause and resume tracking, use `pause()` and `resume()` explained below.
 
 #### **Pause tracking of history**
 
-- `pause`: call function to pause tracking state changes. This will prevent new states from being stored in history.
+`pause: () => void`
+
+`pause`: call function to pause tracking state changes. This will prevent new states from being stored in history within the temporal store.
 
 #### **Resume tracking of history**
 
-- `resume`: call function to resume tracking state changes. This will allow new states to be stored in history.
+`resume: () => void`
+
+`resume`: call function to resume tracking state changes. This will allow new states to be stored in history within the temporal store.
 
 #### **Programmatically add middleware to the setter**
 
-- `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context.
+`setOnSave: (onSave: (pastState: State, currentState: State) => void) => void`
+
+`setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store. 
 
 ## Road Map
 
@@ -277,7 +320,7 @@ PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnp
 
 ## Author
 
-- Charles Kornoelje ([@\_charkour](https://twitter.com/_charkour)) - [Tekton](www.tekton.com)
+Charles Kornoelje ([@\_charkour](https://twitter.com/_charkour))
 
 ## Versioning
 
@@ -285,4 +328,4 @@ View the [releases](https://github.com/charkour/zundo/releases) for the change l
 
 ## Illustration Credits
 
-- Ivo Ilić ([@theivoson](https://twitter.com/theivoson))
+Ivo Ilić ([@theivoson](https://twitter.com/theivoson))
