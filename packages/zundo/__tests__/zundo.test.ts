@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
 import { temporal } from '../src/index';
-import createVanilla, { StoreApi } from 'zustand/vanilla';
+import createVanilla, { type StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
-import { TemporalState, Write } from '../src/types';
+import type { TemporalState, Write } from '../src/types';
 
 interface MyState {
   count: number;

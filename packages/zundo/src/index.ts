@@ -1,15 +1,11 @@
-import {
+import type {
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
   StoreApi,
 } from 'zustand';
-import {
-  createVanillaTemporal,
-  ZundoOptions,
-} from './temporal';
-import { PopArgument, TemporalState, Write } from './types';
-
+import { createVanillaTemporal } from './temporal';
+import type { PopArgument, TemporalState, Write, ZundoOptions } from './types';
 
 type Zundo = <
   TState,

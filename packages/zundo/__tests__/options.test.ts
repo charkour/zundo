@@ -4,9 +4,13 @@ import { temporal } from '../src/index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import shallow from 'zustand/shallow';
-import { TemporalStateWithInternals, ZundoOptions } from '../src/temporal';
-import throttle from '../node_modules/lodash.throttle'
-import { TemporalState, Write } from '../src/types';
+import type {
+  TemporalStateWithInternals,
+  ZundoOptions,
+  TemporalState,
+  Write,
+} from '../src/types';
+import throttle from '../node_modules/lodash.throttle';
 
 interface MyState {
   count: number;
