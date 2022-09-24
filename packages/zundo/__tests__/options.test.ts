@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
-import { temporal } from '../../index';
+import { temporal } from '../src/index';
 import createVanilla, { StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import shallow from 'zustand/shallow';
-import { TemporalStateWithInternals, ZundoOptions } from '../../temporal';
-import throttle from 'lodash.throttle';
-import { TemporalState, Write } from '../../types';
+import { TemporalStateWithInternals, ZundoOptions } from '../src/temporal';
+import throttle from '../node_modules/lodash.throttle'
+import { TemporalState, Write } from '../src/types';
 
 interface MyState {
   count: number;
