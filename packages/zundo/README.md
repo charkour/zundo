@@ -6,9 +6,7 @@ enable time-travel in your apps. undo/redo middleware for [zustand](https://gith
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
-<div style="width: 100%; display: flex; max-width: 300px;">
-<img src="zundo-mascot.png" style="max-width: 100px; margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." />
-</div>
+![](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
 
 See a [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 
@@ -25,6 +23,10 @@ npm i zustand zundo@beta
 - Solves the issue of managing state in complex user applications
 - Leverages zustand for state management, keeping the internals small
 - Middleware can be used with multiple stores in the same app
+
+<div style="width: 100%; display: flex;">
+<img src="https://github.com/charkour/zundo/blob/main/zundo-mascot.png" style="margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." width=300 />
+</div>
 
 ## First create a store with temporal middleware
 
