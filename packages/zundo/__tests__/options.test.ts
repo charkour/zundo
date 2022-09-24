@@ -156,50 +156,6 @@ describe('Middleware options', () => {
     });
   });
 
-  describe('temporal state', () => {
-    it('should initialize state to tracking', () => {
-      const { trackingState: state } = store.temporal.getState();
-      expect(state).toBe('tracking');
-    });
-
-    it('should switch to paused', () => {
-      const { pause } = store.temporal.getState();
-      act(() => {
-        pause();
-      });
-      expect(store.temporal.getState().trackingState).toBe('paused');
-    });
-
-    it('should switch to tracking', () => {
-      const { resume, pause } = store.temporal.getState();
-      act(() => {
-        pause();
-        resume();
-      });
-      expect(store.temporal.getState().trackingState).toBe('tracking');
-    });
-
-    it('does not track state when paused', () => {
-      const { pause, resume } = store.temporal.getState();
-      act(() => {
-        pause();
-        store.getState().increment();
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(0);
-      expect(store.getState()).toContain({ count: 1, count2: 1 });
-      act(() => {
-        resume();
-        store.getState().increment();
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.temporal.getState().pastStates[0]).toContain({
-        count: 1,
-        count2: 1,
-      });
-      expect(store.getState()).toContain({ count: 2, count2: 2 });
-    });
-  });
-
   describe('limit', () => {
     it('should not limit the number of past states when not set', () => {
       const { increment } = store.getState();
