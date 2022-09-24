@@ -1,15 +1,11 @@
-import {
+import type {
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
   StoreApi,
 } from 'zustand';
-import {
-  createVanillaTemporal,
-  ZundoOptions,
-} from './temporal';
-import { PopArgument, TemporalState, Write } from './types';
-
+import { createVanillaTemporal } from './temporal';
+import type { PopArgument, TemporalState, Write, ZundoOptions } from './types';
 
 type Zundo = <
   TState,
@@ -53,6 +49,8 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
     StoreApi<TState>,
     [['temporal', StoreAddition]]
   >;
+  // TODO: should temporal be only temporalStore.getState()?
+  // We can hide the rest of the store in the secret internals.
   store.temporal = temporalStore;
 
   const curriedUserLandSet = userlandSetFactory(
@@ -60,7 +58,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   );
 
   const modifiedSetter: typeof set = (state, replace) => {
-    // TODO: get() can eventually be replaced with the state in the callback
+    // Get most up to date state. Should this be the same as the state in the callback?
     const pastState = partialize(get());
     set(state, replace);
     curriedUserLandSet(pastState);

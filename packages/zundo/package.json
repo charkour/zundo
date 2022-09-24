@@ -5,9 +5,11 @@
   "description": "🍜 undo/redo middleware for zustand",
   "keywords": [
     "undo",
+    "redo",
     "history",
     "middleware",
-    "zustand"
+    "zustand",
+    "react"
   ],
   "homepage": "https://github.com/charkour/zundo",
   "bugs": {
@@ -17,21 +19,23 @@
     "type": "git",
     "url": "git+https://github.com/charkour/zundo.git"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/charkour"
+  },
   "license": "MIT",
   "author": "Charles Kornoelje",
   "main": "dist/index.js",
-  "module": "dist/zundo.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "src",
     "package.json"
   ],
   "scripts": {
     "build": "tsup",
-    "test": "vitest",
     "dev": "vitest --watch",
-    "size": "size-limit"
+    "size": "size-limit",
+    "test": "vitest"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.0.1",
