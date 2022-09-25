@@ -10,7 +10,9 @@ interface MyState {
   decrement: () => void;
 }
 
-describe('Temporal', () => {
+// tests the createVanillaTemporal function rather than the temporal middleware
+// Not exhaustive, but also likely not needed
+describe('createVanillaTemporal', () => {
   const store = createVanilla<MyState>((set) => {
     return {
       count: 0,

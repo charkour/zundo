@@ -62,8 +62,7 @@ describe('Middleware options', () => {
 
   describe('partialize', () => {
     it('should not partialize by default', () => {
-      const { undo, redo, clear, pastStates, futureStates } =
-        store.temporal.getState();
+      const { pastStates, futureStates } = store.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
       act(() => {
@@ -94,7 +93,7 @@ describe('Middleware options', () => {
           count: state.count,
         }),
       });
-      const { undo, redo, clear, pastStates, futureStates } =
+      const { pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
@@ -118,7 +117,7 @@ describe('Middleware options', () => {
           count: state.count,
         }),
       });
-      const { undo, redo, clear, pastStates, futureStates } =
+      const { undo, pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
       expect(pastStates.length).toBe(0);
       expect(futureStates.length).toBe(0);
@@ -153,50 +152,6 @@ describe('Middleware options', () => {
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
       });
-    });
-  });
-
-  describe('temporal state', () => {
-    it('should initialize state to tracking', () => {
-      const { trackingState: state } = store.temporal.getState();
-      expect(state).toBe('tracking');
-    });
-
-    it('should switch to paused', () => {
-      const { pause } = store.temporal.getState();
-      act(() => {
-        pause();
-      });
-      expect(store.temporal.getState().trackingState).toBe('paused');
-    });
-
-    it('should switch to tracking', () => {
-      const { resume, pause } = store.temporal.getState();
-      act(() => {
-        pause();
-        resume();
-      });
-      expect(store.temporal.getState().trackingState).toBe('tracking');
-    });
-
-    it('does not track state when paused', () => {
-      const { pause, resume } = store.temporal.getState();
-      act(() => {
-        pause();
-        store.getState().increment();
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(0);
-      expect(store.getState()).toContain({ count: 1, count2: 1 });
-      act(() => {
-        resume();
-        store.getState().increment();
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.temporal.getState().pastStates[0]).toContain({
-        count: 1,
-        count2: 1,
-      });
-      expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
   });
 
@@ -242,7 +197,8 @@ describe('Middleware options', () => {
   describe('equality function', () => {
     it('should use the equality function when set', () => {
       const storeWithEquality = createStore({
-        equality: (state1, state2) => state1.count === state2.count,
+        equality: (currentState, pastState) =>
+          currentState.count === pastState.count,
       });
       const { doNothing, increment } = storeWithEquality.getState();
       act(() => {
@@ -321,7 +277,7 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
-    it('should call the onSave function when set through the temporal state', () => {
+    it('should call the onSave function when set through the temporal store function', () => {
       global.console.warn = vi.fn();
       const { doNothing, increment } = store.getState();
       const { setOnSave } = store.temporal.getState();
@@ -393,7 +349,7 @@ describe('Middleware options', () => {
   });
 
   describe('handleSet', () => {
-    it('should work by default', () => {
+    it('should update the temporal store as expected if no handleSet options is passed', () => {
       const { doNothing, increment } = store.getState();
       act(() => {
         increment();
@@ -418,6 +374,14 @@ describe('Middleware options', () => {
         doNothing();
       });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.info).toHaveBeenCalledTimes(2);
+      act(() => {
+        storeWithHandleSet.temporal.getState().undo(2);
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+        2,
+      );
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
@@ -445,6 +409,15 @@ describe('Middleware options', () => {
       vi.runAllTimers();
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       expect(console.error).toHaveBeenCalledTimes(2);
+      act(() => {
+        storeWithHandleSet.temporal.getState().undo(2);
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+        2,
+      );
+      expect(console.log).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -453,6 +426,8 @@ describe('Middleware options', () => {
       const { __internal } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
       expect(__internal).toBeDefined();
+      expect(__internal.handleUserSet).toBeInstanceOf(Function);
+      expect(__internal.onSave).toBeInstanceOf(Function);
     });
     describe('onSave', () => {
       it('should call onSave cb without adding a new state when onSave is set by user', () => {
@@ -472,7 +447,7 @@ describe('Middleware options', () => {
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.error).toHaveBeenCalledTimes(1);
       });
-      it('should call onSave cb without adding a new state when onSave is set at store init', () => {
+      it('should call onSave cb without adding a new state when onSave is set at store init options', () => {
         global.console.info = vi.fn();
         const storeWithOnSave = createStore({
           onSave: (pastStates) => {
@@ -525,6 +500,39 @@ describe('Middleware options', () => {
       });
     });
 
-    // describe('handleUserSet', () => {});
+    describe('handleUserSet', () => {
+      it('should update the temporal store with the pastState when called', () => {
+        const { __internal } =
+          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { handleUserSet } = __internal;
+        act(() => {
+          handleUserSet(store.getState());
+        });
+        expect(store.temporal.getState().pastStates.length).toBe(1);
+      });
+
+      it('should only update if the the status is tracking', () => {
+        const { __internal } =
+          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { handleUserSet } = __internal;
+        act(() => {
+          handleUserSet(store.getState());
+        });
+        expect(store.temporal.getState().pastStates.length).toBe(1);
+        act(() => {
+          store.temporal.getState().pause();
+          handleUserSet(store.getState());
+        });
+        expect(store.temporal.getState().pastStates.length).toBe(1);
+        act(() => {
+          store.temporal.getState().resume();
+          handleUserSet(store.getState());
+        })
+      })
+
+      // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
+
+    });
+
   });
 });
