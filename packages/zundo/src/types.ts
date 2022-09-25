@@ -1,6 +1,6 @@
 import type { StoreApi } from 'zustand/vanilla';
 
-type onSave<State> = (pastState: State, currentState: State) => void;
+type onSave<TState> = (pastState: TState, currentState: TState) => void;
 
 export interface TemporalStateWithInternals<TState> {
   pastStates: TState[];
@@ -10,7 +10,7 @@ export interface TemporalStateWithInternals<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingState: 'paused' | 'tracking';
+  trackingStatus: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
 
@@ -21,16 +21,14 @@ export interface TemporalStateWithInternals<TState> {
   };
 }
 
-export interface ZundoOptions<State, TemporalState = State> {
-  partialize?: (state: State) => TemporalState;
+export interface ZundoOptions<TState, PartialTState = TState> {
+  partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (a: State, b: State) => boolean;
-  /* called when saved */
-  onSave?: onSave<State>;
-  /* Middleware for the temporal setter */
+  equality?: (currentState: TState, pastState: TState) => boolean;
+  onSave?: onSave<TState>;
   handleSet?: (
-    handleSet: StoreApi<State>['setState'],
-  ) => StoreApi<State>['setState'];
+    handleSet: StoreApi<TState>['setState'],
+  ) => StoreApi<TState>['setState'];
 }
 
 export type PopArgument<T extends (...a: never[]) => unknown> = T extends (

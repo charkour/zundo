@@ -2,7 +2,7 @@
 
 enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <1kB
 
-![](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
+![gif displaying undo feature](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
 
 [![Build Size](https://img.shields.io/bundlephobia/minzip/zundo/beta?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
@@ -91,29 +91,29 @@ const App = () => {
 
 `(config: StateCreator, options?: ZundoOptions) => StateCreator`
 
-zundo has one export: `temporal` It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API. 
+zundo has one export: `temporal` It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
 
 ### Middleware Options
 
 ```tsx
-type onSave<State> = (pastState: State, currentState: State) => void;
+type onSave<TState> = (pastState: TState, currentState: TState) => void;
 
-interface ZundoOptions<State, TemporalState = State> {
-  partialize?: (state: State) => TemporalState;
+export interface ZundoOptions<TState, PartialTState = TState> {
+  partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (a: State, b: State) => boolean;
-  onSave?: onSave<State>;
+  equality?: (currentState: TState, pastState: TState) => boolean;
+  onSave?: onSave<TState>;
   handleSet?: (
-    handleSet: StoreApi<State>['setState'],
-  ) => StoreApi<State>['setState'];
+    handleSet: StoreApi<TState>['setState'],
+  ) => StoreApi<TState>['setState'];
 }
 ```
 
 #### **Exclude fields from being tracked in history**
 
-`partialize?: (state: State) => TemporalState`
+`partialize?: (state: TState) => PartialTState`
 
-Use the `partialize` option to omit or include specific fields. Pass a callback that returns the desired fields. This can also be used to exclude fields. By default, the entire state object is tracked. 
+Use the `partialize` option to omit or include specific fields. Pass a callback that returns the desired fields. This can also be used to exclude fields. By default, the entire state object is tracked.
 
 ```tsx
 // Only field1 and field2 will be tracked
@@ -156,9 +156,9 @@ const useStore = create<StoreState>(
 
 #### **Prevent unchanged states to be stored**
 
-`equality?: (a: State, b: State) => boolean`
+`equality?: (currentState: TState, pastState: TState) => boolean`
 
-For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked. 
+For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked.
 
 ```tsx
 import shallow from 'zustand/shallow'
@@ -182,7 +182,7 @@ const useStoreB = create<StoreState>(
 
 #### **Callback when temporal store is updated**
 
-`onSave?: (pastState: State, currentState: State) => void`
+`onSave?: (pastState: TState, currentState: TState) => void`
 
 Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programmatically setting the callback if you need lexical context (see the `TemporalState` API below for more information).
 
@@ -199,9 +199,9 @@ const useStoreA = create<StoreState>(
 
 #### **Cool-off period**
 
-`handleSet?: (handleSet: StoreApi<State>['setState']) => StoreApi<State>['setState']`
+`handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
 
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter funciton. 
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter function.
 
 ```tsx
 const withTemporal = temporal<MyState>(
@@ -218,15 +218,15 @@ const withTemporal = temporal<MyState>(
 
 ### `useStore.temporal`
 
-When using zustand with the `temporal` middleware, a `temoral` object is attached to your vanilla or React-based store. `temporal` is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
+When using zustand with the `temporal` middleware, a `temporal` object is attached to your vanilla or React-based store. `temporal` is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
 
 Use `temporal.getState()` to access to temporal store!
 
-> While `setState`, `subscribe`, and `destory` exist on `temporal`, you should not use them. 
+> While `setState`, `subscribe`, and `destory` exist on `temporal`, you should not use them.
 
 ### `useStore.temporal.getState()`
 
-`temporal.getState()` returns the `TemporalState` which contains `undo`, `redo`, and other helpful functions and fields. 
+`temporal.getState()` returns the `TemporalState` which contains `undo`, `redo`, and other helpful functions and fields.
 
 ```tsx
 interface TemporalState<TState> {
@@ -237,7 +237,7 @@ interface TemporalState<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingState: 'paused' | 'tracking';
+  trackingStatus: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
 
@@ -279,9 +279,9 @@ interface TemporalState<TState> {
 
 #### **Stop and start history**
 
-`trackingState: 'paused' | 'tracking'`
+`trackingStatus: 'paused' | 'tracking'`
 
-`trackingState`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programatically pause and resume tracking, use `pause()` and `resume()` explained below.
+`trackingStatus`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programmatically pause and resume tracking, use `pause()` and `resume()` explained below.
 
 #### **Pause tracking of history**
 
@@ -299,7 +299,14 @@ interface TemporalState<TState> {
 
 `setOnSave: (onSave: (pastState: State, currentState: State) => void) => void`
 
-`setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store. 
+`setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store.
+
+## Migrate from v1 to v2
+
+<details>
+<summary>Click to expand</summary>
+
+</details>
 
 ## Road Map
 
