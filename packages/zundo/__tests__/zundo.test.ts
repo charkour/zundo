@@ -42,14 +42,14 @@ describe('temporal middleware', () => {
   });
 
   it('should have the objects defined', () => {
-    const { undo, redo, clear, pastStates, futureStates, trackingState, pause, resume, setOnSave } =
+    const { undo, redo, clear, pastStates, futureStates, trackingStatus, pause, resume, setOnSave } =
       store.temporal.getState();
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
     expect(clear).toBeDefined();
     expect(pastStates).toBeDefined();
     expect(futureStates).toBeDefined();
-    expect(trackingState).toBeDefined();
+    expect(trackingStatus).toBeDefined();
     expect(pause).toBeDefined();
     expect(resume).toBeDefined();
     expect(setOnSave).toBeDefined();
@@ -301,10 +301,10 @@ describe('temporal middleware', () => {
     expect(futureStates.length).toBe(0);
   });
 
-  describe('temporal state', () => {
+  describe('temporal tracking status', () => {
     it('should initialize state to tracking', () => {
-      const { trackingState: state } = store.temporal.getState();
-      expect(state).toBe('tracking');
+      const { trackingStatus } = store.temporal.getState();
+      expect(trackingStatus).toBe('tracking');
     });
 
     it('should switch to paused', () => {
@@ -312,7 +312,7 @@ describe('temporal middleware', () => {
       act(() => {
         pause();
       });
-      expect(store.temporal.getState().trackingState).toBe('paused');
+      expect(store.temporal.getState().trackingStatus).toBe('paused');
     });
 
     it('should switch to tracking', () => {
@@ -321,7 +321,7 @@ describe('temporal middleware', () => {
         pause();
         resume();
       });
-      expect(store.temporal.getState().trackingState).toBe('tracking');
+      expect(store.temporal.getState().trackingStatus).toBe('tracking');
     });
 
     it('does not track state when paused', () => {

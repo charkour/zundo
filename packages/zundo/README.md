@@ -201,7 +201,7 @@ const useStoreA = create<StoreState>(
 
 `handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
 
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter funciton.
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter function.
 
 ```tsx
 const withTemporal = temporal<MyState>(
@@ -218,7 +218,7 @@ const withTemporal = temporal<MyState>(
 
 ### `useStore.temporal`
 
-When using zustand with the `temporal` middleware, a `temoral` object is attached to your vanilla or React-based store. `temporal` is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
+When using zustand with the `temporal` middleware, a `temporal` object is attached to your vanilla or React-based store. `temporal` is a vanilla zustand store: see [StoreApi<T> from](https://github.com/pmndrs/zustand/blob/f0ff30f7c431f6bf25b3cb439d065a7e61355df4/src/vanilla.ts#L8) zustand for more details.
 
 Use `temporal.getState()` to access to temporal store!
 
@@ -237,7 +237,7 @@ interface TemporalState<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingState: 'paused' | 'tracking';
+  trackingStatus: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
 
@@ -279,9 +279,9 @@ interface TemporalState<TState> {
 
 #### **Stop and start history**
 
-`trackingState: 'paused' | 'tracking'`
+`trackingStatus: 'paused' | 'tracking'`
 
-`trackingState`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programatically pause and resume tracking, use `pause()` and `resume()` explained below.
+`trackingStatus`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programmatically pause and resume tracking, use `pause()` and `resume()` explained below.
 
 #### **Pause tracking of history**
 

@@ -10,7 +10,7 @@ export interface TemporalStateWithInternals<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingState: 'paused' | 'tracking';
+  trackingStatus: 'paused' | 'tracking';
   pause: () => void;
   resume: () => void;
 
