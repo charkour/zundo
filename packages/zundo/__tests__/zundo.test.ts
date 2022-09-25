@@ -7,6 +7,7 @@ import type { TemporalState, Write } from '../src/types';
 
 interface MyState {
   count: number;
+  count2: number;
   increment: () => void;
   decrement: () => void;
 }
@@ -24,13 +25,16 @@ describe('temporal middleware', () => {
       temporal((set) => {
         return {
           count: 0,
+          count2: 0,
           increment: () =>
             set((state) => ({
               count: state.count + 1,
+              count2: state.count2 + 1,
             })),
           decrement: () =>
             set((state) => ({
               count: state.count - 1,
+              count2: state.count2 - 1,
             })),
         };
       }),
@@ -73,7 +77,7 @@ describe('temporal middleware', () => {
     });
 
     it('should undo multiple states (step)', () => {
-      const { undo, redo, clear, pastStates, futureStates } =
+      const { undo, pastStates } =
         store.temporal.getState();
       expect(pastStates.length).toBe(0);
       act(() => {
@@ -115,7 +119,7 @@ describe('temporal middleware', () => {
     });
 
     it('should redo multiple states (step)', () => {
-      const { undo, redo, clear, pastStates, futureStates } =
+      const { undo, redo, pastStates, futureStates } =
         store.temporal.getState();
       expect(pastStates.length).toBe(0);
       act(() => {
