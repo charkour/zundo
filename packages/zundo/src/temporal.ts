@@ -70,7 +70,8 @@ export const createVanillaTemporal = <TState>(
       __internal: {
         onSave,
         handleUserSet: (pastState) => {
-          const { trackingStatus, pastStates, futureStates, __internal } = get();
+          const { trackingStatus, pastStates, futureStates, __internal } =
+            get();
           const currentState = partialize(userGet());
           if (
             trackingStatus === 'tracking' &&

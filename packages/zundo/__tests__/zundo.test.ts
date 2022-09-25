@@ -42,8 +42,17 @@ describe('temporal middleware', () => {
   });
 
   it('should have the objects defined', () => {
-    const { undo, redo, clear, pastStates, futureStates, trackingStatus, pause, resume, setOnSave } =
-      store.temporal.getState();
+    const {
+      undo,
+      redo,
+      clear,
+      pastStates,
+      futureStates,
+      trackingStatus,
+      pause,
+      resume,
+      setOnSave,
+    } = store.temporal.getState();
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
     expect(clear).toBeDefined();
@@ -63,8 +72,7 @@ describe('temporal middleware', () => {
 
   describe('undo', () => {
     it('should undo', () => {
-      const { undo } =
-        store.temporal.getState();
+      const { undo } = store.temporal.getState();
       expect(store.getState().count).toBe(0);
       act(() => {
         store.getState().increment();
@@ -77,8 +85,7 @@ describe('temporal middleware', () => {
     });
 
     it('should undo multiple states (step)', () => {
-      const { undo, pastStates } =
-        store.temporal.getState();
+      const { undo, pastStates } = store.temporal.getState();
       expect(pastStates.length).toBe(0);
       act(() => {
         store.getState().increment();
@@ -101,8 +108,7 @@ describe('temporal middleware', () => {
 
   describe('redo', () => {
     it('should redo', () => {
-      const { undo, redo } =
-        store.temporal.getState();
+      const { undo, redo } = store.temporal.getState();
       expect(store.getState().count).toBe(0);
       act(() => {
         store.getState().increment();
@@ -161,8 +167,8 @@ describe('temporal middleware', () => {
     expect(pastStates.length).toBe(1);
     expect(futureStates.length).toBe(2);
     act(() => {
-      redo()
-    })
+      redo();
+    });
     expect(pastStates.length).toBe(2);
     expect(futureStates.length).toBe(1);
     act(() => {
@@ -173,8 +179,7 @@ describe('temporal middleware', () => {
   });
 
   it('should update pastStates', () => {
-    const { undo, redo, clear, pastStates } =
-      store.temporal.getState();
+    const { undo, redo, clear, pastStates } = store.temporal.getState();
     expect(pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -203,8 +208,7 @@ describe('temporal middleware', () => {
   });
 
   it('should update futureStates', () => {
-    const { undo, redo, clear, futureStates } =
-      store.temporal.getState();
+    const { undo, redo, clear, futureStates } = store.temporal.getState();
     expect(futureStates.length).toBe(0);
     act(() => {
       store.getState().increment();
@@ -344,4 +348,6 @@ describe('temporal middleware', () => {
       expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
   });
+
+  // Note: setOnSave and __internals are tested in options.test.ts since they are closely related
 });

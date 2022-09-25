@@ -101,7 +101,7 @@ type onSave<TState> = (pastState: TState, currentState: TState) => void;
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (a: TState, b: TState) => boolean;
+  equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
@@ -156,7 +156,7 @@ const useStore = create<StoreState>(
 
 #### **Prevent unchanged states to be stored**
 
-`equality?: (a: TState, b: TState) => boolean`
+`equality?: (currentState: TState, pastState: TState) => boolean`
 
 For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked.
 

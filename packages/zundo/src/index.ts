@@ -53,7 +53,6 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   // We can hide the rest of the store in the secret internals.
   store.temporal = temporalStore;
 
-  // TODO: understand what this does. I forgot how it works.
   const curriedUserLandSet = userlandSetFactory(
     temporalStore.getState().__internal.handleUserSet,
   );
