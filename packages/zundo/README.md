@@ -301,6 +301,11 @@ interface TemporalState<TState> {
 
 `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store.
 
+## Examples
+
+- [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
+- [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
+
 ## Migrate from v1 to v2
 
 <details>
