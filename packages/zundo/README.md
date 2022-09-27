@@ -30,7 +30,7 @@ npm i zustand zundo@beta
 <img src="https://github.com/charkour/zundo/blob/main/zundo-mascot.png" style="margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." width=300 />
 </div>
 
-## First create a store with temporal middleware
+## First create a vanilla store with temporal middleware
 
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
@@ -55,6 +55,16 @@ const useStoreWithUndo = create<StoreState>()(
 );
 ```
 
+## Convert to React Store
+
+If you're using React, you can convert the store to a React hook using create from `zustand`.
+
+```tsx
+import { create } from 'zustand'
+
+const useTemporalStore = create(useStoreWithUndo.temporal)
+```
+
 ## Then bind your components
 
 Use your store anywhere, including `undo`, `redo`, and `clear`!
@@ -70,7 +80,9 @@ const App = () => {
     undo,
     redo,
     clear
-  } = useStoreWithUndo.temporal.getState();
+  } = useTemporalStore();
+  // or if you don't use create from zustand, you can use the store directly
+  // } = useStoreWithUndo.temporal.getState();
 
   return (
     <>
@@ -224,6 +236,24 @@ Use `temporal.getState()` to access to temporal store!
 
 > While `setState`, `subscribe`, and `destory` exist on `temporal`, you should not use them.
 
+#### **React Hooks**
+
+To use within React hooks, we need to convert the vanilla store to a React-based store using `create` from `zustand`. This is done by passing the vanilla store to `create` from `zustand`.
+
+```tsx
+import { create } from 'zustand';
+import { temporal } from 'zundo';
+
+const useStore = create(
+  temporal(
+    set => ({ ... }),
+    { ... }
+  )
+);
+
+const useTemporalStore = create(useStore.temporal);
+```
+
 ### `useStore.temporal.getState()`
 
 `temporal.getState()` returns the `TemporalState` which contains `undo`, `redo`, and other helpful functions and fields.
@@ -300,6 +330,12 @@ interface TemporalState<TState> {
 `setOnSave: (onSave: (pastState: State, currentState: State) => void) => void`
 
 `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store.
+
+## Examples
+
+- [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
+- [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
+- [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
 
 ## Migrate from v1 to v2
 
