@@ -22,40 +22,45 @@ export const createVanillaTemporal = <TState>(
       pastStates,
       futureStates,
       undo: (steps = 1) => {
-        if (pastStates.length === 0) {
+        const ps = get().pastStates.slice();
+        const fs = get().futureStates.slice();
+        if (ps.length === 0) {
           return;
         }
 
-        const skippedPastStates = pastStates.splice(
-          pastStates.length - (steps - 1),
+        const skippedPastStates = ps.splice(
+          ps.length - (steps - 1),
         );
-        const pastState = pastStates.pop();
+        const pastState = ps.pop();
         if (pastState) {
-          futureStates.push(partialize(userGet()));
+          fs.push(partialize(userGet()));
           userSet(pastState);
         }
 
-        futureStates.push(...skippedPastStates);
+        fs.push(...skippedPastStates);
+        set({ pastStates: ps, futureStates: fs });
       },
       redo: (steps = 1) => {
-        if (futureStates.length === 0) {
+        const ps = get().pastStates.slice();
+        const fs = get().futureStates.slice();
+        if (fs.length === 0) {
           return;
         }
 
-        const skippedFutureStates = futureStates.splice(
-          futureStates.length - (steps - 1),
+        const skippedFutureStates = fs.splice(
+          fs.length - (steps - 1),
         );
-        const futureState = futureStates.pop();
+        const futureState = fs.pop();
         if (futureState) {
-          pastStates.push(partialize(userGet()));
+          ps.push(partialize(userGet()));
           userSet(futureState);
         }
 
-        pastStates.push(...skippedFutureStates);
+        ps.push(...skippedFutureStates);
+        set({ pastStates: ps, futureStates: fs });
       },
       clear: () => {
-        pastStates.length = 0;
-        futureStates.length = 0;
+        set({ pastStates: [], futureStates: [] });
       },
       trackingStatus: 'tracking',
       pause: () => {
@@ -70,19 +75,20 @@ export const createVanillaTemporal = <TState>(
       __internal: {
         onSave,
         handleUserSet: (pastState) => {
-          const { trackingStatus, pastStates, futureStates, __internal } =
+          const { trackingStatus, pastStates, __internal } =
             get();
+          const ps = pastStates.slice();
           const currentState = partialize(userGet());
           if (
             trackingStatus === 'tracking' &&
             !equality(currentState, pastState)
           ) {
-            if (limit && pastStates.length >= limit) {
-              pastStates.shift();
+            if (limit && ps.length >= limit) {
+              ps.shift();
             }
-            pastStates.push(pastState);
-            futureStates.length = 0;
+            ps.push(pastState);
             __internal.onSave?.(pastState, currentState);
+            set({ pastStates: ps, futureStates: [] });
           }
         },
       },

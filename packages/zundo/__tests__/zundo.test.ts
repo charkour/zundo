@@ -92,16 +92,16 @@ describe('temporal middleware', () => {
         store.getState().increment();
         store.getState().increment();
       });
-      expect(pastStates.length).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(3);
       act(() => {
         undo(2);
       });
-      expect(pastStates.length).toBe(1);
+      expect(store.temporal.getState().pastStates.length).toBe(1);
       expect(store.getState().count).toBe(1);
       act(() => {
         undo();
       });
-      expect(pastStates.length).toBe(0);
+      expect(store.temporal.getState().pastStates.length).toBe(0);
       expect(store.getState().count).toBe(0);
     });
   });
@@ -133,17 +133,17 @@ describe('temporal middleware', () => {
         store.getState().increment();
         store.getState().increment();
       });
-      expect(pastStates.length).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(3);
       act(() => {
         undo(2);
       });
-      expect(pastStates.length).toBe(1);
+      expect(store.temporal.getState().pastStates.length).toBe(1);
       expect(store.getState().count).toBe(1);
-      expect(futureStates.length).toBe(2);
+      expect(store.temporal.getState().futureStates.length).toBe(2);
       act(() => {
         redo(2);
       });
-      expect(pastStates.length).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(3);
       expect(store.getState().count).toBe(3);
     });
   });
@@ -155,56 +155,56 @@ describe('temporal middleware', () => {
     act(() => {
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     act(() => {
       store.getState().increment();
       store.getState().decrement();
     });
-    expect(pastStates.length).toBe(3);
+    expect(store.temporal.getState().pastStates.length).toBe(3);
     act(() => {
       undo(2);
     });
-    expect(pastStates.length).toBe(1);
-    expect(futureStates.length).toBe(2);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
+    expect(store.temporal.getState().futureStates.length).toBe(2);
     act(() => {
       redo();
     });
-    expect(pastStates.length).toBe(2);
-    expect(futureStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(2);
+    expect(store.temporal.getState().futureStates.length).toBe(1);
     act(() => {
       clear();
     });
-    expect(pastStates.length).toBe(0);
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
   });
 
   it('should update pastStates', () => {
     const { undo, redo, clear, pastStates } = store.temporal.getState();
-    expect(pastStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
     act(() => {
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     act(() => {
       store.getState().decrement();
     });
-    expect(pastStates.length).toBe(2);
+    expect(store.temporal.getState().pastStates.length).toBe(2);
     act(() => {
       undo();
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     act(() => {
       undo();
     });
-    expect(pastStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
     act(() => {
       redo();
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     act(() => {
       clear();
     });
-    expect(pastStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
   });
 
   it('should update futureStates', () => {
@@ -213,24 +213,24 @@ describe('temporal middleware', () => {
     act(() => {
       store.getState().increment();
     });
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
     act(() => {
       store.getState().increment();
       store.getState().decrement();
     });
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
     act(() => {
       undo(2);
     });
-    expect(futureStates.length).toBe(2);
+    expect(store.temporal.getState().futureStates.length).toBe(2);
     act(() => {
       redo();
     });
-    expect(futureStates.length).toBe(1);
+    expect(store.temporal.getState().futureStates.length).toBe(1);
     act(() => {
       clear();
     });
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
   });
 
   it('properly tracks state values after clearing', () => {
@@ -242,40 +242,40 @@ describe('temporal middleware', () => {
       store.getState().increment();
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(3);
+    expect(store.temporal.getState().pastStates.length).toBe(3);
     act(() => {
       clear();
     });
-    expect(pastStates.length).toBe(0);
-    expect(futureStates.length).toBe(0);
-    expect(pastStates).toEqual([]);
-    expect(futureStates).toEqual([]);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates).toEqual([]);
+    expect(store.temporal.getState().futureStates).toEqual([]);
     expect(store.getState().count).toBe(3);
     act(() => {
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     expect(store.getState().count).toBe(4);
     act(() => {
       store.getState().increment();
       store.getState().increment();
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(4);
+    expect(store.temporal.getState().pastStates.length).toBe(4);
     expect(store.getState().count).toBe(7);
     act(() => {
       undo(3);
     });
-    expect(pastStates.length).toBe(1);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
     expect(store.getState().count).toBe(4);
-    expect(futureStates.length).toBe(3);
+    expect(store.temporal.getState().futureStates.length).toBe(3);
     act(() => {
       clear();
     });
-    expect(pastStates.length).toBe(0);
-    expect(futureStates.length).toBe(0);
-    expect(pastStates).toEqual([]);
-    expect(futureStates).toEqual([]);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates).toEqual([]);
+    expect(store.temporal.getState().futureStates).toEqual([]);
     expect(store.getState().count).toBe(4);
   });
 
@@ -289,20 +289,20 @@ describe('temporal middleware', () => {
       store.getState().increment();
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(3);
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(3);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
     act(() => {
       undo(2);
     });
-    expect(pastStates.length).toBe(1);
-    expect(futureStates.length).toBe(2);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
+    expect(store.temporal.getState().futureStates.length).toBe(2);
     act(() => {
       store.getState().increment();
       store.getState().increment();
       store.getState().increment();
     });
-    expect(pastStates.length).toBe(4);
-    expect(futureStates.length).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(4);
+    expect(store.temporal.getState().futureStates.length).toBe(0);
   });
 
   describe('temporal tracking status', () => {

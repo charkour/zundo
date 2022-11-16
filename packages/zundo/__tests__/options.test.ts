@@ -69,15 +69,15 @@ describe('Middleware options', () => {
         store.getState().increment();
         store.getState().increment();
       });
-      expect(pastStates.length).toBe(2);
-      expect(pastStates[0]).toEqual({
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+      expect(store.temporal.getState().pastStates[0]).toEqual({
         count: 0,
         count2: 0,
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
       });
-      expect(pastStates[1]).toEqual({
+      expect(store.temporal.getState().pastStates[1]).toEqual({
         count: 1,
         count2: 1,
         increment: expect.any(Function),
@@ -95,17 +95,17 @@ describe('Middleware options', () => {
       });
       const { pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
-      expect(pastStates.length).toBe(0);
-      expect(futureStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(0);
       act(() => {
         storeWithPartialize.getState().increment();
         storeWithPartialize.getState().increment();
       });
-      expect(pastStates.length).toBe(2);
-      expect(pastStates[0]).toEqual({
+      expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(2);
+      expect(storeWithPartialize.temporal.getState().pastStates[0]).toEqual({
         count: 0,
       });
-      expect(pastStates[1]).toEqual({
+      expect(storeWithPartialize.temporal.getState().pastStates[1]).toEqual({
         count: 1,
       });
       expect(storeWithPartialize.getState()).toContain({ count: 2, count2: 2 });
@@ -119,16 +119,16 @@ describe('Middleware options', () => {
       });
       const { undo, pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
-      expect(pastStates.length).toBe(0);
-      expect(futureStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(0);
 
       act(() => {
         storeWithPartialize.getState().increment();
         storeWithPartialize.getState().increment();
         undo();
       });
-      expect(futureStates.length).toBe(1);
-      expect(futureStates[0]).toEqual({
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(1);
+      expect(storeWithPartialize.temporal.getState().futureStates[0]).toEqual({
         count: 2,
       });
       expect(storeWithPartialize.getState()).toEqual({
@@ -141,8 +141,8 @@ describe('Middleware options', () => {
       act(() => {
         undo();
       });
-      expect(futureStates.length).toBe(2);
-      expect(futureStates[1]).toEqual({
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(2);
+      expect(storeWithPartialize.temporal.getState().futureStates[1]).toEqual({
         count: 1,
       });
       expect(storeWithPartialize.getState()).toEqual({
