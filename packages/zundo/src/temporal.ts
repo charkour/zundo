@@ -37,7 +37,7 @@ export const createVanillaTemporal = <TState>(
           userSet(pastState);
         }
 
-        fs.push(...skippedPastStates);
+        fs.push(...skippedPastStates.reverse());
         set({ pastStates: ps, futureStates: fs });
       },
       redo: (steps = 1) => {
@@ -56,7 +56,7 @@ export const createVanillaTemporal = <TState>(
           userSet(futureState);
         }
 
-        ps.push(...skippedFutureStates);
+        ps.push(...skippedFutureStates.reverse());
         set({ pastStates: ps, futureStates: fs });
       },
       clear: () => {
