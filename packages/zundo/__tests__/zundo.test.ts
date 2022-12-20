@@ -91,15 +91,19 @@ describe('temporal middleware', () => {
         store.getState().increment();
         store.getState().increment();
         store.getState().increment();
+        store.getState().increment();
+        store.getState().increment();
+        store.getState().increment();
       });
-      expect(store.temporal.getState().pastStates.length).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(6);
+      act(() => {
+        undo(4);
+      });
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+      expect(store.getState().count).toBe(2);
+      expect(store.temporal.getState().futureStates.map((state) => state.count)).toEqual([6, 5, 4, 3]);
       act(() => {
         undo(2);
-      });
-      expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.getState().count).toBe(1);
-      act(() => {
-        undo();
       });
       expect(store.temporal.getState().pastStates.length).toBe(0);
       expect(store.getState().count).toBe(0);
@@ -132,19 +136,23 @@ describe('temporal middleware', () => {
         store.getState().increment();
         store.getState().increment();
         store.getState().increment();
+        store.getState().increment();
+        store.getState().increment();
+        store.getState().increment();
       });
-      expect(store.temporal.getState().pastStates.length).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(6);
       act(() => {
-        undo(2);
+        undo(4);
       });
-      expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.getState().count).toBe(1);
-      expect(store.temporal.getState().futureStates.length).toBe(2);
+      expect(store.temporal.getState().pastStates.length).toBe(2);
+      expect(store.getState().count).toBe(2);
+      expect(store.temporal.getState().futureStates.length).toBe(4);
       act(() => {
-        redo(2);
+        redo(4);
       });
-      expect(store.temporal.getState().pastStates.length).toBe(3);
-      expect(store.getState().count).toBe(3);
+      expect(store.temporal.getState().pastStates.length).toBe(6);
+      expect(store.temporal.getState().pastStates.map((state) => state.count)).toEqual([0, 1, 2, 3, 4, 5]);
+      expect(store.getState().count).toBe(6);
     });
   });
 
