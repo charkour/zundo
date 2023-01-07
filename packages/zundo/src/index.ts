@@ -1,10 +1,9 @@
 import type {
   StateCreator,
   StoreMutatorIdentifier,
-  Mutate,
   StoreApi,
 } from 'zustand';
-import { createVanillaTemporal } from './temporal';
+import {createTemporal, sanitizeUserState, StateWithTemporal} from './temporal';
 import type { PopArgument, TemporalState, Write, ZundoOptions } from './types';
 
 type Zundo = <
@@ -34,7 +33,6 @@ type ZundoImpl = <TState>(
 
 const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   type TState = ReturnType<typeof config>;
-  type StoreAddition = StoreApi<TemporalState<TState>>;
 
   const options = {
     partialize: (state: TState) => state,
@@ -43,28 +41,25 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   };
   const { partialize, handleSet: userlandSetFactory } = options;
 
-  const temporalStore = createVanillaTemporal<TState>(set, get, options);
-
-  const store = _store as Mutate<
-    StoreApi<TState>,
-    [['temporal', StoreAddition]]
-  >;
-  // TODO: should temporal be only temporalStore.getState()?
-  // We can hide the rest of the store in the secret internals.
-  store.temporal = temporalStore;
+  // @ts-ignore
+  const temporalStore = createTemporal<TState>(set, get, options);
 
   const curriedUserLandSet = userlandSetFactory(
-    temporalStore.getState().__internal.handleUserSet,
+    temporalStore.__internal.handleUserSet,
   );
 
   const modifiedSetter: typeof set = (state, replace) => {
     // Get most up to date state. Should this be the same as the state in the callback?
-    const pastState = partialize(get());
+    // @ts-ignore
+    const pastState = partialize(sanitizeUserState(get()));
     set(state, replace);
     curriedUserLandSet(pastState);
   };
 
-  return config(modifiedSetter, get, _store);
+  return {
+    ...config(modifiedSetter, get, _store),
+    _temporal: temporalStore
+  };
 };
 
 export const temporal = zundoImpl as unknown as Zundo;

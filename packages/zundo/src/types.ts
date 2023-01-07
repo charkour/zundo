@@ -1,6 +1,6 @@
 import type { StoreApi } from 'zustand/vanilla';
 
-type onSave<TState> = (pastState: TState, currentState: TState) => void;
+export type onSave<TState> = (pastState: TState, currentState: TState) => void;
 
 export interface TemporalStateWithInternals<TState> {
   pastStates: TState[];
