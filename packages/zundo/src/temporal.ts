@@ -14,7 +14,14 @@ export const createVanillaTemporal = <TState>(
     ...baseOptions,
   };
 
-  if (options.persist) options.persist.name = `${options.persist.name}-temporal`
+  if (options.persist) options.persist = {
+    ...options.persist,
+    name: `${options.persist.name}-temporal`,
+    partialize: state => {
+      const { __internal, ...rest } = state
+      return rest as any
+    }
+  }
 
   const { partialize, onSave, limit, equality } = options;
 

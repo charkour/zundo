@@ -21,10 +21,8 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   inc: () => set((state) => { state.count++ }),
   dec: () => set((state) => { state.count-- }),
 })), {
-  persist: persistOptions,
-  partialize: (state) => {
-    const { count } = state
-    return { count }
+  persist: {
+    name: persistOptions.name
   }
 }), persistOptions))
 

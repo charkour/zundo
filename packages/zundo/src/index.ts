@@ -5,7 +5,7 @@ import type {
   StoreApi,
 } from 'zustand';
 import { createVanillaTemporal } from './temporal';
-import type { PopArgument, TemporalState, Write, ZundoOptions } from './types';
+import type { PopArgument, TemporalState, Write, ZundoOptions, TemporalStateWithInternals } from './types';
 
 type Zundo = <
   TState,
@@ -68,3 +68,4 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
 };
 
 export const temporal = zundoImpl as unknown as Zundo;
+export { TemporalStateWithInternals };

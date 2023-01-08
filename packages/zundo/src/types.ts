@@ -30,7 +30,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
-  persist?: PersistOptions<TState>
+  persist?: PersistOptions<TemporalStateWithInternals<TState>>
 }
 
 export type PopArgument<T extends (...a: never[]) => unknown> = T extends (
