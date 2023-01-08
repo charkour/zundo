@@ -1,0 +1,82 @@
+import React, { useMemo } from 'react'
+import create from "zustand";
+import { temporal } from "zundo";
+import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import dynamic from "next/dynamic";
+import { PersistOptions } from "zustand/middleware/persist";
+
+interface Store {
+  count: number
+  inc: () => void
+  dec: () => void
+}
+
+const persistOptions: PersistOptions<Store> = {
+  name: 'some-store'
+}
+
+const useStore = create<Store>()(persist(temporal(immer(set => ({
+  count: 0,
+  inc: () => set((state) => { state.count++ }),
+  dec: () => set((state) => { state.count-- }),
+})), {
+  persist: persistOptions,
+  partialize: (state) => {
+    const { count } = state
+    return { count }
+  }
+}), persistOptions))
+
+const useTemporalStore = create(useStore.temporal)
+
+export const Persist = dynamic(Promise.resolve(() => {
+  const state = useStore()
+  const temporalState = useTemporalStore()
+
+  const localStorageStateOnLoad = useMemo(() => localStorage.getItem('some-store') ?? '{}', [])
+  const localStorageTemporalStateOnLoad = useMemo(() => localStorage.getItem('some-store-temporal') ?? '{}', [])
+
+  return (
+    <div>
+      <h1>Count: {state.count}</h1>
+      <button onClick={state.inc}>inc</button>
+      <button onClick={state.dec}>dec</button>
+      {/*<button onClick={state.setFoo}>setfoo</button>*/}
+
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 1 }}>
+          <h2>Current state</h2>
+          <pre>
+            {JSON.stringify(state, null, 2)}
+          </pre>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h2>Previous states</h2>
+          <pre>
+            {JSON.stringify(temporalState, null, 2)}
+          </pre>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 1 }}>
+          <h2>Local storage state on load</h2>
+          <pre>
+        {JSON.stringify(JSON.parse(localStorageStateOnLoad), null, 2)}
+      </pre>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h2>Local storage temporal state on load</h2>
+          <pre>
+        {JSON.stringify(JSON.parse(localStorageTemporalStateOnLoad), null, 2)}
+      </pre>
+        </div>
+      </div>
+    </div>
+  )
+}), { ssr: false })
+
+export default Persist
