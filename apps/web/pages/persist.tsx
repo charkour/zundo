@@ -4,7 +4,6 @@ import { temporal } from "zundo";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import dynamic from "next/dynamic";
-import { merge } from "lodash";
 
 interface Store {
   count: number
@@ -30,8 +29,7 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   inc: () => set((state) => { state.count++ }),
   dec: () => set((state) => { state.count-- }),
 }))), {
-  name: 'temporal-store',
-  merge: (persistedState, currentState) => merge(currentState, persistedState),
+  name: 'temporal-store'
 }))
 
 export const Persist = dynamic(Promise.resolve(() => {
@@ -44,10 +42,6 @@ export const Persist = dynamic(Promise.resolve(() => {
       <h1>Count: {state.count}</h1>
       <button onClick={state.inc}>inc</button>
       <button onClick={state.dec}>dec</button>
-      {/*@ts-ignore*/}
-      <button onClick={() => { state._temporal.undo() }}>undo</button>
-      {/*@ts-ignore*/}
-      <button onClick={() => { state._temporal.redo() }}>redo</button>
       {/*<button onClick={state.setFoo}>setfoo</button>*/}
 
       <h2>Current state</h2>
