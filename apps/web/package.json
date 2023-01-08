@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@types/lodash.throttle": "4.1.7",
-    "immer": "^9.0.17",
     "lodash.throttle": "4.1.1",
     "next": "12.2.5",
     "react": "18.2.0",
@@ -20,12 +19,10 @@
     "zustand": "4.1.1"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.191",
     "@types/node": "16.11.7",
     "@types/react": "18.0.17",
     "eslint": "8.22.0",
     "eslint-config-custom": "workspace:*",
-    "lodash": "^4.17.21",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "workspace:*",
     "typescript": "4.7.4"

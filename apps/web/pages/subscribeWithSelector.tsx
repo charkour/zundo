@@ -17,9 +17,3 @@ const store = create<ExampleData>()(
     }))
   )
 );
-
-const Subscribed = () => {
-  return <></>
-}
-
-export default Subscribed
