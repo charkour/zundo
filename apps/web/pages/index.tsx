@@ -1,9 +1,9 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
 import { temporal } from 'zundo';
-import create from 'zustand';
-import createVanilla from 'zustand/vanilla';
-import shallow from 'zustand/shallow';
+import { create } from 'zustand';
+import { createStore as createVanilla } from 'zustand/vanilla';
+import { shallow } from 'zustand/shallow';
 
 interface MyState {
   count: number;

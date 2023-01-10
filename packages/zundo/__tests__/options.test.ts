@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
 import { temporal } from '../src/index';
-import createVanilla, { StoreApi } from 'zustand/vanilla';
+import { createStore as createVanilla, StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import type {
   TemporalStateWithInternals,
   ZundoOptions,
@@ -96,7 +96,9 @@ describe('Middleware options', () => {
       const { pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
       expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
-      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
+        0,
+      );
       act(() => {
         storeWithPartialize.getState().increment();
         storeWithPartialize.getState().increment();
@@ -120,14 +122,18 @@ describe('Middleware options', () => {
       const { undo, pastStates, futureStates } =
         storeWithPartialize.temporal.getState();
       expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
-      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(0);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
+        0,
+      );
 
       act(() => {
         storeWithPartialize.getState().increment();
         storeWithPartialize.getState().increment();
         undo();
       });
-      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(1);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
+        1,
+      );
       expect(storeWithPartialize.temporal.getState().futureStates[0]).toEqual({
         count: 2,
       });
@@ -141,7 +147,9 @@ describe('Middleware options', () => {
       act(() => {
         undo();
       });
-      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(2);
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
+        2,
+      );
       expect(storeWithPartialize.temporal.getState().futureStates[1]).toEqual({
         count: 1,
       });
@@ -527,12 +535,10 @@ describe('Middleware options', () => {
         act(() => {
           store.temporal.getState().resume();
           handleUserSet(store.getState());
-        })
-      })
+        });
+      });
 
       // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
-
     });
-
   });
 });

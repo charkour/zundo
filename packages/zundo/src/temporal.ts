@@ -1,4 +1,4 @@
-import createVanilla, { type StoreApi } from 'zustand/vanilla';
+import { createStore as createVanilla, type StoreApi } from 'zustand/vanilla';
 import type { TemporalStateWithInternals, ZundoOptions } from './types';
 
 export const createVanillaTemporal = <TState>(
