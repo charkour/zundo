@@ -35,7 +35,8 @@
     "build": "tsup",
     "dev": "vitest --watch",
     "size": "size-limit",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ci": "vitest run --reporter junit --outputFile.junit=./junit.xml"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "8.1.0",
