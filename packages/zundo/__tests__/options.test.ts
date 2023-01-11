@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-vi.mock('zustand/vanilla');
+vi.mock('zustand');
 import { temporal } from '../src/index';
-import { createStore as createVanilla, StoreApi } from 'zustand/vanilla';
+import { createStore, type StoreApi } from 'zustand';
 import { act } from 'react-dom/test-utils';
 import { shallow } from 'zustand/shallow';
 import type {
@@ -20,10 +20,10 @@ interface MyState {
   doNothing: () => void;
 }
 
-const createStore = (
+const createVanillaStore = (
   options?: ZundoOptions<MyState, Pick<MyState, 'count'>>,
 ) => {
-  return createVanilla<MyState>()(
+  return createStore<MyState>()(
     temporal((set) => {
       return {
         count: 0,
@@ -57,7 +57,7 @@ describe('Middleware options', () => {
   >;
   // Recreate store for each test
   beforeEach(() => {
-    store = createStore();
+    store = createVanillaStore();
   });
 
   describe('partialize', () => {
@@ -88,7 +88,7 @@ describe('Middleware options', () => {
     });
 
     it('should partialize the past states', () => {
-      const storeWithPartialize = createStore({
+      const storeWithPartialize = createVanillaStore({
         partialize: (state) => ({
           count: state.count,
         }),
@@ -114,7 +114,7 @@ describe('Middleware options', () => {
     });
 
     it('should partialize the future states', () => {
-      const storeWithPartialize = createStore({
+      const storeWithPartialize = createVanillaStore({
         partialize: (state) => ({
           count: state.count,
         }),
@@ -183,7 +183,7 @@ describe('Middleware options', () => {
     });
 
     it('should limit the number of past states when set', () => {
-      const storeWithLimit = createStore({ limit: 3 });
+      const storeWithLimit = createVanillaStore({ limit: 3 });
       const { increment } = storeWithLimit.getState();
       act(() => {
         increment();
@@ -204,7 +204,7 @@ describe('Middleware options', () => {
 
   describe('equality function', () => {
     it('should use the equality function when set', () => {
-      const storeWithEquality = createStore({
+      const storeWithEquality = createVanillaStore({
         equality: (currentState, pastState) =>
           currentState.count === pastState.count,
       });
@@ -227,7 +227,7 @@ describe('Middleware options', () => {
     });
 
     it('should use an external equality function', () => {
-      const storeWithEquality = createStore({
+      const storeWithEquality = createVanillaStore({
         equality: shallow,
       });
       const { doNothing, increment } = storeWithEquality.getState();
@@ -271,7 +271,7 @@ describe('Middleware options', () => {
   describe('onSave', () => {
     it('should call the onSave function when set through options', () => {
       global.console.info = vi.fn();
-      const storeWithOnSave = createStore({
+      const storeWithOnSave = createVanillaStore({
         onSave: (pastStates) => {
           console.info(pastStates);
         },
@@ -312,7 +312,7 @@ describe('Middleware options', () => {
       global.console.info = vi.fn();
       global.console.log = vi.fn();
       global.console.error = vi.fn();
-      const storeWithOnSave = createStore({
+      const storeWithOnSave = createVanillaStore({
         onSave: (pastStates) => {
           console.info(pastStates);
         },
@@ -368,7 +368,7 @@ describe('Middleware options', () => {
 
     it('should call function if set', () => {
       global.console.info = vi.fn();
-      const storeWithHandleSet = createStore({
+      const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
           return (state) => {
             console.info('handleSet called');
@@ -396,7 +396,7 @@ describe('Middleware options', () => {
     it('should correctly use throttling', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();
-      const storeWithHandleSet = createStore({
+      const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>((state) => {
             console.error('handleSet called');
@@ -457,7 +457,7 @@ describe('Middleware options', () => {
       });
       it('should call onSave cb without adding a new state when onSave is set at store init options', () => {
         global.console.info = vi.fn();
-        const storeWithOnSave = createStore({
+        const storeWithOnSave = createVanillaStore({
           onSave: (pastStates) => {
             console.info(pastStates);
           },
@@ -474,7 +474,7 @@ describe('Middleware options', () => {
       it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
         global.console.dir = vi.fn();
         global.console.trace = vi.fn();
-        const storeWithOnSave = createStore({
+        const storeWithOnSave = createVanillaStore({
           onSave: (pastStates) => {
             console.dir(pastStates);
           },

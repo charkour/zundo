@@ -1,8 +1,7 @@
 import throttle from 'lodash.throttle';
 import { Button } from 'ui';
 import { temporal } from 'zundo';
-import { create } from 'zustand';
-import { createStore as createVanilla } from 'zustand/vanilla';
+import { create, createStore } from 'zustand';
 import { shallow } from 'zustand/shallow';
 
 interface MyState {
@@ -26,7 +25,7 @@ const withZundo = temporal<MyState>(
   },
 );
 
-const originalStore = createVanilla(withZundo);
+const originalStore = createStore(withZundo);
 
 const useStore = create(originalStore);
 const useTemporalStore = create(originalStore.temporal);
