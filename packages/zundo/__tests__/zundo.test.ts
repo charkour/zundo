@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand/vanilla');
 import { temporal } from '../src/index';
-import createVanilla, { type StoreApi } from 'zustand/vanilla';
+import { createStore as createVanilla, type StoreApi } from 'zustand/vanilla';
 import { act } from 'react-dom/test-utils';
 import type { TemporalState, Write } from '../src/types';
 
@@ -101,7 +101,9 @@ describe('temporal middleware', () => {
       });
       expect(store.temporal.getState().pastStates.length).toBe(2);
       expect(store.getState().count).toBe(2);
-      expect(store.temporal.getState().futureStates.map((state) => state.count)).toEqual([6, 5, 4, 3]);
+      expect(
+        store.temporal.getState().futureStates.map((state) => state.count),
+      ).toEqual([6, 5, 4, 3]);
       act(() => {
         undo(2);
       });
@@ -151,7 +153,9 @@ describe('temporal middleware', () => {
         redo(4);
       });
       expect(store.temporal.getState().pastStates.length).toBe(6);
-      expect(store.temporal.getState().pastStates.map((state) => state.count)).toEqual([0, 1, 2, 3, 4, 5]);
+      expect(
+        store.temporal.getState().pastStates.map((state) => state.count),
+      ).toEqual([0, 1, 2, 3, 4, 5]);
       expect(store.getState().count).toBe(6);
     });
   });

@@ -1,8 +1,6 @@
-import throttle from 'lodash.throttle';
 import { Button } from 'ui';
 import { temporal } from 'zundo';
 import create from 'zustand';
-import createVanilla from 'zustand/vanilla';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
@@ -55,7 +53,8 @@ const useChainedStore = create<MyState>()(
 
 export default function Web() {
   const { count, increment, decrement } = useChainedStore();
-  const { undo, futureStates, pastStates } = useChainedStore.temporal.getState();
+  const { undo, futureStates, pastStates } =
+    useChainedStore.temporal.getState();
 
   return (
     <div>
