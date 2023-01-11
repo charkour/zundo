@@ -16,7 +16,7 @@ Try a live [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.t
 npm i zustand zundo@beta
 ```
 
-> zustand v4.1.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
+> zustand v4.3.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
 
 ## Background
 
@@ -36,7 +36,7 @@ This returns the familiar store accessible by a hook! But now your store tracks 
 
 ```tsx
 import { temporal } from 'zundo'
-import create from 'zustand'
+import { create } from 'zustand'
 
 // define the store (typescript)
 interface StoreState {
@@ -341,6 +341,8 @@ interface TemporalState<TState> {
 
 <details>
 <summary>Click to expand</summary>
+
+This is a work in progress. Submit a PR!
 
 </details>
 

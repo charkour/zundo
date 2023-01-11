@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-vi.mock('zustand/vanilla');
+vi.mock('zustand');
 import { temporal } from '../src/index';
-import { createStore as createVanilla, type StoreApi } from 'zustand/vanilla';
+import { createStore, type StoreApi } from 'zustand';
 import { act } from 'react-dom/test-utils';
 import type { TemporalState, Write } from '../src/types';
 
@@ -21,7 +21,7 @@ describe('temporal middleware', () => {
   >;
   // Recreate store for each test
   beforeEach(() => {
-    store = createVanilla<MyState>()(
+    store = createStore<MyState>()(
       temporal((set) => {
         return {
           count: 0,
