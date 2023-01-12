@@ -16,7 +16,7 @@ Try a live [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.t
 npm i zustand zundo@beta
 ```
 
-> zustand v4.1.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
+> zustand v4.3.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
 
 ## Background
 
@@ -36,7 +36,7 @@ This returns the familiar store accessible by a hook! But now your store tracks 
 
 ```tsx
 import { temporal } from 'zundo'
-import create from 'zustand'
+import { create } from 'zustand'
 
 // define the store (typescript)
 interface StoreState {
@@ -173,7 +173,7 @@ const useStore = create<StoreState>(
 For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked.
 
 ```tsx
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 
 // Use an existing equality function
 const useStoreA = create<StoreState>(
@@ -199,7 +199,7 @@ const useStoreB = create<StoreState>(
 Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programmatically setting the callback if you need lexical context (see the `TemporalState` API below for more information).
 
 ```tsx
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 
 const useStoreA = create<StoreState>(
   temporal(
@@ -341,6 +341,8 @@ interface TemporalState<TState> {
 
 <details>
 <summary>Click to expand</summary>
+
+This is a work in progress. Submit a PR!
 
 </details>
 

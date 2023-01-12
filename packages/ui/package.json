@@ -8,12 +8,12 @@
     "lint": "eslint *.ts*"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "eslint": "latest",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
+    "eslint": "^8.31.0",
     "eslint-config-custom": "workspace:*",
-    "react": "latest",
+    "react": "^18.2.0",
     "tsconfig": "workspace:*",
-    "typescript": "latest"
+    "typescript": "^4.9.4"
   }
 }

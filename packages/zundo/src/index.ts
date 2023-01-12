@@ -5,7 +5,7 @@ import type {
   StoreApi,
 } from 'zustand';
 import { createVanillaTemporal } from './temporal';
-import type { PopArgument, TemporalState, Write, ZundoOptions } from './types';
+import type { TemporalState, Write, ZundoOptions } from './types';
 
 type Zundo = <
   TState,
@@ -28,9 +28,9 @@ declare module 'zustand/vanilla' {
 }
 
 type ZundoImpl = <TState>(
-  config: PopArgument<StateCreator<TState, [], []>>,
+  config: StateCreator<TState, [], []>,
   options: ZundoOptions<TState>,
-) => PopArgument<StateCreator<TState, [], []>>;
+) => StateCreator<TState, [], []>;
 
 const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   type TState = ReturnType<typeof config>;

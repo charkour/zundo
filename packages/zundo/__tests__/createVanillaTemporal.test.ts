@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-vi.mock('zustand/vanilla');
+vi.mock('zustand');
 import { createVanillaTemporal } from '../src/temporal';
-import createVanilla from 'zustand/vanilla';
+import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
 
 interface MyState {
@@ -13,7 +13,7 @@ interface MyState {
 // tests the createVanillaTemporal function rather than the temporal middleware
 // Not exhaustive, but also likely not needed
 describe('createVanillaTemporal', () => {
-  const store = createVanilla<MyState>((set) => {
+  const store = createStore<MyState>((set) => {
     return {
       count: 0,
       increment: () =>

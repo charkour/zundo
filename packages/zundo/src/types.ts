@@ -1,4 +1,4 @@
-import type { StoreApi } from 'zustand/vanilla';
+import type { StoreApi } from 'zustand';
 
 type onSave<TState> = (pastState: TState, currentState: TState) => void;
 
@@ -30,12 +30,6 @@ export interface ZundoOptions<TState, PartialTState = TState> {
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
 }
-
-export type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never;
 
 export type Write<T, U> = Omit<T, keyof U> & U;
 
