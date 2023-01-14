@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/lodash.throttle": "4.1.7",
     "immer": "^9.0.17",
+    "lodash": "^4.17.21",
     "lodash.throttle": "4.1.1",
     "next": "13.1.1",
     "react": "18.2.0",
@@ -20,6 +21,7 @@
     "zustand": "4.3.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.191",
     "@types/node": "18.11.18",
     "@types/react": "18.0.26",
     "eslint": "8.31.0",

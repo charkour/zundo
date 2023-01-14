@@ -1,5 +1,5 @@
 import type { StoreApi } from 'zustand';
-import { PersistOptions } from "zustand/middleware";
+import { StateCreator } from "zustand/vanilla";
 
 type onSave<TState> = (pastState: TState, currentState: TState) => void;
 
@@ -27,10 +27,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
-  handleSet?: (
-    handleSet: StoreApi<TState>['setState'],
-  ) => StoreApi<TState>['setState'];
-  persist?: PersistOptions<TemporalStateWithInternals<TState>>
+  handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState'];
+  storeWrap?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [], []>) => StateCreator<TemporalStateWithInternals<TState>, [], []>
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;

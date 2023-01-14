@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
-import create from "zustand";
+import { create } from "zustand";
 import { temporal } from "zundo";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import dynamic from "next/dynamic";
 import { PersistOptions } from "zustand/middleware/persist";
+import { merge } from "lodash";
 
 interface Store {
   count: number
@@ -20,10 +21,11 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   count: 0,
   inc: () => set((state) => { state.count++ }),
   dec: () => set((state) => { state.count-- }),
-})), {
-  persist: {
-    name: persistOptions.name
-  }
+})), { // TODO: find a proper way to type cast here
+  storeWrap: (store) => persist(store, {
+    name: 'some-store-temporal',
+    merge: (persistedState, currentState) => merge(currentState, persistedState)
+  })
 }), persistOptions))
 
 const useTemporalStore = create(useStore.temporal)
