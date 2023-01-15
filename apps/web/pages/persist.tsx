@@ -22,7 +22,7 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   inc: () => set((state) => { state.count++ }),
   dec: () => set((state) => { state.count-- }),
 })), { // TODO: find a proper way to type cast here
-  storeWrap: (store) => persist(store, {
+  wrapTemporalStore: (store) => persist(store, {
     name: 'some-store-temporal',
     merge: (persistedState, currentState) => merge(currentState, persistedState)
   })

@@ -28,7 +28,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
   handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState'];
-  storeWrap?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [], []>) => StateCreator<TemporalStateWithInternals<TState>, [], []>
+  wrapTemporalStore?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [], []>) => StateCreator<TemporalStateWithInternals<TState>, [], []>
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;

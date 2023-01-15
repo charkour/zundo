@@ -11,13 +11,13 @@ export const createVanillaTemporal = <TState>(
     partialize: (state: TState) => state,
     equality: (a: TState, b: TState) => false,
     onSave: () => {},
-    storeWrap: (init: StateCreator<TemporalStateWithInternals<TState>, [], []>) => init,
+    wrapTemporalStore: (init: StateCreator<TemporalStateWithInternals<TState>, [], []>) => init,
     ...baseOptions,
   };
 
-  const { partialize, onSave, limit, equality, storeWrap } = options;
+  const { partialize, onSave, limit, equality, wrapTemporalStore } = options;
 
-  return createStore<TemporalStateWithInternals<TState>>(storeWrap((set, get) => ({
+  return createStore<TemporalStateWithInternals<TState>>(wrapTemporalStore((set, get) => ({
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
