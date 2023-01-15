@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+    <testsuite name="__tests__/createVanillaTemporal.test.ts" timestamp="2023-01-10T21:57:34.749Z" hostname="Livios-MBP" tests="1" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="__tests__/createVanillaTemporal.test.ts" name="createVanillaTemporal &gt; should have the objects defined" time="0.003">
+        </testcase>
+    </testsuite>
+    <testsuite name="__tests__/zundo.test.ts" timestamp="2023-01-10T21:57:34.758Z" hostname="Livios-MBP" tests="14" failures="0" errors="0" skipped="0" time="0.009">
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; should have the objects defined" time="0.003">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; undo &gt; should undo" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; undo &gt; should undo multiple states (step)" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; redo &gt; should redo" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; redo &gt; should redo multiple states (step)" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; should clear" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; should update pastStates" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; should update futureStates" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; properly tracks state values after clearing" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; should clear future states when set is called" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; temporal tracking status &gt; should initialize state to tracking" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; temporal tracking status &gt; should switch to paused" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; temporal tracking status &gt; should switch to tracking" time="0">
+        </testcase>
+        <testcase classname="__tests__/zundo.test.ts" name="temporal middleware &gt; temporal tracking status &gt; does not track state when paused" time="0.001">
+        </testcase>
+    </testsuite>
+    <testsuite name="__tests__/options.test.ts" timestamp="2023-01-10T21:57:34.760Z" hostname="Livios-MBP" tests="20" failures="0" errors="0" skipped="0" time="0.011">
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; partialize &gt; should not partialize by default" time="0.003">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; partialize &gt; should partialize the past states" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; partialize &gt; should partialize the future states" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; limit &gt; should not limit the number of past states when not set" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; limit &gt; should limit the number of past states when set" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; equality function &gt; should use the equality function when set" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; equality function &gt; should use an external equality function" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; equality function &gt; should not prevent history if there is no equality function" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; onSave &gt; should call the onSave function when set through options" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; onSave &gt; should call the onSave function when set through the temporal store function" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; onSave &gt; should call a new onSave function after being set" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; handleSet &gt; should update the temporal store as expected if no handleSet options is passed" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; handleSet &gt; should call function if set" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; handleSet &gt; should correctly use throttling" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; should have a secret internal state" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; onSave &gt; should call onSave cb without adding a new state when onSave is set by user" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; onSave &gt; should call onSave cb without adding a new state when onSave is set at store init options" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; onSave &gt; should call onSave cb without adding a new state and respond to new setOnSave" time="0.001">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; handleUserSet &gt; should update the temporal store with the pastState when called" time="0">
+        </testcase>
+        <testcase classname="__tests__/options.test.ts" name="Middleware options &gt; secret internals &gt; handleUserSet &gt; should only update if the the status is tracking" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>

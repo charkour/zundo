@@ -36,7 +36,7 @@
     "dev": "vitest --watch",
     "size": "size-limit",
     "test": "vitest",
-    "test:ci": "vitest run --reporter junit --outputFile.junit=./junit.xml"
+    "test:ci": "vitest run"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "8.1.0",
