@@ -21,7 +21,8 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   count: 0,
   inc: () => set((state) => { state.count++ }),
   dec: () => set((state) => { state.count-- }),
-})), { // TODO: find a proper way to type cast here
+})), {
+  limit: 5,
   wrapTemporalStore: (store) => persist(store, {
     name: 'some-store-temporal',
     merge: (persistedState, currentState) => merge(currentState, persistedState)
@@ -42,7 +43,6 @@ export const Persist = dynamic(Promise.resolve(() => {
       <h1>Count: {state.count}</h1>
       <button onClick={state.inc}>inc</button>
       <button onClick={state.dec}>dec</button>
-      {/*<button onClick={state.setFoo}>setfoo</button>*/}
 
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 1 }}>

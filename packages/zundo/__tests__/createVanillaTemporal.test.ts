@@ -3,7 +3,7 @@ vi.mock('zustand');
 import { createVanillaTemporal } from '../src/temporal';
 import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
-import {persist} from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 interface MyState {
   count: number;
@@ -44,7 +44,7 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should wrap temporal store in given middlewares', () => {
-    const temporalStore = createVanillaTemporal(store.setState, store.getState, { wrapTemporalStore: (store) => persist(store, { name: 'persist' }) })
+    const temporalStore = createVanillaTemporal(store.setState, store.getState, { limit: 1, wrapTemporalStore: (store) => persist(store, { name: '123' }) })
     expect(temporalStore).toHaveProperty('persist')
   });
 });

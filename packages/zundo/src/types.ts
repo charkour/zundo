@@ -1,4 +1,4 @@
-import type { StoreApi } from 'zustand';
+import type { StoreApi, StoreMutatorIdentifier } from 'zustand';
 import { StateCreator } from "zustand/vanilla";
 
 type onSave<TState> = (pastState: TState, currentState: TState) => void;
@@ -24,11 +24,11 @@ export interface TemporalStateWithInternals<TState> {
 
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
-  limit?: number;
+  limit: number | undefined;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
   handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState'];
-  wrapTemporalStore?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [], []>) => StateCreator<TemporalStateWithInternals<TState>, [], []>
+  wrapTemporalStore?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;
