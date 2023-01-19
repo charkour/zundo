@@ -1,6 +1,5 @@
-import {createStore, type StoreApi, StoreMutatorIdentifier} from 'zustand';
+import { createStore, type StoreApi } from 'zustand';
 import type { TemporalStateWithInternals, ZundoOptions } from './types';
-import { StateCreator } from "zustand/vanilla";
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
@@ -17,7 +16,7 @@ export const createVanillaTemporal = <TState>(
 
   const { partialize, onSave, limit, equality, wrapTemporalStore } = options;
 
-  return createStore<TemporalStateWithInternals<TState>>(wrapTemporalStore((set, get)  => ({
+  return createStore<TemporalStateWithInternals<TState>>()(wrapTemporalStore((set, get)  => ({
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
@@ -87,5 +86,5 @@ export const createVanillaTemporal = <TState>(
         },
       },
     })
-  ) as StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][]>)
+  ))
 };
