@@ -49,6 +49,8 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
     StoreApi<TState>,
     [['temporal', StoreAddition]]
   >;
+  const { setState } = store;
+
   // TODO: should temporal be only temporalStore.getState()?
   // We can hide the rest of the store in the secret internals.
   store.temporal = temporalStore;
@@ -56,6 +58,13 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   const curriedUserLandSet = userlandSetFactory(
     temporalStore.getState().__internal.handleUserSet,
   );
+
+  const modifiedSetState: typeof setState = (state, replace) => {
+    const pastState = partialize(get());
+    setState(state, replace);
+    curriedUserLandSet(pastState);
+  };
+  store.setState = modifiedSetState;
 
   const modifiedSetter: typeof set = (state, replace) => {
     // Get most up to date state. Should this be the same as the state in the callback?

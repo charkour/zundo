@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "vitest --watch",
+    "dev": "tsup --watch",
     "size": "size-limit",
     "test": "vitest"
   },
