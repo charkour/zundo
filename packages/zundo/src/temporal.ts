@@ -1,6 +1,6 @@
 import {createStore, type StoreApi, StoreMutatorIdentifier} from 'zustand';
 import type { TemporalStateWithInternals, ZundoOptions } from './types';
-import {StateCreator} from "zustand/vanilla";
+import { StateCreator } from "zustand/vanilla";
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
