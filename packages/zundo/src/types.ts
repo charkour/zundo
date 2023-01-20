@@ -24,7 +24,7 @@ export interface TemporalStateWithInternals<TState> {
 
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
-  limit: number | undefined;
+  limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
   handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState'];
