@@ -44,7 +44,7 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should wrap temporal store in given middlewares', () => {
-    const temporalStore = createVanillaTemporal(store.setState, store.getState, { limit: 1, wrapTemporalStore: (store) => persist(store, { name: '123' }) })
+    const temporalStore = createVanillaTemporal(store.setState, store.getState, { wrapTemporalStore: (store) => persist(store, { name: '123' }) })
     expect(temporalStore).toHaveProperty('persist')
   });
 });
