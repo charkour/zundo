@@ -5,7 +5,7 @@ import type {
   StoreApi,
 } from 'zustand';
 import { createVanillaTemporal } from './temporal';
-import type { TemporalState, Write, ZundoOptions, TemporalStateWithInternals } from './types';
+import type { TemporalState, Write, ZundoOptions } from './types';
 
 type Zundo = <
   TState,
@@ -67,7 +67,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   store.setState = modifiedSetState;
 
   const modifiedSetter: typeof set = (state, replace) => {
-    // Get most up to date state. Should this be the same as the state in the callback?
+    // Get most up-to-date state. Should this be the same as the state in the callback?
     const pastState = partialize(get());
     set(state, replace);
     curriedUserLandSet(pastState);
@@ -77,4 +77,3 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
 };
 
 export const temporal = zundoImpl as unknown as Zundo;
-export { TemporalStateWithInternals };
