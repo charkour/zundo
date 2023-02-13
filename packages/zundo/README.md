@@ -84,7 +84,7 @@ const App = () => {
     undo,
     redo,
     clear
-  } = useTemporalStore();
+  } = useTemporalStore((state) => state);
   // or if you don't use create from zustand, you can use the store directly
   // } = useStoreWithUndo.temporal.getState();
 
