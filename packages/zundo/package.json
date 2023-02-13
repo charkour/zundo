@@ -34,22 +34,22 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "size": "size-limit",
+    "size": "pnpm build && size-limit",
     "test": "vitest"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "8.1.0",
+    "@size-limit/preset-small-lib": "8.2.4",
     "@types/lodash.throttle": "4.1.7",
     "@types/react-dom": "18.0.10",
     "lodash.throttle": "4.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "size-limit": "8.1.0",
+    "size-limit": "8.2.4",
     "tsconfig": "workspace:*",
-    "tsup": "6.5.0",
-    "typescript": "4.9.4",
-    "vitest": "0.27.0",
-    "zustand": "4.3.1"
+    "tsup": "6.6.2",
+    "typescript": "4.9.5",
+    "vitest": "0.28.5",
+    "zustand": "4.3.3"
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
