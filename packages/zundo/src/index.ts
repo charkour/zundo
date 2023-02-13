@@ -77,3 +77,4 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
 };
 
 export const temporal = zundoImpl as unknown as Zundo;
+export type { ZundoOptions, Zundo, TemporalState };
