@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import dynamic from "next/dynamic";
 import { PersistOptions } from "zustand/middleware/persist";
-import { merge } from "lodash";
+import merge from "lodash.merge";
 
 interface Store {
   count: number
