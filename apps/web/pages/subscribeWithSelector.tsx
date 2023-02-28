@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import create from "zustand";
+import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { temporal } from "zundo";
 
@@ -17,3 +16,9 @@ const store = create<ExampleData>()(
     }))
   )
 );
+
+export default function Dummy() {
+  return (
+    <></>
+  )
+}

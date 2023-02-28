@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 importers:
 
@@ -108,8 +108,10 @@ importers:
   packages/zundo:
     specifiers:
       '@size-limit/preset-small-lib': 8.2.4
+      '@types/lodash.merge': ^4.6.7
       '@types/lodash.throttle': 4.1.7
       '@types/react-dom': 18.0.10
+      lodash.merge: ^4.6.2
       lodash.throttle: 4.1.1
       react: 18.2.0
       react-dom: 18.2.0
@@ -121,8 +123,10 @@ importers:
       zustand: 4.3.3
     devDependencies:
       '@size-limit/preset-small-lib': 8.2.4_size-limit@8.2.4
+      '@types/lodash.merge': 4.6.7
       '@types/lodash.throttle': 4.1.7
       '@types/react-dom': 18.0.10
+      lodash.merge: 4.6.2
       lodash.throttle: 4.1.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -782,6 +786,12 @@ packages:
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: false
+
+  /@types/lodash.merge/4.6.7:
+    resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
+    dependencies:
+      '@types/lodash': 4.14.191
+    dev: true
 
   /@types/lodash.throttle/4.1.7:
     resolution: {integrity: sha512-znwGDpjCHQ4FpLLx19w4OXDqq8+OvREa05H89obtSyXyOFKL3dDjCslsmfBz0T2FU8dmf5Wx1QvogbINiGIu9g==}

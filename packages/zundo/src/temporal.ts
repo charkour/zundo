@@ -10,12 +10,13 @@ export const createVanillaTemporal = <TState>(
     partialize: (state: TState) => state,
     equality: (a: TState, b: TState) => false,
     onSave: () => {},
+    wrapTemporalStore: (init => init) as Required<ZundoOptions<TState>>['wrapTemporalStore'],
     ...baseOptions,
   };
-  const { partialize, onSave, limit, equality } = options;
 
-  return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
-    return {
+  const { partialize, onSave, limit, equality, wrapTemporalStore } = options;
+
+  return createStore<TemporalStateWithInternals<TState>>()(wrapTemporalStore((set, get)  => ({
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
@@ -84,6 +85,6 @@ export const createVanillaTemporal = <TState>(
           }
         },
       },
-    };
-  });
+    })
+  ))
 };

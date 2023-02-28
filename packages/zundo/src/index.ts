@@ -67,7 +67,7 @@ const zundoImpl: ZundoImpl = (config, baseOptions) => (set, get, _store) => {
   store.setState = modifiedSetState;
 
   const modifiedSetter: typeof set = (state, replace) => {
-    // Get most up to date state. Should this be the same as the state in the callback?
+    // Get most up-to-date state. Should this be the same as the state in the callback?
     const pastState = partialize(get());
     set(state, replace);
     curriedUserLandSet(pastState);
