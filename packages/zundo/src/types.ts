@@ -4,18 +4,9 @@ type onSave<TState> =
   | ((pastState: TState, currentState: TState) => void)
   | undefined;
 
-// Inspired by https://stackoverflow.com/a/66144780/9931154
-type KeysWithoutValsOfType<T, V> = keyof {
-  [P in keyof T as T[P] extends V ? never : P]: P;
-};
-
-type ObjectWithoutFunctions<T> = {
-  [P in KeysWithoutValsOfType<T, Function>]: P extends keyof T ? T[P] : never;
-};
-
 export interface TemporalStateWithInternals<TState> {
-  pastStates: ObjectWithoutFunctions<TState>[];
-  futureStates: ObjectWithoutFunctions<TState>[];
+  pastStates: Partial<TState>[];
+  futureStates: Partial<TState>[];
 
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
@@ -41,8 +32,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
   // Functions are not serializable, so we don't want to store them in the state
-  pastStates?: ObjectWithoutFunctions<PartialTState>[];
-  futureStates?: ObjectWithoutFunctions<PartialTState>[];
+  pastStates?: Partial<PartialTState>[];
+  futureStates?: Partial<PartialTState>[];
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;
