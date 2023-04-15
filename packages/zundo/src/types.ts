@@ -1,10 +1,21 @@
 import type { StoreApi } from 'zustand';
 
-type onSave<TState> = ((pastState: TState, currentState: TState) => void) | undefined;
+type onSave<TState> =
+  | ((pastState: TState, currentState: TState) => void)
+  | undefined;
+
+// Inspired by https://stackoverflow.com/a/66144780/9931154
+type KeysWithoutValsOfType<T, V> = keyof {
+  [P in keyof T as T[P] extends V ? never : P]: P;
+};
+
+type ObjectWithoutFunctions<T> = {
+  [P in KeysWithoutValsOfType<T, Function>]: P extends keyof T ? T[P] : never;
+};
 
 export interface TemporalStateWithInternals<TState> {
-  pastStates: TState[];
-  futureStates: TState[];
+  pastStates: ObjectWithoutFunctions<TState>[];
+  futureStates: ObjectWithoutFunctions<TState>[];
 
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
@@ -29,6 +40,9 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
+  // Functions are not serializable, so we don't want to store them in the state
+  pastStates?: ObjectWithoutFunctions<PartialTState>[];
+  futureStates?: ObjectWithoutFunctions<PartialTState>[];
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;
@@ -39,4 +53,4 @@ export type TemporalState<TState> = Omit<
 >;
 
 // https://stackoverflow.com/a/69328045/9931154
-export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

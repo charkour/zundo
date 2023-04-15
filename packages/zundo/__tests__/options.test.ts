@@ -15,6 +15,10 @@ import throttle from '../node_modules/lodash.throttle';
 interface MyState {
   count: number;
   count2: number;
+  myString: string;
+  string2: string;
+  boolean1: boolean;
+  boolean2: boolean;
   increment: () => void;
   decrement: () => void;
   doNothing: () => void;
@@ -28,6 +32,10 @@ const createVanillaStore = (
       return {
         count: 0,
         count2: 0,
+        myString: 'hello',
+        string2: 'world',
+        boolean1: true,
+        boolean2: false,
         increment: () =>
           set((state) => ({
             count: state.count + 1,
@@ -540,6 +548,26 @@ describe('Middleware options', () => {
       });
 
       // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
+    });
+  });
+
+  describe('init pastStates', () => {
+    it('should init the pastStates with the initial state', () => {
+      const storeWithPastStates = createVanillaStore({
+        pastStates: [{ count: 0 }, { count: 1 }],
+      });
+      expect(storeWithPastStates.temporal.getState().pastStates.length).toBe(2);
+    });
+    it('should init the pastStates with the initial state and call onSave', () => {
+      global.console.log = vi.fn();
+      const storeWithPastStates = createVanillaStore({
+        pastStates: [store.getState()],
+        onSave: (pastStates) => {
+          console.log(pastStates);
+        },
+      });
+      expect(storeWithPastStates.temporal.getState().pastStates.length).toBe(1);
+      expect(console.log).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -1,5 +1,9 @@
 import { createStore, type StoreApi } from 'zustand';
-import type { TemporalStateWithInternals, WithRequired, ZundoOptions } from './types';
+import type {
+  TemporalStateWithInternals,
+  WithRequired,
+  ZundoOptions,
+} from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
@@ -9,13 +13,14 @@ export const createVanillaTemporal = <TState>(
     equality,
     onSave,
     limit,
-  } = {} as Omit<WithRequired<ZundoOptions<TState>, | 'partialize'>, 'handleSet'>,
+    pastStates = [],
+    futureStates = [],
+  } = {} as Omit<WithRequired<ZundoOptions<TState>, 'partialize'>, 'handleSet'>,
 ) => {
-
   return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
     return {
-      pastStates: [],
-      futureStates: [],
+      pastStates,
+      futureStates,
       undo: (steps = 1) => {
         const ps = get().pastStates.slice();
         const fs = get().futureStates.slice();
