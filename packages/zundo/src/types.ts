@@ -1,6 +1,6 @@
 import type { StoreApi } from 'zustand';
 
-type onSave<TState> = (pastState: TState, currentState: TState) => void;
+type onSave<TState> = ((pastState: TState, currentState: TState) => void) | undefined;
 
 export interface TemporalStateWithInternals<TState> {
   pastStates: TState[];
@@ -37,3 +37,6 @@ export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
   '__internal'
 >;
+
+// https://stackoverflow.com/a/69328045/9931154
+export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
