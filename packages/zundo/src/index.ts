@@ -32,10 +32,8 @@ const zundoImpl =
     config: StateCreator<TState, [], []>,
     {
       partialize = (state: TState) => state,
-      equality,
-      onSave,
-      limit,
       handleSet: userlandSetFactory = (handleSetCb) => handleSetCb,
+      ...rest
     } = {} as ZundoOptions<TState>,
   ): StateCreator<TState, [], []> =>
   (set, get, _store) => {
@@ -44,9 +42,7 @@ const zundoImpl =
 
     const temporalStore = createVanillaTemporal<TState>(set, get, {
       partialize,
-      equality,
-      onSave,
-      limit,
+      ...rest,
     });
 
     const store = _store as Mutate<
