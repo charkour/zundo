@@ -1,18 +1,16 @@
 import { createStore, type StoreApi } from 'zustand';
-import type { TemporalStateWithInternals, ZundoOptions } from './types';
+import type { TemporalStateWithInternals, WithRequired, ZundoOptions } from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  baseOptions?: ZundoOptions<TState>,
+  {
+    partialize,
+    equality,
+    onSave,
+    limit,
+  } = {} as Omit<WithRequired<ZundoOptions<TState>, | 'partialize'>, 'handleSet'>,
 ) => {
-  const options = {
-    partialize: (state: TState) => state,
-    equality: (a: TState, b: TState) => false,
-    onSave: () => {},
-    ...baseOptions,
-  };
-  const { partialize, onSave, limit, equality } = options;
 
   return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
     return {
@@ -73,7 +71,7 @@ export const createVanillaTemporal = <TState>(
           const currentState = partialize(userGet());
           if (
             trackingStatus === 'tracking' &&
-            !equality(currentState, pastState)
+            !equality?.(currentState, pastState)
           ) {
             if (limit && ps.length >= limit) {
               ps.shift();

@@ -435,7 +435,7 @@ describe('Middleware options', () => {
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
       expect(__internal).toBeDefined();
       expect(__internal.handleUserSet).toBeInstanceOf(Function);
-      expect(__internal.onSave).toBeInstanceOf(Function);
+      expect(__internal.onSave).toBe(undefined);
     });
     describe('onSave', () => {
       it('should call onSave cb without adding a new state when onSave is set by user', () => {
@@ -452,6 +452,7 @@ describe('Middleware options', () => {
         act(() => {
           onSave(store.getState(), store.getState());
         });
+        expect(__internal.onSave).toBeInstanceOf(Function);
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.error).toHaveBeenCalledTimes(1);
       });
