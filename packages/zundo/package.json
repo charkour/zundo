@@ -34,8 +34,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "size": "pnpm build && size-limit",
-    "test": "vitest"
+    "size": "size-limit",
+    "test": "vitest",
+    "test:ci": "vitest run"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "8.2.4",
