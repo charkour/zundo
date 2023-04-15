@@ -15,12 +15,9 @@ export const createVanillaTemporal = <TState>(
   const { partialize, onSave, limit, equality } = options;
 
   return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
-    const pastStates: TState[] = [];
-    const futureStates: TState[] = [];
-
     return {
-      pastStates,
-      futureStates,
+      pastStates: [],
+      futureStates: [],
       undo: (steps = 1) => {
         const ps = get().pastStates.slice();
         const fs = get().futureStates.slice();
