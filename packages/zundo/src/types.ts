@@ -31,7 +31,6 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
-  // Functions are not serializable, so we don't want to store them in the state
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
 }
