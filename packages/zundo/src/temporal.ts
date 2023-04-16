@@ -72,6 +72,7 @@ export const createVanillaTemporal = <TState>(
           trackingStatus === 'tracking' &&
           !equality?.(currentState, pastState)
         ) {
+          // This naively assumes that only one new state can be added at a time
           if (limit && pastStates.length >= limit) {
             pastStates.shift();
           }
