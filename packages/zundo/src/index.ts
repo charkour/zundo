@@ -56,7 +56,7 @@ const zundoImpl =
     store.temporal = temporalStore;
 
     const curriedUserLandSet = userlandSetFactory(
-      temporalStore.getState().__internal.handleUserSet,
+      temporalStore.getState().__handleUserSet,
     );
 
     const modifiedSetState: typeof setState = (state, replace) => {
