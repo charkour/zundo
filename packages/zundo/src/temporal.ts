@@ -67,18 +67,17 @@ export const createVanillaTemporal = <TState>(
       __onSave: onSave,
       __handleUserSet: (pastState) => {
         const { trackingStatus, pastStates, __onSave } = get();
-        const ps = pastStates.slice();
         const currentState = partialize(userGet());
         if (
           trackingStatus === 'tracking' &&
           !equality?.(currentState, pastState)
         ) {
-          if (limit && ps.length >= limit) {
-            ps.shift();
+          if (limit && pastStates.length >= limit) {
+            pastStates.shift();
           }
-          ps.push(pastState);
+          pastStates.push(pastState);
           __onSave?.(pastState, currentState);
-          set({ pastStates: ps, futureStates: [] });
+          set({ pastStates, futureStates: [] });
         }
       },
     };
