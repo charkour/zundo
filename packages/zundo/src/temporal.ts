@@ -12,7 +12,7 @@ export const createVanillaTemporal = <TState>(
   } = {} as Omit<WithRequired<ZundoOptions<TState>, | 'partialize'>, 'handleSet'>,
 ) => {
 
-  return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
+  return createStore<TemporalStateWithInternals<TState>>((set, get) => {
     return {
       pastStates: [],
       futureStates: [],
