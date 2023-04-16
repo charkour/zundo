@@ -55,9 +55,9 @@ const zundoImpl = <TState>(
       ...restOptions,
     });
 
-    const curriedUserLandSet = handleSet(
+    const curriedHandleSet = handleSet(
       (store.temporal.getState() as TemporalStateWithInternals<TState>)
-      .__handleUserSet,
+      .__handleSet,
       );
 
     const { setState } = store;
@@ -67,7 +67,7 @@ const zundoImpl = <TState>(
       // The order of the get() and set() calls is important here.
       const pastState = partialize(get());
       setState(state, replace);
-      curriedUserLandSet(pastState);
+      curriedHandleSet(pastState);
     };
 
     return config(
@@ -77,7 +77,7 @@ const zundoImpl = <TState>(
         // The order of the get() and set() calls is important here.
         const pastState = partialize(get());
         set(state, replace);
-        curriedUserLandSet(pastState);
+        curriedHandleSet(pastState);
       },
       get,
       store,
