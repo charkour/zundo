@@ -17,38 +17,38 @@ export const createVanillaTemporal = <TState>(
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
-        const ps = get().pastStates.slice();
-        const fs = get().futureStates.slice();
-        if (ps.length === 0) {
+        const { futureStates, pastStates } = get();
+        if (pastStates.length === 0) {
           return;
         }
 
-        const skippedPastStates = ps.splice(ps.length - (steps - 1));
-        const pastState = ps.pop();
-        if (pastState) {
-          fs.push(partialize(userGet()));
-          userSet(pastState);
+        // Based on the steps, get values from the pastStates array and push them to the futureStates array
+        for (let i = 0; i < steps; i++) {
+          const pastState = pastStates.pop();
+          if (pastState) {
+            futureStates.push(partialize(userGet()));
+            userSet(pastState);
+          }
         }
 
-        fs.push(...skippedPastStates.reverse());
-        set({ pastStates: ps, futureStates: fs });
+        set({ pastStates, futureStates });
       },
       redo: (steps = 1) => {
-        const ps = get().pastStates.slice();
-        const fs = get().futureStates.slice();
-        if (fs.length === 0) {
+        const { futureStates, pastStates } = get();
+        if (futureStates.length === 0) {
           return;
         }
 
-        const skippedFutureStates = fs.splice(fs.length - (steps - 1));
-        const futureState = fs.pop();
-        if (futureState) {
-          ps.push(partialize(userGet()));
-          userSet(futureState);
+        // Based on the steps, get values from the futureStates array and push them to the pastStates array
+        for (let i = 0; i < steps; i++) {
+          const futureState = futureStates.pop();
+          if (futureState) {
+            pastStates.push(partialize(userGet()));
+            userSet(futureState);
+          }
         }
 
-        ps.push(...skippedFutureStates.reverse());
-        set({ pastStates: ps, futureStates: fs });
+        set({ pastStates, futureStates });
       },
       clear: () => {
         set({ pastStates: [], futureStates: [] });
