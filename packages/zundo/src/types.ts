@@ -15,10 +15,8 @@ export interface TemporalStateWithInternals<TState> {
   resume: () => void;
 
   setOnSave: (onSave: onSave<TState>) => void;
-  __internal: {
-    onSave: onSave<TState>;
-    handleUserSet: (pastState: TState) => void;
-  };
+  __onSave: onSave<TState>;
+  __handleUserSet: (pastState: TState) => void;
 }
 
 export interface ZundoOptions<TState, PartialTState = TState> {
@@ -35,7 +33,7 @@ export type Write<T, U> = Omit<T, keyof U> & U;
 
 export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
-  '__internal'
+  '__onSave' | '__handleUserSet'
 >;
 
 // https://stackoverflow.com/a/69328045/9931154

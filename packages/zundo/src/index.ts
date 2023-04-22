@@ -40,23 +40,20 @@ const zundoImpl =
     type TState = ReturnType<typeof config>;
     type StoreAddition = StoreApi<TemporalState<TState>>;
 
-    const temporalStore = createVanillaTemporal<TState>(set, get, {
-      partialize,
-      ...restOptions,
-    });
+    const temporalStore = createVanillaTemporal<TState>(set, get, partialize, restOptions);
 
     const store = _store as Mutate<
       StoreApi<TState>,
       [['temporal', StoreAddition]]
     >;
-    const { setState } = store;
+    const setState = store.setState;
 
     // TODO: should temporal be only temporalStore.getState()?
     // We can hide the rest of the store in the secret internals.
     store.temporal = temporalStore;
 
     const curriedUserLandSet = userlandSetFactory(
-      temporalStore.getState().__internal.handleUserSet,
+      temporalStore.getState().__handleUserSet,
     );
 
     const modifiedSetState: typeof setState = (state, replace) => {

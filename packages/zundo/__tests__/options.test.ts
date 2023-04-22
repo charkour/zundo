@@ -310,7 +310,7 @@ describe('Middleware options', () => {
 
     it('should call a new onSave function after being set', () => {
       global.console.info = vi.fn();
-      global.console.log = vi.fn();
+      global.console.warn = vi.fn();
       global.console.error = vi.fn();
       const storeWithOnSave = createVanillaStore({
         onSave: (pastStates) => {
@@ -325,11 +325,11 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(2);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(0);
+      expect(console.warn).toHaveBeenCalledTimes(0);
       expect(console.error).toHaveBeenCalledTimes(0);
       act(() => {
         setOnSave((pastStates, currentState) => {
-          console.log(pastStates, currentState);
+          console.warn(pastStates, currentState);
         });
       });
       act(() => {
@@ -338,7 +338,7 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(4);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledTimes(0);
       act(() => {
         setOnSave((pastStates, currentState) => {
@@ -351,7 +351,7 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(6);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledTimes(2);
     });
   });
@@ -425,17 +425,16 @@ describe('Middleware options', () => {
       expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
         2,
       );
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { __internal } =
+      const { __handleUserSet, __onSave } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
-      expect(__internal).toBeDefined();
-      expect(__internal.handleUserSet).toBeInstanceOf(Function);
-      expect(__internal.onSave).toBe(undefined);
+      expect(__handleUserSet).toBeInstanceOf(Function);
+      expect(__onSave).toBe(undefined);
     });
     describe('onSave', () => {
       it('should call onSave cb without adding a new state when onSave is set by user', () => {
@@ -446,13 +445,12 @@ describe('Middleware options', () => {
             console.error(pastStates, currentState);
           });
         });
-        const { __internal } =
+        const { __onSave } =
           store.temporal.getState() as TemporalStateWithInternals<MyState>;
-        const { onSave } = __internal;
         act(() => {
-          onSave(store.getState(), store.getState());
+          __onSave(store.getState(), store.getState());
         });
-        expect(__internal.onSave).toBeInstanceOf(Function);
+        expect(__onSave).toBeInstanceOf(Function);
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.error).toHaveBeenCalledTimes(1);
       });
@@ -463,11 +461,10 @@ describe('Middleware options', () => {
             console.info(pastStates);
           },
         });
-        const { __internal } =
+        const { __onSave } =
           storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>;
-        const { onSave } = __internal;
         act(() => {
-          onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
+          __onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
         expect(console.error).toHaveBeenCalledTimes(1);
@@ -483,7 +480,7 @@ describe('Middleware options', () => {
         act(() => {
           (
             storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-          ).__internal.onSave(
+          ).__onSave(
             storeWithOnSave.getState(),
             storeWithOnSave.getState(),
           );
@@ -501,7 +498,7 @@ describe('Middleware options', () => {
         act(() => {
           (
             storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-          ).__internal.onSave(store.getState(), store.getState());
+          ).__onSave(store.getState(), store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.dir).toHaveBeenCalledTimes(1);
@@ -511,31 +508,29 @@ describe('Middleware options', () => {
 
     describe('handleUserSet', () => {
       it('should update the temporal store with the pastState when called', () => {
-        const { __internal } =
+        const { __handleUserSet } =
           store.temporal.getState() as TemporalStateWithInternals<MyState>;
-        const { handleUserSet } = __internal;
         act(() => {
-          handleUserSet(store.getState());
+          __handleUserSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
       });
 
       it('should only update if the the status is tracking', () => {
-        const { __internal } =
+        const { __handleUserSet } =
           store.temporal.getState() as TemporalStateWithInternals<MyState>;
-        const { handleUserSet } = __internal;
         act(() => {
-          handleUserSet(store.getState());
+          __handleUserSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().pause();
-          handleUserSet(store.getState());
+          __handleUserSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().resume();
-          handleUserSet(store.getState());
+          __handleUserSet(store.getState());
         });
       });
 
