@@ -310,7 +310,7 @@ describe('Middleware options', () => {
 
     it('should call a new onSave function after being set', () => {
       global.console.info = vi.fn();
-      global.console.log = vi.fn();
+      global.console.warn = vi.fn();
       global.console.error = vi.fn();
       const storeWithOnSave = createVanillaStore({
         onSave: (pastStates) => {
@@ -325,11 +325,11 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(2);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(0);
+      expect(console.warn).toHaveBeenCalledTimes(0);
       expect(console.error).toHaveBeenCalledTimes(0);
       act(() => {
         setOnSave((pastStates, currentState) => {
-          console.log(pastStates, currentState);
+          console.warn(pastStates, currentState);
         });
       });
       act(() => {
@@ -338,7 +338,7 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(4);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledTimes(0);
       act(() => {
         setOnSave((pastStates, currentState) => {
@@ -351,7 +351,7 @@ describe('Middleware options', () => {
       });
       expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(6);
       expect(console.info).toHaveBeenCalledTimes(2);
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledTimes(2);
     });
   });
@@ -425,7 +425,7 @@ describe('Middleware options', () => {
       expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
         2,
       );
-      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(console.warn).toHaveBeenCalledTimes(2);
     });
   });
 
