@@ -16,7 +16,7 @@ export interface TemporalStateWithInternals<TState> {
 
   setOnSave: (onSave: onSave<TState>) => void;
   __onSave: onSave<TState>;
-  __handleUserSet: (pastState: TState) => void;
+  __handleSet: (pastState: TState) => void;
 }
 
 export interface ZundoOptions<TState, PartialTState = TState> {

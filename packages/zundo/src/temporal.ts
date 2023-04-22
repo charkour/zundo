@@ -11,7 +11,8 @@ export const createVanillaTemporal = <TState>(
   partialize: (state: TState) => TState,
   { equality, onSave, limit } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
 ) => {
-  return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
+
+  return createStore<TemporalStateWithInternals<TState>>((set, get) => {
     return {
       pastStates: [],
       futureStates: [],
@@ -68,7 +69,7 @@ export const createVanillaTemporal = <TState>(
       },
       // Internal properties
       __onSave: onSave,
-      __handleUserSet: (pastState) => {
+      __handleSet: (pastState) => {
         const trackingStatus = get().trackingStatus,
           onSave = get().__onSave,
           pastStates = get().pastStates.slice(),
@@ -77,6 +78,7 @@ export const createVanillaTemporal = <TState>(
           trackingStatus === 'tracking' &&
           !equality?.(currentState, pastState)
         ) {
+          // This naively assumes that only one new state can be added at a time
           if (limit && pastStates.length >= limit) {
             pastStates.shift();
           }

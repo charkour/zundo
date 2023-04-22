@@ -431,9 +431,9 @@ describe('Middleware options', () => {
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { __handleUserSet, __onSave } =
+      const { __handleSet, __onSave } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
-      expect(__handleUserSet).toBeInstanceOf(Function);
+      expect(__handleSet).toBeInstanceOf(Function);
       expect(__onSave).toBe(undefined);
     });
     describe('onSave', () => {
@@ -508,29 +508,29 @@ describe('Middleware options', () => {
 
     describe('handleUserSet', () => {
       it('should update the temporal store with the pastState when called', () => {
-        const { __handleUserSet } =
+        const { __handleSet } =
           store.temporal.getState() as TemporalStateWithInternals<MyState>;
         act(() => {
-          __handleUserSet(store.getState());
+          __handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
       });
 
       it('should only update if the the status is tracking', () => {
-        const { __handleUserSet } =
+        const { __handleSet } =
           store.temporal.getState() as TemporalStateWithInternals<MyState>;
         act(() => {
-          __handleUserSet(store.getState());
+          __handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().pause();
-          __handleUserSet(store.getState());
+          __handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().resume();
-          __handleUserSet(store.getState());
+          __handleSet(store.getState());
         });
       });
 
