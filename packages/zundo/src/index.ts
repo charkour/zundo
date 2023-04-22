@@ -46,7 +46,7 @@ const zundoImpl =
       StoreApi<TState>,
       [['temporal', StoreAddition]]
     >;
-    const { setState } = store;
+    const setState = store.setState;
 
     // TODO: should temporal be only temporalStore.getState()?
     // We can hide the rest of the store in the secret internals.
