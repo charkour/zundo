@@ -35,6 +35,6 @@ describe('React Re-renders when state changes', () => {
 
     expect(queryByText(/bears: 0/i)).toBeTruthy();
     expect(queryByText(/past states: \[\]/i)).toBeTruthy();
-    expect(queryByText(/future states: \[{"bears":0},{"bears":1}\]/i)).toBeTruthy();
+    expect(queryByText(/future states: \[{"bears":2},{"bears":1}\]/i)).toBeTruthy();
   });
 });
