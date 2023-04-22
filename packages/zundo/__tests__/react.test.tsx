@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-// vi.mock('zustand');
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import Reactive from '../../../apps/web/pages/reactive';

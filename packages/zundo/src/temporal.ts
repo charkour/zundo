@@ -18,6 +18,7 @@ export const createVanillaTemporal = <TState>(
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
         if (pastStates.length === 0) {
@@ -36,6 +37,7 @@ export const createVanillaTemporal = <TState>(
         set({ pastStates, futureStates });
       },
       redo: (steps = 1) => {
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
         if (futureStates.length === 0) {
@@ -69,8 +71,8 @@ export const createVanillaTemporal = <TState>(
       // Internal properties
       __onSave: onSave,
       __handleUserSet: (pastState) => {
-        const { trackingStatus, pastStates: ps, __onSave } = get();
-        const pastStates = ps.slice();
+        const { trackingStatus, __onSave } = get();
+        const pastStates = get().pastStates.slice();
         const currentState = partialize(userGet());
         if (
           trackingStatus === 'tracking' &&

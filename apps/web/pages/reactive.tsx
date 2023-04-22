@@ -1,4 +1,3 @@
-import { useReducer } from 'react';
 import { TemporalState, temporal } from 'zundo';
 import { StoreApi, useStore, create } from 'zustand';
 
@@ -28,7 +27,6 @@ const useTemporalStore = <S extends WithReact<StoreApi<TemporalState<MyState>>>,
   selector: (state: ExtractState<S>) => U,
   equality?: (a: U, b: U) => boolean,
 ): U => {
-  // useStore(useMyStore.temporal as any, (state) => state.update)
   const state = useStore(useMyStore.temporal as any, selector, equality);
   return state
 }
