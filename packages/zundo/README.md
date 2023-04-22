@@ -85,14 +85,15 @@ const App = () => {
     redo,
     clear
   } = useTemporalStore((state) => state);
-  // or if you don't use create from zustand, you can use the store directly
+  // or if you don't use create from zustand, you can use the store directly.
   // } = useStoreWithUndo.temporal.getState();
+  // if you want reactivity, you'll need to subscribe to the temporal store.
 
   return (
     <>
       bears: {bears}
-      <button onClick={increasePopulation}>increase</button>
-      <button onClick={removeAllBears}>remove</button>
+      <button onClick={() => increasePopulation}>increase</button>
+      <button onClick={() => removeAllBears}>remove</button>
       <button onClick={() => undo()}>undo</button>
       <button onClick={() => redo()}>redo</button>
       <button onClick={() => clear()}>clear</button>
@@ -107,7 +108,7 @@ const App = () => {
 
 `(config: StateCreator, options?: ZundoOptions) => StateCreator`
 
-zundo has one export: `temporal` It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
+zundo has one export: `temporal`. It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
 
 ### Middleware Options
 
