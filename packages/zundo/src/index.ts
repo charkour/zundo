@@ -40,10 +40,7 @@ const zundoImpl =
     type TState = ReturnType<typeof config>;
     type StoreAddition = StoreApi<TemporalState<TState>>;
 
-    const temporalStore = createVanillaTemporal<TState>(set, get, {
-      partialize,
-      ...restOptions,
-    });
+    const temporalStore = createVanillaTemporal<TState>(set, get, partialize, restOptions);
 
     const store = _store as Mutate<
       StoreApi<TState>,

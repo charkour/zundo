@@ -8,10 +8,8 @@ import type {
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  { partialize, equality, onSave, limit } = {} as Omit<
-    WithRequired<ZundoOptions<TState>, 'partialize'>,
-    'handleSet'
-  >,
+  partialize: (state: TState) => TState,
+  { equality, onSave, limit } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
 ) => {
   return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
     return {
