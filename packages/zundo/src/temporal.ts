@@ -1,15 +1,15 @@
 import { createStore, type StoreApi } from 'zustand';
-import type { TemporalStateWithInternals, WithRequired, ZundoOptions } from './types';
+import type {
+  TemporalStateWithInternals,
+  WithRequired,
+  ZundoOptions,
+} from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  {
-    partialize,
-    equality,
-    onSave,
-    limit,
-  } = {} as Omit<WithRequired<ZundoOptions<TState>, | 'partialize'>, 'handleSet'>,
+  partialize: (state: TState) => TState,
+  { equality, onSave, limit } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
 ) => {
 
   return createStore<TemporalStateWithInternals<TState>>((set, get) => {
@@ -17,7 +17,9 @@ export const createVanillaTemporal = <TState>(
       pastStates: [],
       futureStates: [],
       undo: (steps = 1) => {
-        const { futureStates, pastStates } = get();
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
+        const pastStates = get().pastStates.slice();
+        const futureStates = get().futureStates.slice();
         if (pastStates.length === 0) {
           return;
         }
@@ -34,7 +36,9 @@ export const createVanillaTemporal = <TState>(
         set({ pastStates, futureStates });
       },
       redo: (steps = 1) => {
-        const { futureStates, pastStates } = get();
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
+        const pastStates = get().pastStates.slice();
+        const futureStates = get().futureStates.slice();
         if (futureStates.length === 0) {
           return;
         }
@@ -66,8 +70,10 @@ export const createVanillaTemporal = <TState>(
       // Internal properties
       __onSave: onSave,
       __handleSet: (pastState) => {
-        const { trackingStatus, pastStates, __onSave } = get();
-        const currentState = partialize(userGet());
+        const trackingStatus = get().trackingStatus,
+          onSave = get().__onSave,
+          pastStates = get().pastStates.slice(),
+          currentState = partialize(userGet());
         if (
           trackingStatus === 'tracking' &&
           !equality?.(currentState, pastState)
@@ -77,7 +83,7 @@ export const createVanillaTemporal = <TState>(
             pastStates.shift();
           }
           pastStates.push(pastState);
-          __onSave?.(pastState, currentState);
+          onSave?.(pastState, currentState);
           set({ pastStates, futureStates: [] });
         }
       },

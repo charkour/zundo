@@ -50,17 +50,19 @@ const zundoImpl = <TState>(
     get: StoreApi<TState>['getState'],
     store: StoreWithAddition,
   ) => {
-    store.temporal = createVanillaTemporal<TState>(set, get, {
+    store.temporal = createVanillaTemporal<TState>(
+      set,
+      get,
       partialize,
-      ...restOptions,
-    });
+      restOptions,
+    );
 
     const curriedHandleSet = handleSet(
       (store.temporal.getState() as TemporalStateWithInternals<TState>)
-      .__handleSet,
-      );
+        .__handleSet,
+    );
 
-    const { setState } = store;
+    const setState = store.setState;
     // Modify the setState function to call the userlandSet function
     store.setState = (state, replace) => {
       // Get most up to date state. The state from the callback might be a partial state.
