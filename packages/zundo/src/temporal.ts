@@ -17,7 +17,7 @@ export const createVanillaTemporal = <TState>(
     wrapTemporal = (init) => init,
   } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
 ) => {
-  const stateCreator = wrapTemporal(
+  const stateCreator: StateCreator<TemporalState<TState>, [], []> = wrapTemporal(
     (set, get) => {
       return {
         pastStates,
@@ -96,6 +96,6 @@ export const createVanillaTemporal = <TState>(
       };
     },
     // Cast to a version of the store that does not include "temporal" addition
-  ) as StateCreator<TemporalState<TState>>;
+  ) as StateCreator<TemporalState<TState>, [], []>;
   return createStore<TemporalState<TState>>(stateCreator);
 };

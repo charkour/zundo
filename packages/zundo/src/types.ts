@@ -1,5 +1,5 @@
 import type { StoreApi, StoreMutatorIdentifier } from 'zustand';
-import { StateCreator } from 'zustand/vanilla';
+import type { StateCreator } from 'zustand/vanilla';
 
 type onSave<TState> =
   | ((pastState: TState, currentState: TState) => void)
