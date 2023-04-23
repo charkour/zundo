@@ -1,5 +1,8 @@
-import { createStore, type StoreApi } from 'zustand';
-import type { TemporalStateWithInternals, ZundoOptions } from './types';
+import { createStore, type StoreApi, type StateCreator } from 'zustand';
+import type {
+  TemporalStateWithInternals as TemporalState,
+  ZundoOptions,
+} from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
@@ -11,13 +14,11 @@ export const createVanillaTemporal = <TState>(
     limit,
     pastStates = [],
     futureStates = [],
-    wrapTemporalStore = ((init) => init) as Required<
-      ZundoOptions<TState>
-    >['wrapTemporalStore'],
+    wrapTemporal = (init) => init,
   } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
 ) => {
-  return createStore<TemporalStateWithInternals<TState>>()(
-    wrapTemporalStore((set, get) => {
+  const stateCreator = wrapTemporal(
+    (set, get) => {
       return {
         pastStates,
         futureStates,
@@ -93,6 +94,8 @@ export const createVanillaTemporal = <TState>(
           }
         },
       };
-    }),
-  );
+    },
+    // Cast to a version of the store that does not include "temporal" addition
+  ) as StateCreator<TemporalState<TState>>;
+  return createStore<TemporalState<TState>>(stateCreator);
 };

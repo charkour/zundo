@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/lodash.throttle": "4.1.7",
+    "lodash.merge": "4.6.2",
     "lodash.throttle": "4.1.1",
     "next": "13.3.0",
     "react": "18.2.0",
@@ -19,6 +19,8 @@
     "zustand": "4.3.7"
   },
   "devDependencies": {
+    "@types/lodash.merge": "4.6.7",
+    "@types/lodash.throttle": "4.1.7",
     "@types/node": "18.15.11",
     "@types/react": "18.0.35",
     "eslint": "8.38.0",

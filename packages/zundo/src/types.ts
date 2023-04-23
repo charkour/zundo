@@ -32,7 +32,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
-  wrapTemporalStore?: (
+  wrapTemporal?: (
     initializer: StateCreator<
       TemporalStateWithInternals<TState>,
       [StoreMutatorIdentifier, unknown][],

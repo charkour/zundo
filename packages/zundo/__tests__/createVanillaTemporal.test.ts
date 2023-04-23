@@ -53,7 +53,7 @@ describe('createVanillaTemporal', () => {
       store.setState,
       store.getState,
       (state) => state,
-      { wrapTemporalStore: (store) => persist(store, { name: '123' }) },
+      { wrapTemporal: (store) => persist(store, { name: '123' }) },
     );
     expect(temporalStore).toHaveProperty('persist');
   });

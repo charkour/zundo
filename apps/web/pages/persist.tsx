@@ -23,7 +23,7 @@ const useStore = create<Store>()(persist(temporal(immer(set => ({
   dec: () => set((state) => { state.count-- }),
 })), {
   limit: 5,
-  wrapTemporalStore: (store) => persist(store, {
+  wrapTemporal: (store) => persist(store, {
     name: 'some-store-temporal',
     merge: (persistedState, currentState) => merge(currentState, persistedState)
   })

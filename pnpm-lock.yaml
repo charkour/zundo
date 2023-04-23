@@ -50,9 +50,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@types/lodash.throttle':
-        specifier: 4.1.7
-        version: 4.1.7
+      lodash.merge:
+        specifier: 4.6.2
+        version: 4.6.2
       lodash.throttle:
         specifier: 4.1.1
         version: 4.1.1
@@ -75,6 +75,12 @@ importers:
         specifier: 4.3.7
         version: 4.3.7(react@18.2.0)
     devDependencies:
+      '@types/lodash.merge':
+        specifier: 4.6.7
+        version: 4.6.7
+      '@types/lodash.throttle':
+        specifier: 4.1.7
+        version: 4.1.7
       '@types/node':
         specifier: 18.15.11
         version: 18.15.11
@@ -791,13 +797,21 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: false
 
+  /@types/lodash.merge@4.6.7:
+    resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
+    dependencies:
+      '@types/lodash': 4.14.194
+    dev: true
+
   /@types/lodash.throttle@4.1.7:
     resolution: {integrity: sha512-znwGDpjCHQ4FpLLx19w4OXDqq8+OvREa05H89obtSyXyOFKL3dDjCslsmfBz0T2FU8dmf5Wx1QvogbINiGIu9g==}
     dependencies:
       '@types/lodash': 4.14.194
+    dev: true
 
   /@types/lodash@4.14.194:
     resolution: {integrity: sha512-r22s9tAS7imvBt2lyHC9B8AGwWnXaYb1tY09oyLkXDs4vArpYJzw09nj8MLx5VfciBPGIb+ZwG0ssYnEPJxn/g==}
+    dev: true
 
   /@types/node@18.15.11:
     resolution: {integrity: sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==}
