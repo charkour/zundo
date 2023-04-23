@@ -1,13 +1,15 @@
 import { createStore, type StoreApi, type StateCreator } from 'zustand';
 import type {
+  CreateTemporalOptions,
   TemporalStateWithInternals as TemporalState,
+  TemporalStateCreator,
   ZundoOptions,
 } from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  partialize: (state: TState) => TState,
+  partialize: NonNullable<ZundoOptions<TState>['partialize']>,
   {
     equality,
     onSave,
@@ -15,9 +17,9 @@ export const createVanillaTemporal = <TState>(
     pastStates = [],
     futureStates = [],
     wrapTemporal = (init) => init,
-  } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
+  } = {} as CreateTemporalOptions<TState>,
 ) => {
-  const stateCreator: StateCreator<TemporalState<TState>, [], []> = wrapTemporal(
+  const stateCreator: TemporalStateCreator<TState> = wrapTemporal(
     (set, get) => {
       return {
         pastStates,
@@ -96,6 +98,6 @@ export const createVanillaTemporal = <TState>(
       };
     },
     // Cast to a version of the store that does not include "temporal" addition
-  ) as StateCreator<TemporalState<TState>, [], []>;
+  ) as TemporalStateCreator<TState>;
   return createStore<TemporalState<TState>>(stateCreator);
 };
