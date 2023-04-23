@@ -8,52 +8,53 @@ import type {
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  {
-    partialize,
-    equality,
-    onSave,
-    limit,
-    pastStates = [],
-    futureStates = [],
-  } = {} as Omit<WithRequired<ZundoOptions<TState>, 'partialize'>, 'handleSet'>,
+  partialize: (state: TState) => TState,
+  { equality, onSave, limit, pastStates = [], futureStates = [] } = {} as Omit<
+    ZundoOptions<TState>,
+    'handleSet'
+  >,
 ) => {
-  return createStore<TemporalStateWithInternals<TState>>()((set, get) => {
+  return createStore<TemporalStateWithInternals<TState>>((set, get) => {
     return {
       pastStates,
       futureStates,
       undo: (steps = 1) => {
-        const ps = get().pastStates.slice();
-        const fs = get().futureStates.slice();
-        if (ps.length === 0) {
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
+        const pastStates = get().pastStates.slice();
+        const futureStates = get().futureStates.slice();
+        if (pastStates.length === 0) {
           return;
         }
 
-        const skippedPastStates = ps.splice(ps.length - (steps - 1));
-        const pastState = ps.pop();
-        if (pastState) {
-          fs.push(partialize(userGet()));
-          userSet(pastState);
+        // Based on the steps, get values from the pastStates array and push them to the futureStates array
+        for (let i = 0; i < steps; i++) {
+          const pastState = pastStates.pop();
+          if (pastState) {
+            futureStates.push(partialize(userGet()));
+            userSet(pastState);
+          }
         }
 
-        fs.push(...skippedPastStates.reverse());
-        set({ pastStates: ps, futureStates: fs });
+        set({ pastStates, futureStates });
       },
       redo: (steps = 1) => {
-        const ps = get().pastStates.slice();
-        const fs = get().futureStates.slice();
-        if (fs.length === 0) {
+        // Fastest way to clone an array on Chromium. Needed to create a new array reference
+        const pastStates = get().pastStates.slice();
+        const futureStates = get().futureStates.slice();
+        if (futureStates.length === 0) {
           return;
         }
 
-        const skippedFutureStates = fs.splice(fs.length - (steps - 1));
-        const futureState = fs.pop();
-        if (futureState) {
-          ps.push(partialize(userGet()));
-          userSet(futureState);
+        // Based on the steps, get values from the futureStates array and push them to the pastStates array
+        for (let i = 0; i < steps; i++) {
+          const futureState = futureStates.pop();
+          if (futureState) {
+            pastStates.push(partialize(userGet()));
+            userSet(futureState);
+          }
         }
 
-        ps.push(...skippedFutureStates.reverse());
-        set({ pastStates: ps, futureStates: fs });
+        set({ pastStates, futureStates });
       },
       clear: () => {
         set({ pastStates: [], futureStates: [] });
@@ -65,27 +66,28 @@ export const createVanillaTemporal = <TState>(
       resume: () => {
         set({ trackingStatus: 'tracking' });
       },
-      setOnSave: (onSave) => {
-        set((state) => ({ __internal: { ...state.__internal, onSave } }));
+      setOnSave: (__onSave) => {
+        set({ __onSave });
       },
-      __internal: {
-        onSave,
-        handleUserSet: (pastState) => {
-          const { trackingStatus, pastStates, __internal } = get();
-          const ps = pastStates.slice();
-          const currentState = partialize(userGet());
-          if (
-            trackingStatus === 'tracking' &&
-            !equality?.(currentState, pastState)
-          ) {
-            if (limit && ps.length >= limit) {
-              ps.shift();
-            }
-            ps.push(pastState);
-            __internal.onSave?.(pastState, currentState);
-            set({ pastStates: ps, futureStates: [] });
+      // Internal properties
+      __onSave: onSave,
+      __handleSet: (pastState) => {
+        const trackingStatus = get().trackingStatus,
+          onSave = get().__onSave,
+          pastStates = get().pastStates.slice(),
+          currentState = partialize(userGet());
+        if (
+          trackingStatus === 'tracking' &&
+          !equality?.(currentState, pastState)
+        ) {
+          // This naively assumes that only one new state can be added at a time
+          if (limit && pastStates.length >= limit) {
+            pastStates.shift();
           }
-        },
+          pastStates.push(pastState);
+          onSave?.(pastState, currentState);
+          set({ pastStates, futureStates: [] });
+        }
       },
     };
   });
