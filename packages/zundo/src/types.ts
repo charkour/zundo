@@ -51,6 +51,3 @@ export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
   '__onSave' | '__handleUserSet'
 >;
-
-// https://stackoverflow.com/a/69328045/9931154
-export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
