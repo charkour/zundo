@@ -113,7 +113,9 @@ zundo has one export: `temporal`. It is used to as middleware for `create` from 
 ### Middleware Options
 
 ```tsx
-type onSave<TState> = (pastState: TState, currentState: TState) => void;
+type onSave<TState> =
+  | ((pastState: TState, currentState: TState) => void)
+  | undefined;
 
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
@@ -123,6 +125,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
+  pastStates?: Partial<PartialTState>[];
+  futureStates?: Partial<PartialTState>[];
 }
 ```
 
@@ -229,6 +233,24 @@ const withTemporal = temporal<MyState>(
         console.info('handleSet called');
         handleSet(state);
       }, 1000),
+  },
+);
+```
+
+#### **Initialize temporal store with past and future states**
+
+`pastStates?: Partial<PartialTState>[]`
+
+`futureStates?: Partial<PartialTState>[]`
+
+You can initialize the temporal store with past and future states. This is useful when you want to load a previous state from a database or initialize the store with a default state. By default, the temporal store is initialized with an empty array of past and future states.
+
+```tsx
+const withTemporal = temporal<MyState>(
+  (set) => ({ ... }),
+  {
+    pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
+    futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
   },
 );
 ```
