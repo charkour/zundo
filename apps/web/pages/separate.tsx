@@ -1,18 +1,26 @@
-import { temporal } from "zundo";
-import create from "zustand";
+import { temporal } from 'zundo';
+import create from 'zustand';
 
 interface MyState {
   bears: number;
+  bees: number;
   increment: () => void;
   decrement: () => void;
+  incrementBees: () => void;
+  decrementBees: () => void;
 }
 
 const useStore = create(
   temporal<MyState>((set) => ({
     bears: 0,
+    bees: 10,
     increment: () => set((state) => ({ bears: state.bears + 1 })),
     decrement: () => set((state) => ({ bears: state.bears - 1 })),
-  })),
+    incrementBees: () => set((state) => ({ bees: state.bees + 1 })),
+    decrementBees: () => set((state) => ({ bees: state.bees - 1 })),
+  }), {
+    pastStates: [{ bees: 20}, { bees: 30 }],
+  }),
 );
 const useTemporalStore = create(useStore.temporal);
 
@@ -34,8 +42,12 @@ const UndoBar = () => {
   );
 };
 
-const StateBar = () => {
-  const store = useStore();
+const StateBear = () => {
+  const store = useStore((state) => ({
+    bears: state.bears,
+    increment: state.increment,
+    decrement: state.decrement,
+  }));
   const { bears, increment, decrement } = store;
   return (
     <div>
@@ -50,20 +62,38 @@ const StateBar = () => {
   );
 };
 
+const StateBee = () => {
+  const store = useStore();
+  console.log(store)
+  const { bees, increment, decrement } = store;
+  return (
+    <div>
+      current state: {JSON.stringify(store)}
+      <br />
+      <br />
+      bees: {bees}
+      <br />
+      <button onClick={increment}>increment</button>
+      <button onClick={decrement}>decrement</button>
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <div>
       <h1>
-        {" "}
+        {' '}
         <span role="img" aria-label="bear">
           🐻
-        </span>{" "}
+        </span>{' '}
         <span role="img" aria-label="recycle">
           ♻️
-        </span>{" "}
+        </span>{' '}
         Zundo!
       </h1>
-      <StateBar />
+      <StateBear />
+      <StateBee />
       <br />
       <UndoBar />
     </div>

@@ -9,13 +9,15 @@ export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   partialize: (state: TState) => TState,
-  { equality, onSave, limit } = {} as Omit<ZundoOptions<TState>, 'handleSet'>,
+  { equality, onSave, limit, pastStates = [], futureStates = [] } = {} as Omit<
+    ZundoOptions<TState>,
+    'handleSet'
+  >,
 ) => {
-
   return createStore<TemporalStateWithInternals<TState>>((set, get) => {
     return {
-      pastStates: [],
-      futureStates: [],
+      pastStates,
+      futureStates,
       undo: (steps = 1) => {
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();

@@ -15,6 +15,10 @@ import throttle from '../node_modules/lodash.throttle';
 interface MyState {
   count: number;
   count2: number;
+  myString: string;
+  string2: string;
+  boolean1: boolean;
+  boolean2: boolean;
   increment: () => void;
   decrement: () => void;
   doNothing: () => void;
@@ -28,6 +32,10 @@ const createVanillaStore = (
       return {
         count: 0,
         count2: 0,
+        myString: 'hello',
+        string2: 'world',
+        boolean1: true,
+        boolean2: false,
         increment: () =>
           set((state) => ({
             count: state.count + 1,
@@ -76,6 +84,10 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        myString: 'hello',
+        string2: 'world',
+        boolean1: true,
+        boolean2: false,
       });
       expect(store.temporal.getState().pastStates[1]).toEqual({
         count: 1,
@@ -83,6 +95,10 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        myString: 'hello',
+        string2: 'world',
+        boolean1: true,
+        boolean2: false,
       });
       expect(store.getState()).toContain({ count: 2, count2: 2 });
     });
@@ -93,8 +109,6 @@ describe('Middleware options', () => {
           count: state.count,
         }),
       });
-      const { pastStates, futureStates } =
-        storeWithPartialize.temporal.getState();
       expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
       expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
         0,
@@ -119,8 +133,7 @@ describe('Middleware options', () => {
           count: state.count,
         }),
       });
-      const { undo, pastStates, futureStates } =
-        storeWithPartialize.temporal.getState();
+      const { undo } = storeWithPartialize.temporal.getState();
       expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
       expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
         0,
@@ -143,6 +156,10 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        boolean1: true,
+        boolean2: false,
+        myString: 'hello',
+        string2: 'world',
       });
       act(() => {
         undo();
@@ -159,6 +176,10 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        boolean1: true,
+        boolean2: false,
+        myString: 'hello',
+        string2: 'world',
       });
     });
   });
@@ -535,6 +556,46 @@ describe('Middleware options', () => {
       });
 
       // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
+    });
+  });
+
+  describe('init pastStates', () => {
+    it('should init the pastStates with the initial state', () => {
+      const storeWithPastStates = createVanillaStore({
+        pastStates: [{ count: 0 }, { count: 1 }],
+      });
+      expect(storeWithPastStates.temporal.getState().pastStates.length).toBe(2);
+    });
+    it('should be able to call undo on init pastStates', () => {
+      const storeWithPastStates = createVanillaStore({
+        pastStates: [{ count: 999 }, { count: 1000 }],
+      });
+      expect(storeWithPastStates.getState().count).toBe(0);
+      act(() => {
+        storeWithPastStates.temporal.getState().undo();
+      });
+      expect(storeWithPastStates.getState().count).toBe(1000);
+    });
+  });
+
+  describe('init futureStates', () => {
+    it('should init the futureStates with the initial state', () => {
+      const storeWithFutureStates = createVanillaStore({
+        futureStates: [{ count: 0 }, { count: 1 }],
+      });
+      expect(
+        storeWithFutureStates.temporal.getState().futureStates.length,
+      ).toBe(2);
+    });
+    it('should be able to call redo on init futureStates', () => {
+      const storeWithFutureStates = createVanillaStore({
+        futureStates: [{ count: 1001 }, { count: 1000 }],
+      });
+      expect(storeWithFutureStates.getState().count).toBe(0);
+      act(() => {
+        storeWithFutureStates.temporal.getState().redo();
+      });
+      expect(storeWithFutureStates.getState().count).toBe(1000);
     });
   });
 });
