@@ -245,6 +245,8 @@ const withTemporal = temporal<MyState>(
 
 You can initialize the temporal store with past and future states. This is useful when you want to load a previous state from a database or initialize the store with a default state. By default, the temporal store is initialized with an empty array of past and future states.
 
+> Note: The `pastStates` and `futureStates` do not respect the limit set in the options. If you want to limit the number of past and future states, you must do so manually prior to initializing the store.
+
 ```tsx
 const withTemporal = temporal<MyState>(
   (set) => ({ ... }),
