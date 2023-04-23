@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
-import { temporal } from "zundo";
+import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
+import { temporal } from 'zundo';
 
 interface ExampleData {
   key1: boolean;
@@ -12,13 +12,11 @@ const store = create<ExampleData>()(
     temporal(() => ({
       // TODO: find a way to remove this type cast.
       key1: false as boolean,
-      key2: 32
-    }))
-  )
+      key2: 32,
+    })),
+  ),
 );
 
 export default function Dummy() {
-  return (
-    <></>
-  )
+  return <></>;
 }
