@@ -68,5 +68,8 @@
       "limit": "1 kB",
       "path": "dist/index.js"
     }
-  ]
+  ],
+  "dependencies": {
+    "vitest-localstorage-mock": "0.0.1"
+  }
 }
