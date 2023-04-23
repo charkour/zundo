@@ -85,14 +85,15 @@ const App = () => {
     redo,
     clear
   } = useTemporalStore((state) => state);
-  // or if you don't use create from zustand, you can use the store directly
+  // or if you don't use create from zustand, you can use the store directly.
   // } = useStoreWithUndo.temporal.getState();
+  // if you want reactivity, you'll need to subscribe to the temporal store.
 
   return (
     <>
       bears: {bears}
-      <button onClick={increasePopulation}>increase</button>
-      <button onClick={removeAllBears}>remove</button>
+      <button onClick={() => increasePopulation}>increase</button>
+      <button onClick={() => removeAllBears}>remove</button>
       <button onClick={() => undo()}>undo</button>
       <button onClick={() => redo()}>redo</button>
       <button onClick={() => clear()}>clear</button>
@@ -107,12 +108,14 @@ const App = () => {
 
 `(config: StateCreator, options?: ZundoOptions) => StateCreator`
 
-zundo has one export: `temporal` It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
+zundo has one export: `temporal`. It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
 
 ### Middleware Options
 
 ```tsx
-type onSave<TState> = (pastState: TState, currentState: TState) => void;
+type onSave<TState> =
+  | ((pastState: TState, currentState: TState) => void)
+  | undefined;
 
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
@@ -122,6 +125,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
+  pastStates?: Partial<PartialTState>[];
+  futureStates?: Partial<PartialTState>[];
 }
 ```
 
@@ -228,6 +233,26 @@ const withTemporal = temporal<MyState>(
         console.info('handleSet called');
         handleSet(state);
       }, 1000),
+  },
+);
+```
+
+#### **Initialize temporal store with past and future states**
+
+`pastStates?: Partial<PartialTState>[]`
+
+`futureStates?: Partial<PartialTState>[]`
+
+You can initialize the temporal store with past and future states. This is useful when you want to load a previous state from a database or initialize the store with a default state. By default, the temporal store is initialized with an empty array of past and future states.
+
+> Note: The `pastStates` and `futureStates` do not respect the limit set in the options. If you want to limit the number of past and future states, you must do so manually prior to initializing the store.
+
+```tsx
+const withTemporal = temporal<MyState>(
+  (set) => ({ ... }),
+  {
+    pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
+    futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
   },
 );
 ```

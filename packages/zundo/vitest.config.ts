@@ -1,9 +1,11 @@
-import { defineConfig } from "vitest/config";
+/// <reference types="vitest" />
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   test: {
-    globals: true, // required
-    setupFiles: ['vitest-localstorage-mock'],
-    mockReset: false,
-  }
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./__tests__/setup.ts', 'vitest-localstorage-mock'],
+    mockReset: false
+  },
 })

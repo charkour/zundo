@@ -1,11 +1,13 @@
 import type { StoreApi, StoreMutatorIdentifier } from 'zustand';
-import { StateCreator } from "zustand/vanilla";
+import { StateCreator } from 'zustand/vanilla';
 
-type onSave<TState> = (pastState: TState, currentState: TState) => void;
+type onSave<TState> =
+  | ((pastState: TState, currentState: TState) => void)
+  | undefined;
 
 export interface TemporalStateWithInternals<TState> {
-  pastStates: TState[];
-  futureStates: TState[];
+  pastStates: Partial<TState>[];
+  futureStates: Partial<TState>[];
 
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
@@ -16,10 +18,8 @@ export interface TemporalStateWithInternals<TState> {
   resume: () => void;
 
   setOnSave: (onSave: onSave<TState>) => void;
-  __internal: {
-    onSave: onSave<TState>;
-    handleUserSet: (pastState: TState) => void;
-  };
+  __onSave: onSave<TState>;
+  __handleSet: (pastState: TState) => void;
 }
 
 export interface ZundoOptions<TState, PartialTState = TState> {
@@ -27,13 +27,30 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
-  handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState'];
-  wrapTemporalStore?: (initializer: StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>
+  handleSet?: (
+    handleSet: StoreApi<TState>['setState'],
+  ) => StoreApi<TState>['setState'];
+  pastStates?: Partial<PartialTState>[];
+  futureStates?: Partial<PartialTState>[];
+  wrapTemporalStore?: (
+    initializer: StateCreator<
+      TemporalStateWithInternals<TState>,
+      [StoreMutatorIdentifier, unknown][],
+      []
+    >,
+  ) => StateCreator<
+    TemporalStateWithInternals<TState>,
+    [StoreMutatorIdentifier, unknown][],
+    [StoreMutatorIdentifier, unknown][]
+  >;
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;
 
 export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
-  '__internal'
+  '__onSave' | '__handleUserSet'
 >;
+
+// https://stackoverflow.com/a/69328045/9931154
+export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

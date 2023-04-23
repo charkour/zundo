@@ -3,7 +3,7 @@ vi.mock('zustand');
 import { createVanillaTemporal } from '../src/temporal';
 import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
-import { persist } from "zustand/middleware";
+import { persist } from 'zustand/middleware';
 
 interface MyState {
   count: number;
@@ -29,8 +29,13 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should have the objects defined', () => {
-    const temporalStore = createVanillaTemporal(store.setState, store.getState);
-    const { undo, redo, clear, pastStates, futureStates } = temporalStore.getState();
+    const temporalStore = createVanillaTemporal(
+      store.setState,
+      store.getState,
+      (state) => state,
+    );
+    const { undo, redo, clear, pastStates, futureStates } =
+      temporalStore.getState();
 
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();
@@ -44,7 +49,12 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should wrap temporal store in given middlewares', () => {
-    const temporalStore = createVanillaTemporal(store.setState, store.getState, { wrapTemporalStore: (store) => persist(store, { name: '123' }) })
-    expect(temporalStore).toHaveProperty('persist')
+    const temporalStore = createVanillaTemporal(
+      store.setState,
+      store.getState,
+      (state) => state,
+      { wrapTemporalStore: (store) => persist(store, { name: '123' }) },
+    );
+    expect(temporalStore).toHaveProperty('persist');
   });
 });
