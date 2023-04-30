@@ -75,7 +75,7 @@ const zundoImpl = <TState>(
     return config(
       // Modify the set function to call the userlandSet function
       (state, replace) => {
-        // Get most up to date state. The state from the callback might be a partial state.
+        // Get most up-to-date state. The state from the callback might be a partial state.
         // The order of the get() and set() calls is important here.
         const pastState = partialize(get());
         set(state, replace);

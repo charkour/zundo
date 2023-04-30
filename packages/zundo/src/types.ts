@@ -1,4 +1,5 @@
-import type { StoreApi } from 'zustand';
+import type { StoreApi, StoreMutatorIdentifier } from 'zustand';
+import type { StateCreator } from 'zustand/vanilla';
 
 type onSave<TState> =
   | ((pastState: TState, currentState: TState) => void)
@@ -21,6 +22,22 @@ export interface TemporalStateWithInternals<TState> {
   __handleSet: (pastState: TState) => void;
 }
 
+export type CreateTemporalOptions<TState> = Pick<
+  ZundoOptions<TState>,
+  | 'equality'
+  | 'onSave'
+  | 'limit'
+  | 'pastStates'
+  | 'futureStates'
+  | 'wrapTemporal'
+>;
+
+export type TemporalStateCreator<TState> = StateCreator<
+  TemporalStateWithInternals<TState>,
+  [],
+  []
+>;
+
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
@@ -31,6 +48,17 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
+  wrapTemporal?: (
+    storeInitializer: StateCreator<
+      TemporalStateWithInternals<TState>,
+      [StoreMutatorIdentifier, unknown][],
+      []
+    >,
+  ) => StateCreator<
+    TemporalStateWithInternals<TState>,
+    [StoreMutatorIdentifier, unknown][],
+    [StoreMutatorIdentifier, unknown][]
+  >;
 }
 
 export type Write<T, U> = Omit<T, keyof U> & U;
@@ -39,6 +67,3 @@ export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
   '__onSave' | '__handleUserSet'
 >;
-
-// https://stackoverflow.com/a/69328045/9931154
-export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

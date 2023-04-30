@@ -35,8 +35,8 @@ npm i zustand zundo
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
-import { temporal } from 'zundo'
-import { create } from 'zustand'
+import { temporal } from 'zundo';
+import { create } from 'zustand';
 
 // define the store (typescript)
 interface StoreState {
@@ -60,8 +60,8 @@ const useStoreWithUndo = create<StoreState>()(
 If you're using React, you can convert the store to a React hook using create from `zustand`.
 
 ```tsx
-import { useStore } from 'zustand'
-import type { TemporalState } from 'zundo'
+import { useStore } from 'zustand';
+import type { TemporalState } from 'zundo';
 
 const useTemporalStore = <T,>(
   selector: (state: TemporalState<StoreState>) => T,
@@ -75,16 +75,8 @@ Use your store anywhere, including `undo`, `redo`, and `clear`!
 
 ```tsx
 const App = () => {
-  const {
-    bears,
-    increasePopulation,
-    removeAllBears,
-  } = useStoreWithUndo();
-  const {
-    undo,
-    redo,
-    clear
-  } = useTemporalStore((state) => state);
+  const { bears, increasePopulation, removeAllBears } = useStoreWithUndo();
+  const { undo, redo, clear } = useTemporalStore((state) => state);
   // or if you don't use create from zustand, you can use the store directly.
   // } = useStoreWithUndo.temporal.getState();
   // if you want reactivity, you'll need to subscribe to the temporal store.
@@ -127,6 +119,17 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
+  wrapTemporal?: (
+    storeInitializer: StateCreator<
+      TemporalStateWithInternals<TState>,
+      [StoreMutatorIdentifier, unknown][],
+      []
+    >,
+  ) => StateCreator<
+    TemporalStateWithInternals<TState>,
+    [StoreMutatorIdentifier, unknown][],
+    [StoreMutatorIdentifier, unknown][]
+  >;
 }
 ```
 
@@ -253,6 +256,25 @@ const withTemporal = temporal<MyState>(
   {
     pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
     futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
+  },
+);
+```
+
+#### **Wrap temporal store**
+
+`wrapTemporal?: (storeInitializer: StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>`
+
+You can wrap the temporal store with your own middleware. This is useful if you want to add additional functionality to the temporal store. For example, you can add `persist` middleware to the temporal store to persist the past and future states to local storage.
+
+> Note: The `temporal` middleware can be added to the `temporal` store. This way, you could track the history of the history. 🤯
+
+```tsx
+import { persist } from 'zustand/middleware'
+
+const withTemporal = temporal<MyState>(
+  (set) => ({ ... }),
+  {
+    wrapTemporal: (storeInitializer) => persist(storeInitializer, { name: 'temporal-persist' }),
   },
 );
 ```
