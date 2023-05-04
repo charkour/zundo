@@ -114,9 +114,6 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
-  handleSet?: (
-    handleSet: StoreApi<TState>['setState'],
-  ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (
@@ -218,25 +215,6 @@ const useStoreA = create<StoreState>(
     set => ({ ... }),
     { onSave: (state) => console.log('saved', state) }
   )
-);
-```
-
-#### **Cool-off period**
-
-`handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
-
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter function.
-
-```tsx
-const withTemporal = temporal<MyState>(
-  (set) => ({ ... }),
-  {
-    handleSet: (handleSet) =>
-      throttle<typeof handleSet>((state) => {
-        console.info('handleSet called');
-        handleSet(state);
-      }, 1000),
-  },
 );
 ```
 
