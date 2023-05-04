@@ -529,37 +529,6 @@ describe('Middleware options', () => {
         expect(console.trace).toHaveBeenCalledTimes(1);
       });
     });
-
-    // describe('handleUserSet', () => {
-    //   it('should update the temporal store with the pastState when called', () => {
-    //     const { __handleSet } =
-    //       store.temporal.getState() as TemporalStateWithInternals<MyState>;
-    //     act(() => {
-    //       __handleSet(store.getState());
-    //     });
-    //     expect(store.temporal.getState().pastStates.length).toBe(1);
-    //   });
-
-    //   it('should only update if the the status is tracking', () => {
-    //     const { __handleSet } =
-    //       store.temporal.getState() as TemporalStateWithInternals<MyState>;
-    //     act(() => {
-    //       __handleSet(store.getState());
-    //     });
-    //     expect(store.temporal.getState().pastStates.length).toBe(1);
-    //     act(() => {
-    //       store.temporal.getState().pause();
-    //       __handleSet(store.getState());
-    //     });
-    //     expect(store.temporal.getState().pastStates.length).toBe(1);
-    //     act(() => {
-    //       store.temporal.getState().resume();
-    //       __handleSet(store.getState());
-    //     });
-    //   });
-
-    //   // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
-    // });
   });
 
   describe('init pastStates', () => {
