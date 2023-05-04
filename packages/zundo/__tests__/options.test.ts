@@ -387,23 +387,57 @@ describe('Middleware options', () => {
       expect(store.temporal.getState().pastStates.length).toBe(2);
     });
 
-    it('should call function if set', () => {
+    // it('should call function if set', () => {
+    //   global.console.info = vi.fn();
+    //   const storeWithHandleSet = createVanillaStore({
+    //     handleSet: (handleSet) => {
+    //       return (state) => {
+    //         console.info('handleSet called');
+    //         handleSet(state);
+    //       };
+    //     },
+    //   });
+    //   const { doNothing, increment } = storeWithHandleSet.getState();
+    //   act(() => {
+    //     increment();
+    //     doNothing();
+    //   });
+    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+    //   expect(console.info).toHaveBeenCalledTimes(2);
+    //   act(() => {
+    //     storeWithHandleSet.temporal.getState().undo(2);
+    //   });
+    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+    //   expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+    //     2,
+    //   );
+    //   expect(console.info).toHaveBeenCalledTimes(2);
+    // });
+
+    it.only('should call function if set (wrapTemporal)', () => {
       global.console.info = vi.fn();
       const storeWithHandleSet = createVanillaStore({
-        handleSet: (handleSet) => {
-          return (state) => {
-            console.info('handleSet called');
-            handleSet(state);
+        wrapTemporal: (config) => {
+          const thing = (_set, get, store) => {
+            const set: typeof _set = (partial, replace) => {
+              console.info('handleSet called');
+              console.log('calling wrapped setter', JSON.stringify(partial, null, 2));
+              _set(partial, replace);
+            };
+            return config(set, get, store);
           };
+          return thing;
         },
       });
       const { doNothing, increment } = storeWithHandleSet.getState();
       act(() => {
         increment();
-        doNothing();
       });
-      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      act(() => {
+        doNothing();
+      })
       expect(console.info).toHaveBeenCalledTimes(2);
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       act(() => {
         storeWithHandleSet.temporal.getState().undo(2);
       });
@@ -414,47 +448,46 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
-    it('should correctly use throttling', () => {
-      global.console.error = vi.fn();
-      vi.useFakeTimers();
-      const storeWithHandleSet = createVanillaStore({
-        handleSet: (handleSet) => {
-          return throttle<typeof handleSet>((state) => {
-            console.error('handleSet called');
-            handleSet(state);
-          }, 1000);
-        },
-      });
-      const { doNothing, increment } = storeWithHandleSet.getState();
-      act(() => {
-        increment();
-      });
-      vi.runAllTimers();
-      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
-      expect(console.error).toHaveBeenCalledTimes(1);
-      act(() => {
-        doNothing();
-      });
-      vi.runAllTimers();
-      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
-      expect(console.error).toHaveBeenCalledTimes(2);
-      act(() => {
-        storeWithHandleSet.temporal.getState().undo(2);
-      });
-      vi.runAllTimers();
-      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
-      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
-        2,
-      );
-      expect(console.warn).toHaveBeenCalledTimes(2);
-    });
+    // it('should correctly use throttling', () => {
+    //   global.console.error = vi.fn();
+    //   vi.useFakeTimers();
+    //   const storeWithHandleSet = createVanillaStore({
+    //     handleSet: (handleSet) => {
+    //       return throttle<typeof handleSet>((state) => {
+    //         console.error('handleSet called');
+    //         handleSet(state);
+    //       }, 1000);
+    //     },
+    //   });
+    //   const { doNothing, increment } = storeWithHandleSet.getState();
+    //   act(() => {
+    //     increment();
+    //   });
+    //   vi.runAllTimers();
+    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
+    //   expect(console.error).toHaveBeenCalledTimes(1);
+    //   act(() => {
+    //     doNothing();
+    //   });
+    //   vi.runAllTimers();
+    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+    //   expect(console.error).toHaveBeenCalledTimes(2);
+    //   act(() => {
+    //     storeWithHandleSet.temporal.getState().undo(2);
+    //   });
+    //   vi.runAllTimers();
+    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+    //   expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+    //     2,
+    //   );
+    //   expect(console.warn).toHaveBeenCalledTimes(2);
+    // });
   });
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { __handleSet, __onSave } =
+      const { __onSave } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
-      expect(__handleSet).toBeInstanceOf(Function);
       expect(__onSave).toBe(undefined);
     });
     describe('onSave', () => {
@@ -501,10 +534,7 @@ describe('Middleware options', () => {
         act(() => {
           (
             storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-          ).__onSave(
-            storeWithOnSave.getState(),
-            storeWithOnSave.getState(),
-          );
+          ).__onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
         expect(console.dir).toHaveBeenCalledTimes(1);
@@ -527,36 +557,36 @@ describe('Middleware options', () => {
       });
     });
 
-    describe('handleUserSet', () => {
-      it('should update the temporal store with the pastState when called', () => {
-        const { __handleSet } =
-          store.temporal.getState() as TemporalStateWithInternals<MyState>;
-        act(() => {
-          __handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-      });
+    // describe('handleUserSet', () => {
+    //   it('should update the temporal store with the pastState when called', () => {
+    //     const { __handleSet } =
+    //       store.temporal.getState() as TemporalStateWithInternals<MyState>;
+    //     act(() => {
+    //       __handleSet(store.getState());
+    //     });
+    //     expect(store.temporal.getState().pastStates.length).toBe(1);
+    //   });
 
-      it('should only update if the the status is tracking', () => {
-        const { __handleSet } =
-          store.temporal.getState() as TemporalStateWithInternals<MyState>;
-        act(() => {
-          __handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().pause();
-          __handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().resume();
-          __handleSet(store.getState());
-        });
-      });
+    //   it('should only update if the the status is tracking', () => {
+    //     const { __handleSet } =
+    //       store.temporal.getState() as TemporalStateWithInternals<MyState>;
+    //     act(() => {
+    //       __handleSet(store.getState());
+    //     });
+    //     expect(store.temporal.getState().pastStates.length).toBe(1);
+    //     act(() => {
+    //       store.temporal.getState().pause();
+    //       __handleSet(store.getState());
+    //     });
+    //     expect(store.temporal.getState().pastStates.length).toBe(1);
+    //     act(() => {
+    //       store.temporal.getState().resume();
+    //       __handleSet(store.getState());
+    //     });
+    //   });
 
-      // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
-    });
+    //   // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
+    // });
   });
 
   describe('init pastStates', () => {

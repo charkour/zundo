@@ -19,17 +19,13 @@ export interface TemporalStateWithInternals<TState> {
 
   setOnSave: (onSave: onSave<TState>) => void;
   __onSave: onSave<TState>;
-  __handleSet: (pastState: TState) => void;
 }
 
 export type CreateTemporalOptions<TState> = Pick<
   ZundoOptions<TState>,
-  | 'equality'
   | 'onSave'
-  | 'limit'
   | 'pastStates'
   | 'futureStates'
-  | 'wrapTemporal'
 >;
 
 export type TemporalStateCreator<TState> = StateCreator<
@@ -43,13 +39,10 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
-  handleSet?: (
-    handleSet: StoreApi<TState>['setState'],
-  ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (
-    storeInitializer: StateCreator<
+    config: StateCreator<
       TemporalStateWithInternals<TState>,
       [StoreMutatorIdentifier, unknown][],
       []
