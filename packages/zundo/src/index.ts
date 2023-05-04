@@ -96,6 +96,8 @@ const setterFactory = <TState>(
   return (state, replace) => {
     // For backwards compatibility, will be removed in next version.
     if (handleSet) {
+      const pastState = partialize(userGet());
+      userSet(state, replace);
       handleSet(temporalGet().__handleSet)(state, replace);
       return;
     }
