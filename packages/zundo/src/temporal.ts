@@ -75,6 +75,5 @@ export const temporalStateCreator = <TState>(
       __onSave: onSave,
     };
   };
-  // return createStore<TemporalState<TState>>(stateCreator);
   return stateCreator;
 };

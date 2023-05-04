@@ -1,8 +1,8 @@
 import {
-  StateCreator,
-  StoreMutatorIdentifier,
-  Mutate,
-  StoreApi,
+  type StateCreator,
+  type StoreMutatorIdentifier,
+  type Mutate,
+  type StoreApi,
   createStore,
 } from 'zustand';
 import { temporalStateCreator } from './temporal';
@@ -60,7 +60,10 @@ const zundoImpl = <TState>(
         setState,
         get,
         partialize,
-
+        restOptions.limit,
+        restOptions.equality,
+        tset,
+        tget,
       );
 
       // Modify the set function to call the userlandSet function

@@ -400,13 +400,8 @@ This is a work in progress. Submit a PR!
 ## Road Map
 
 - [ ] create nicer API, or a helper hook in react land (useTemporal). or vanilla version of the it
-- [ ] Allow alternative storage engines for past and future states
-- [ ] See if it canUndo and canRedo
-- [ ] Set initial history, past and future states
-- [ ] create `jump` method that takes an integer
 - [ ] create a `present` object that holds the current state? perhaps
 - [ ] support history branches rather than clearing the future states
-- [ ] Pass middleware to temporal store
 - [ ] store state delta rather than full object
 - [ ] track state for multiple stores at once
 

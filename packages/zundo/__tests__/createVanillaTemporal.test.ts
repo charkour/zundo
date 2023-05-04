@@ -16,22 +16,8 @@ interface MyState {
 // Not exhaustive, but also likely not needed
 describe('createVanillaTemporal', () => {
   it('true', () => {
-
     expect(true)
   })
-  // const store = createStore<MyState>((set) => {
-  //   return {
-  //     count: 0,
-  //     increment: () =>
-  //       set((state) => ({
-  //         count: state.count + 1,
-  //       })),
-  //     decrement: () =>
-  //       set((state) => ({
-  //         count: state.count - 1,
-  //       })),
-  //   };
-  // });
 
   // it('should have the objects defined', () => {
   //   const temporalStore = createVanillaTemporal(

@@ -58,5 +58,5 @@ export type Write<T, U> = Omit<T, keyof U> & U;
 
 export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
-  '__onSave' | '__handleUserSet'
+  '__onSave'
 >;
