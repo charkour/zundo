@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "target": "ESNext"
   },
   "exclude": ["node_modules", "dist"],
   "extends": "tsconfig/base.json",

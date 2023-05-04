@@ -120,7 +120,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (
-    storeInitializer: StateCreator<
+    config: StateCreator<
       TemporalStateWithInternals<TState>,
       [StoreMutatorIdentifier, unknown][],
       []
@@ -262,7 +262,7 @@ const withTemporal = temporal<MyState>(
 
 #### **Wrap temporal store**
 
-`wrapTemporal?: (storeInitializer: StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>`
+`wrapTemporal?: (config: StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<TemporalStateWithInternals<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>`
 
 You can wrap the temporal store with your own middleware. This is useful if you want to add additional functionality to the temporal store. For example, you can add `persist` middleware to the temporal store to persist the past and future states to local storage.
 
@@ -274,7 +274,7 @@ import { persist } from 'zustand/middleware'
 const withTemporal = temporal<MyState>(
   (set) => ({ ... }),
   {
-    wrapTemporal: (storeInitializer) => persist(storeInitializer, { name: 'temporal-persist' }),
+    wrapTemporal: (config) => persist(config, { name: 'temporal-persist' }),
   },
 );
 ```

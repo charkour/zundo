@@ -1,10 +1,11 @@
-import type {
-  StateCreator,
-  StoreMutatorIdentifier,
-  Mutate,
-  StoreApi,
+import {
+  type StateCreator,
+  type StoreMutatorIdentifier,
+  type Mutate,
+  type StoreApi,
+  createStore,
 } from 'zustand';
-import { createVanillaTemporal } from './temporal';
+import { temporalStateCreator } from './temporal';
 import type {
   TemporalState,
   TemporalStateWithInternals,
@@ -35,58 +36,102 @@ declare module 'zustand/vanilla' {
 const zundoImpl = <TState>(
   config: StateCreator<TState, [], []>,
   {
-    partialize = (state: TState) => state,
-    handleSet = (handleSetCb) => handleSetCb,
+    partialize = (state) => state,
+    wrapTemporal = (init) => init,
     ...restOptions
   } = {} as ZundoOptions<TState>,
 ): StateCreator<TState, [], []> => {
   type StoreAddition = StoreApi<TemporalState<TState>>;
-  type StoreWithAddition = Mutate<
+  type StoreApiWithAddition = Mutate<
     StoreApi<TState>,
     [['temporal', StoreAddition]]
   >;
   const configWithTemporal = (
-    set: StoreApi<TState>['setState'],
+    _set: StoreApi<TState>['setState'],
     get: StoreApi<TState>['getState'],
-    store: StoreWithAddition,
+    api: StoreApiWithAddition,
   ) => {
-    store.temporal = createVanillaTemporal<TState>(
-      set,
-      get,
-      partialize,
-      restOptions,
-    );
-
-    const curriedHandleSet = handleSet(
-      (store.temporal.getState() as TemporalStateWithInternals<TState>)
-        .__handleSet,
-    );
-
-    const setState = store.setState;
+    const setState = api.setState;
+    const tconfig = temporalStateCreator(_set, get, partialize, restOptions);
     // Modify the setState function to call the userlandSet function
-    store.setState = (state, replace) => {
-      // Get most up to date state. The state from the callback might be a partial state.
-      // The order of the get() and set() calls is important here.
-      const pastState = partialize(get());
-      setState(state, replace);
-      curriedHandleSet(pastState);
-    };
+    let set: typeof _set = _set;
+    const test: typeof tconfig = (tset, tget, tstore) => {
 
-    return config(
+      api.setState = setterFactory(
+        setState,
+        get,
+        partialize,
+        restOptions.limit,
+        restOptions.equality,
+        tset,
+        tget,
+      );
+
       // Modify the set function to call the userlandSet function
-      (state, replace) => {
+
+      set = (state, replace) => {
         // Get most up-to-date state. The state from the callback might be a partial state.
         // The order of the get() and set() calls is important here.
         const pastState = partialize(get());
-        set(state, replace);
-        curriedHandleSet(pastState);
-      },
-      get,
-      store,
-    );
+        // call original setter
+        _set(state, replace);
+        const trackingStatus = tget().trackingStatus,
+          onSave = (tget() as any).__onSave,
+          pastStates = tget().pastStates.slice(),
+          currentState = partialize(get());
+        if (
+          trackingStatus === 'tracking' &&
+          !restOptions.equality?.(currentState, pastState)
+        ) {
+          // This naively assumes that only one new state can be added at a time
+          if (restOptions.limit && pastStates.length >= restOptions.limit) {
+            pastStates.shift();
+          }
+          pastStates.push(pastState);
+          onSave?.(pastState, currentState);
+          tset({ pastStates, futureStates: [] });
+        }
+      };
+
+      return tconfig(tset, tget, tstore);
+    };
+    api.temporal = createStore(wrapTemporal(test));
+
+    return config(set, get, api);
   };
   return configWithTemporal as StateCreator<TState, [], []>;
 };
 
 export const temporal = zundoImpl as unknown as Zundo;
 export type { ZundoOptions, Zundo, TemporalState };
+
+const setterFactory = <TState>(
+  userSet: StoreApi<TState>['setState'],
+  userGet: StoreApi<TState>['getState'],
+  partialize: NonNullable<ZundoOptions<TState>['partialize']>,
+  limit: ZundoOptions<TState>['limit'],
+  equality: ZundoOptions<TState>['equality'],
+  temporalSet: StoreApi<TemporalStateWithInternals<TState>>['setState'],
+  temporalGet: StoreApi<TemporalStateWithInternals<TState>>['getState'],
+): StoreApi<TState>['setState'] => {
+  return (state, replace) => {
+    // Get most up to date state. The state from the callback might be a partial state.
+    // The order of the get() and set() calls is important here.
+    const pastState = partialize(userGet());
+    // call original setter
+    userSet(state, replace);
+    const trackingStatus = temporalGet().trackingStatus,
+      onSave = (temporalGet() as any).__onSave,
+      pastStates = temporalGet().pastStates.slice(),
+      currentState = partialize(userGet());
+    if (trackingStatus === 'tracking' && !equality?.(currentState, pastState)) {
+      // This naively assumes that only one new state can be added at a time
+      if (limit && pastStates.length >= limit) {
+        pastStates.shift();
+      }
+      pastStates.push(pastState);
+      onSave?.(pastState, currentState);
+      temporalSet({ pastStates, futureStates: [] });
+    }
+  };
+};

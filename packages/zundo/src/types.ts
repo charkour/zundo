@@ -29,7 +29,6 @@ export type CreateTemporalOptions<TState> = Pick<
   | 'limit'
   | 'pastStates'
   | 'futureStates'
-  | 'wrapTemporal'
 >;
 
 export type TemporalStateCreator<TState> = StateCreator<
@@ -43,13 +42,16 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (currentState: TState, pastState: TState) => boolean;
   onSave?: onSave<TState>;
+  /**
+   * @deprecated Use `wrapTemporal` instead. wrapTemporal: (config) => (_set, get, api) => { const set: typeof _set = (state, replace) => { ... }; return config(set, get, api);
+   */
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (
-    storeInitializer: StateCreator<
+    config: StateCreator<
       TemporalStateWithInternals<TState>,
       [StoreMutatorIdentifier, unknown][],
       []
