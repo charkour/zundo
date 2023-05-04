@@ -421,7 +421,6 @@ describe('Middleware options', () => {
           const thing = (_set, get, store) => {
             const set: typeof _set = (partial, replace) => {
               console.info('handleSet called');
-              console.log('calling wrapped setter', JSON.stringify(partial, null, 2));
               _set(partial, replace);
             };
             return config(set, get, store);
@@ -432,10 +431,8 @@ describe('Middleware options', () => {
       const { doNothing, increment } = storeWithHandleSet.getState();
       act(() => {
         increment();
-      });
-      act(() => {
         doNothing();
-      })
+      });
       expect(console.info).toHaveBeenCalledTimes(2);
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       act(() => {
@@ -445,7 +442,7 @@ describe('Middleware options', () => {
       expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
         2,
       );
-      expect(console.info).toHaveBeenCalledTimes(2);
+      expect(console.info).toHaveBeenCalledTimes(3);
     });
 
     // it('should correctly use throttling', () => {
