@@ -387,34 +387,7 @@ describe('Middleware options', () => {
       expect(store.temporal.getState().pastStates.length).toBe(2);
     });
 
-    // it('should call function if set', () => {
-    //   global.console.info = vi.fn();
-    //   const storeWithHandleSet = createVanillaStore({
-    //     handleSet: (handleSet) => {
-    //       return (state) => {
-    //         console.info('handleSet called');
-    //         handleSet(state);
-    //       };
-    //     },
-    //   });
-    //   const { doNothing, increment } = storeWithHandleSet.getState();
-    //   act(() => {
-    //     increment();
-    //     doNothing();
-    //   });
-    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
-    //   expect(console.info).toHaveBeenCalledTimes(2);
-    //   act(() => {
-    //     storeWithHandleSet.temporal.getState().undo(2);
-    //   });
-    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
-    //   expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
-    //     2,
-    //   );
-    //   expect(console.info).toHaveBeenCalledTimes(2);
-    // });
-
-    it.only('should call function if set (wrapTemporal)', () => {
+    it('should call function if set (wrapTemporal)', () => {
       global.console.info = vi.fn();
       const storeWithHandleSet = createVanillaStore({
         wrapTemporal: (config) => {
@@ -445,40 +418,43 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(3);
     });
 
-    // it('should correctly use throttling', () => {
-    //   global.console.error = vi.fn();
-    //   vi.useFakeTimers();
-    //   const storeWithHandleSet = createVanillaStore({
-    //     handleSet: (handleSet) => {
-    //       return throttle<typeof handleSet>((state) => {
-    //         console.error('handleSet called');
-    //         handleSet(state);
-    //       }, 1000);
-    //     },
-    //   });
-    //   const { doNothing, increment } = storeWithHandleSet.getState();
-    //   act(() => {
-    //     increment();
-    //   });
-    //   vi.runAllTimers();
-    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
-    //   expect(console.error).toHaveBeenCalledTimes(1);
-    //   act(() => {
-    //     doNothing();
-    //   });
-    //   vi.runAllTimers();
-    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
-    //   expect(console.error).toHaveBeenCalledTimes(2);
-    //   act(() => {
-    //     storeWithHandleSet.temporal.getState().undo(2);
-    //   });
-    //   vi.runAllTimers();
-    //   expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
-    //   expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
-    //     2,
-    //   );
-    //   expect(console.warn).toHaveBeenCalledTimes(2);
-    // });
+    it('should correctly use throttling', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers();
+      const storeWithHandleSet = createVanillaStore({
+        wrapTemporal: (config) => {
+          return (_set, get, store) => {
+            const set: typeof _set = throttle<typeof _set>((partial, replace) => {
+              console.error('handleSet called');
+              _set(partial, replace);
+            }, 1000);
+            return config(set, get, store);
+          };
+        },
+      });
+      const { doNothing, increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
+      expect(console.error).toHaveBeenCalledTimes(1);
+      act(() => {
+        doNothing();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.error).toHaveBeenCalledTimes(2);
+      act(() => {
+        storeWithHandleSet.temporal.getState().undo(2);
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+        2,
+      );
+      expect(console.warn).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('secret internals', () => {
