@@ -52,50 +52,30 @@ const zundoImpl = <TState>(
     api: StoreApiWithAddition,
   ) => {
     const setState = api.setState;
-    const tconfig = temporalStateCreator(_set, get, partialize, restOptions);
     // Modify the setState function to call the userlandSet function
     let set: typeof _set = _set;
-    const test: typeof tconfig = (tset, tget, tstore) => {
+    api.temporal = createStore(
+      wrapTemporal((tset, tget, tstore) => {
+        api.setState = setterFactory(
+          setState,
+          get,
+          partialize,
+          tset,
+          tget,
+          restOptions,
+        );
 
-      api.setState = setterFactory(
-        setState,
-        get,
-        partialize,
-        restOptions.limit,
-        restOptions.equality,
-        tset,
-        tget,
-      );
+        // Modify the set function to call the userlandSet function
+        set = setterFactory(_set, get, partialize, tset, tget, restOptions);
 
-      // Modify the set function to call the userlandSet function
-
-      set = (state, replace) => {
-        // Get most up-to-date state. The state from the callback might be a partial state.
-        // The order of the get() and set() calls is important here.
-        const pastState = partialize(get());
-        // call original setter
-        _set(state, replace);
-        const trackingStatus = tget().trackingStatus,
-          onSave = (tget() as any).__onSave,
-          pastStates = tget().pastStates.slice(),
-          currentState = partialize(get());
-        if (
-          trackingStatus === 'tracking' &&
-          !restOptions.equality?.(currentState, pastState)
-        ) {
-          // This naively assumes that only one new state can be added at a time
-          if (restOptions.limit && pastStates.length >= restOptions.limit) {
-            pastStates.shift();
-          }
-          pastStates.push(pastState);
-          onSave?.(pastState, currentState);
-          tset({ pastStates, futureStates: [] });
-        }
-      };
-
-      return tconfig(tset, tget, tstore);
-    };
-    api.temporal = createStore(wrapTemporal(test));
+        return temporalStateCreator(
+          _set,
+          get,
+          partialize,
+          restOptions,
+        )(tset, tget, tstore);
+      }),
+    );
 
     return config(set, get, api);
   };
@@ -109,13 +89,18 @@ const setterFactory = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   partialize: NonNullable<ZundoOptions<TState>['partialize']>,
-  limit: ZundoOptions<TState>['limit'],
-  equality: ZundoOptions<TState>['equality'],
   temporalSet: StoreApi<TemporalStateWithInternals<TState>>['setState'],
   temporalGet: StoreApi<TemporalStateWithInternals<TState>>['getState'],
+  { limit, equality, handleSet }: ZundoOptions<TState>,
 ): StoreApi<TState>['setState'] => {
   return (state, replace) => {
-    // Get most up to date state. The state from the callback might be a partial state.
+    // For backwards compatibility, will be removed in next version.
+    if (handleSet) {
+      handleSet(temporalGet().__handleSet)(state, replace);
+      return;
+    }
+
+    // Get most up-to-date state. The state from the callback might be a partial state.
     // The order of the get() and set() calls is important here.
     const pastState = partialize(userGet());
     // call original setter
@@ -124,6 +109,7 @@ const setterFactory = <TState>(
       onSave = (temporalGet() as any).__onSave,
       pastStates = temporalGet().pastStates.slice(),
       currentState = partialize(userGet());
+    // Equality is more expensive than the other checks, so we do it last
     if (trackingStatus === 'tracking' && !equality?.(currentState, pastState)) {
       // This naively assumes that only one new state can be added at a time
       if (limit && pastStates.length >= limit) {
