@@ -144,10 +144,10 @@ const setterFactory = <TState>(
     }
     // Block above will be removed
 
-    const trackingStatus = temporalGet().trackingStatus,
-      onSave = temporalGet()._onSave,
-      pastStates = temporalGet().pastStates.slice(),
-      currentState = partialize(userGet());
+    const trackingStatus = temporalGet().trackingStatus;
+    const onSave = temporalGet()._onSave
+    const pastStates = temporalGet().pastStates.slice()
+    const currentState = partialize(userGet());
     // Equality is more expensive than the other checks, so we do it last
     if (trackingStatus === 'tracking' && !equality?.(currentState, pastState)) {
       // This naively assumes that only one new state can be added at a time
