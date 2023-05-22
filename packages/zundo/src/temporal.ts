@@ -146,6 +146,7 @@ const setterFactory = <TState>(
 
     const trackingStatus = temporalGet().trackingStatus;
     const onSave = temporalGet()._onSave
+    // TODO: in the next PR, once handleSet is removed, then we can move the into a nested if statement
     const pastStates = temporalGet().pastStates.slice()
     const currentState = partialize(userGet());
     // Equality is more expensive than the other checks, so we do it last
@@ -156,6 +157,7 @@ const setterFactory = <TState>(
       }
       pastStates.push(pastState);
       onSave?.(pastState, currentState);
+      // TODO: after handleSet is removed, we should see if there is better perf by only setting futureStates to [] if it is not already []
       temporalSet({ pastStates, futureStates: [] });
     }
   };
