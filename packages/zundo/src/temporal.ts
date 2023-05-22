@@ -40,16 +40,6 @@ export const temporalStateCreator = <TState>(
     );
 
     return {
-      __newSet: setterFactory(
-        userSet,
-        userGet,
-        partialize,
-        limit,
-        equality,
-        handleSet,
-        set,
-        get,
-      ),
       pastStates,
       futureStates,
       undo: (steps = 1) => {
@@ -123,6 +113,16 @@ export const temporalStateCreator = <TState>(
           set({ pastStates, futureStates: [] });
         }
       },
+      __userSet: setterFactory(
+        userSet,
+        userGet,
+        partialize,
+        limit,
+        equality,
+        handleSet,
+        set,
+        get,
+      ),
     };
   };
   return stateCreator;

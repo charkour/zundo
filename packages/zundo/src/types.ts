@@ -20,7 +20,7 @@ export interface TemporalStateWithInternals<TState> {
   setOnSave: (onSave: onSave<TState>) => void;
   __onSave: onSave<TState>;
   __handleSet: (pastState: TState) => void;
-  __newSet: StoreApi<TState>['setState'];
+  __userSet: StoreApi<TState>['setState'];
 }
 
 export type TemporalStateCreator<TState> = StateCreator<
@@ -59,5 +59,5 @@ export type Write<T, U> = Omit<T, keyof U> & U;
 
 export type TemporalState<TState> = Omit<
   TemporalStateWithInternals<TState>,
-  '__onSave' | '__handleSet' | '__newSet'
+  '__onSave' | '__handleSet' | '__userSet'
 >;

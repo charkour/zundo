@@ -51,13 +51,16 @@ export const temporal = (<TState>(
     get: StoreApi<TState>['getState'],
     api: StoreApiWithAddition,
   ): TState => {
+    // Add the temporal store to the userland store
     api.temporal = createStore(
       wrapTemporal(temporalStateCreator(_set, get, api, restOptions)),
     );
-    const set = (api.temporal.getState() as TemporalStateWithInternals<TState>)
-      .__newSet;
-
-    return config(set, get, api);
+    return config(
+      // Get the new userland set function that interfaces with the temporal store to add past states when called
+      (api.temporal.getState() as TemporalStateWithInternals<TState>).__userSet,
+      get,
+      api,
+    );
   }) as StateCreator<TState, [], []>;
 }) as unknown as Zundo;
 
