@@ -524,7 +524,8 @@ describe('Middleware options', () => {
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { __handleSet, __onSave } =
+      // TODO: add more user set tests
+      const { __handleSet, __onSave, __userSet } =
         store.temporal.getState() as TemporalStateWithInternals<MyState>;
       expect(__handleSet).toBeInstanceOf(Function);
       expect(__onSave).toBe(undefined);
