@@ -48,40 +48,35 @@ export const temporalStateCreator = <TState>(
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
-        if (pastStates.length == 0) {
-          return;
-        }
-
-        // Based on the steps, get values from the pastStates array and push them to the futureStates array
-        for (let i = 0; i < (steps || 1); i++) {
-          const pastState = pastStates.pop();
-          if (pastState) {
-            futureStates.push(partialize(userGet()));
-            userSet(pastState);
+        if (pastStates.length > 0) {
+          // Based on the steps, get values from the pastStates array and push them to the futureStates array
+          for (let i = 0; i < (steps || 1); i++) {
+            const pastState = pastStates.pop();
+            if (pastState) {
+              futureStates.push(partialize(userGet()));
+              userSet(pastState);
+            }
           }
+          set({ pastStates, futureStates });
         }
-
-        set({ pastStates, futureStates });
       },
       // Rather than using a default value for steps, using (steps || 1) saves 2 bytes
       redo: (steps) => {
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
-        if (futureStates.length == 0) {
-          return;
-        }
-
-        // Based on the steps, get values from the futureStates array and push them to the pastStates array
-        for (let i = 0; i < (steps || 1); i++) {
-          const futureState = futureStates.pop();
-          if (futureState) {
-            pastStates.push(partialize(userGet()));
-            userSet(futureState);
+        if (futureStates.length > 0) {
+          // Based on the steps, get values from the futureStates array and push them to the pastStates array
+          for (let i = 0; i < (steps || 1); i++) {
+            const futureState = futureStates.pop();
+            if (futureState) {
+              pastStates.push(partialize(userGet()));
+              userSet(futureState);
+            }
           }
-        }
 
-        set({ pastStates, futureStates });
+          set({ pastStates, futureStates });
+        }
       },
       clear: () => {
         set({ pastStates: [], futureStates: [] });
