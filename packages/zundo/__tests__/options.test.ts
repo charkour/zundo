@@ -560,7 +560,7 @@ describe('Middleware options', () => {
           __onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
-        expect(console.error).toHaveBeenCalledTimes(1);
+        expect(console.info).toHaveBeenCalledTimes(1);
       });
       it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
         global.console.dir = vi.fn();
