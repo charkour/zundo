@@ -2,7 +2,7 @@ import { Mutate, type StoreApi } from 'zustand';
 import type {
   TemporalState,
   TemporalStateCreator,
-  TemporalStateWithInternals,
+  _TemporalState,
   ZundoOptions,
 } from './types';
 
@@ -90,14 +90,14 @@ export const temporalStateCreator = <TState>(
       resume: () => {
         set({ trackingStatus: 'tracking' });
       },
-      setOnSave: (__onSave) => {
-        set({ __onSave });
+      setOnSave: (_onSave) => {
+        set({ _onSave });
       },
       // Internal properties
-      __onSave: onSave,
-      __handleSet: (pastState) => {
+      _onSave: onSave,
+      _handleSet: (pastState) => {
         const trackingStatus = get().trackingStatus,
-          onSave = get().__onSave,
+          onSave = get()._onSave,
           pastStates = get().pastStates.slice(),
           currentState = partialize(userGet());
         if (
@@ -113,7 +113,7 @@ export const temporalStateCreator = <TState>(
           set({ pastStates, futureStates: [] });
         }
       },
-      __userSet: setterFactory(
+      _userSet: setterFactory(
         userSet,
         userGet,
         partialize,
@@ -135,14 +135,14 @@ const setterFactory = <TState>(
   limit: ZundoOptions<TState>['limit'],
   equality: ZundoOptions<TState>['equality'],
   handleSet: ZundoOptions<TState>['handleSet'],
-  temporalSet: StoreApi<TemporalStateWithInternals<TState>>['setState'],
-  temporalGet: StoreApi<TemporalStateWithInternals<TState>>['getState'],
+  temporalSet: StoreApi<_TemporalState<TState>>['setState'],
+  temporalGet: StoreApi<_TemporalState<TState>>['getState'],
 ): StoreApi<TState>['setState'] => {
   return (state, replace) => {
     // For backwards compatibility, will be removed in next version.
     if (handleSet) {
       userSet(state, replace);
-      handleSet(temporalGet().__handleSet)(state, replace);
+      handleSet(temporalGet()._handleSet)(state, replace);
       return;
     }
 
@@ -152,7 +152,7 @@ const setterFactory = <TState>(
     // call original setter
     userSet(state, replace);
     const trackingStatus = temporalGet().trackingStatus,
-      onSave = (temporalGet()).__onSave,
+      onSave = (temporalGet())._onSave,
       pastStates = temporalGet().pastStates.slice(),
       currentState = partialize(userGet());
     // Equality is more expensive than the other checks, so we do it last

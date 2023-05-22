@@ -5,7 +5,7 @@ import { createStore, type StoreApi } from 'zustand';
 import { act } from 'react-dom/test-utils';
 import { shallow } from 'zustand/shallow';
 import type {
-  TemporalStateWithInternals,
+  _TemporalState,
   ZundoOptions,
   TemporalState,
   Write,
@@ -525,10 +525,10 @@ describe('Middleware options', () => {
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
       // TODO: add more user set tests
-      const { __handleSet, __onSave, __userSet } =
-        store.temporal.getState() as TemporalStateWithInternals<MyState>;
-      expect(__handleSet).toBeInstanceOf(Function);
-      expect(__onSave).toBe(undefined);
+      const { _handleSet, _onSave, _userSet } =
+        store.temporal.getState() as _TemporalState<MyState>;
+      expect(_handleSet).toBeInstanceOf(Function);
+      expect(_onSave).toBe(undefined);
     });
     describe('onSave', () => {
       it('should call onSave cb without adding a new state when onSave is set by user', () => {
@@ -539,12 +539,12 @@ describe('Middleware options', () => {
             console.error(pastStates, currentState);
           });
         });
-        const { __onSave } =
-          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { _onSave } =
+          store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          __onSave(store.getState(), store.getState());
+          _onSave(store.getState(), store.getState());
         });
-        expect(__onSave).toBeInstanceOf(Function);
+        expect(_onSave).toBeInstanceOf(Function);
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.error).toHaveBeenCalledTimes(1);
       });
@@ -555,10 +555,10 @@ describe('Middleware options', () => {
             console.info(pastStates);
           },
         });
-        const { __onSave } =
-          storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { _onSave } =
+          storeWithOnSave.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          __onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
+          _onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
         expect(console.info).toHaveBeenCalledTimes(1);
@@ -573,8 +573,8 @@ describe('Middleware options', () => {
         });
         act(() => {
           (
-            storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-          ).__onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
+            storeWithOnSave.temporal.getState() as _TemporalState<MyState>
+          )._onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
         expect(console.dir).toHaveBeenCalledTimes(1);
@@ -588,8 +588,8 @@ describe('Middleware options', () => {
         });
         act(() => {
           (
-            storeWithOnSave.temporal.getState() as TemporalStateWithInternals<MyState>
-          ).__onSave(store.getState(), store.getState());
+            storeWithOnSave.temporal.getState() as _TemporalState<MyState>
+          )._onSave(store.getState(), store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(0);
         expect(console.dir).toHaveBeenCalledTimes(1);
@@ -599,29 +599,29 @@ describe('Middleware options', () => {
 
     describe('handleUserSet', () => {
       it('should update the temporal store with the pastState when called', () => {
-        const { __handleSet } =
-          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { _handleSet } =
+          store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          __handleSet(store.getState());
+          _handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
       });
 
       it('should only update if the the status is tracking', () => {
-        const { __handleSet } =
-          store.temporal.getState() as TemporalStateWithInternals<MyState>;
+        const { _handleSet } =
+          store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          __handleSet(store.getState());
+          _handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().pause();
-          __handleSet(store.getState());
+          _handleSet(store.getState());
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
         act(() => {
           store.temporal.getState().resume();
-          __handleSet(store.getState());
+          _handleSet(store.getState());
         });
       });
 
