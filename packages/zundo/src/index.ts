@@ -35,10 +35,7 @@ declare module 'zustand/vanilla' {
 
 export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
-  {
-    wrapTemporal = (init) => init,
-    ...restOptions
-  } = {} as ZundoOptions<TState>,
+  restOptions: ZundoOptions<TState>,
 ): StateCreator<TState, [], []> => {
   type StoreAddition = StoreApi<TemporalState<TState>>;
   type StoreApiWithAddition = Mutate<
@@ -53,7 +50,9 @@ export const temporal = (<TState>(
   ): TState => {
     // Add the temporal store to the userland store
     api.temporal = createStore(
-      wrapTemporal(temporalStateCreator(_set, get, api, restOptions)),
+      restOptions.wrapTemporal?.(
+        temporalStateCreator(_set, get, api, restOptions),
+      ) || temporalStateCreator(_set, get, api, restOptions),
     );
     return config(
       // Get the new userland set function that interfaces with the temporal store to add past states when called
