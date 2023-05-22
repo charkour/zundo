@@ -11,6 +11,7 @@ import type {
   Write,
 } from '../src/types';
 import throttle from '../node_modules/lodash.throttle';
+import { persist } from 'zustand/middleware';
 
 interface MyState {
   count: number;
@@ -519,6 +520,35 @@ describe('Middleware options', () => {
         2,
       );
       expect(console.warn).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('wrapTemporal', () => {
+    describe('should wrap temporal store in given middlewares', () => {
+      it('persist', () => {
+        const storeWithTemporalWithPersist = createVanillaStore({
+          wrapTemporal: (config) => persist(config, { name: '123' }),
+        });
+
+        expect(storeWithTemporalWithPersist.temporal).toHaveProperty('persist');
+      });
+
+      it('temporal', () => {
+        const storeWithTemporalWithTemporal = createVanillaStore({
+          wrapTemporal: (store) => temporal(store),
+        });
+        expect(storeWithTemporalWithTemporal.temporal).toHaveProperty('temporal');
+      });
+
+      it('temporal and persist', () => {
+        const storeWithTemporalWithMiddleware = createVanillaStore(
+          {
+            wrapTemporal: (store) => temporal(persist(store, { name: '123' })),
+          },
+        );
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty('persist');
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty('temporal');
+      });
     });
   });
 
