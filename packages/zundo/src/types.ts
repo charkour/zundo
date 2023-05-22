@@ -5,7 +5,7 @@ type onSave<TState> =
   | ((pastState: TState, currentState: TState) => void)
   | undefined;
 
-  // TemporalState with internal properties
+// TemporalState with internal properties
 export interface _TemporalState<TState> {
   pastStates: Partial<TState>[];
   futureStates: Partial<TState>[];

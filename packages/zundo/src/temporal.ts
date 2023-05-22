@@ -1,4 +1,4 @@
-import { Mutate, type StoreApi } from 'zustand';
+import type { Mutate, StoreApi } from 'zustand';
 import type {
   TemporalState,
   TemporalStateCreator,
@@ -26,11 +26,12 @@ export const temporalStateCreator = <TState>(
     [['temporal', StoreAddition]]
   >;
 
-  const stateCreator: TemporalStateCreator<TState> = (set, get, api) => {
+  const stateCreator: TemporalStateCreator<TState> = (set, get) => {
     // Modify the setState function to call the userlandSet function
     userApi.setState = setterFactory(
       userApi.setState,
-      userApi.getState,
+      // Could also use userApi.getState() here, but this saves 4 bytes
+      userGet,
       partialize,
       limit,
       equality,
@@ -42,7 +43,8 @@ export const temporalStateCreator = <TState>(
     return {
       pastStates,
       futureStates,
-      undo: (steps = 1) => {
+      // Rather than using a default value for steps, using (steps || 1) saves 1 byte
+      undo: (steps) => {
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
@@ -51,7 +53,7 @@ export const temporalStateCreator = <TState>(
         }
 
         // Based on the steps, get values from the pastStates array and push them to the futureStates array
-        for (let i = 0; i < steps; i++) {
+        for (let i = 0; i < (steps || 1); i++) {
           const pastState = pastStates.pop();
           if (pastState) {
             futureStates.push(partialize(userGet()));
@@ -61,7 +63,8 @@ export const temporalStateCreator = <TState>(
 
         set({ pastStates, futureStates });
       },
-      redo: (steps = 1) => {
+      // Rather than using a default value for steps, using (steps || 1) saves 2 bytes
+      redo: (steps) => {
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
@@ -70,7 +73,7 @@ export const temporalStateCreator = <TState>(
         }
 
         // Based on the steps, get values from the futureStates array and push them to the pastStates array
-        for (let i = 0; i < steps; i++) {
+        for (let i = 0; i < (steps || 1); i++) {
           const futureState = futureStates.pop();
           if (futureState) {
             pastStates.push(partialize(userGet()));
@@ -152,7 +155,7 @@ const setterFactory = <TState>(
     // call original setter
     userSet(state, replace);
     const trackingStatus = temporalGet().trackingStatus,
-      onSave = (temporalGet())._onSave,
+      onSave = temporalGet()._onSave,
       pastStates = temporalGet().pastStates.slice(),
       currentState = partialize(userGet());
     // Equality is more expensive than the other checks, so we do it last

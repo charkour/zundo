@@ -537,17 +537,21 @@ describe('Middleware options', () => {
         const storeWithTemporalWithTemporal = createVanillaStore({
           wrapTemporal: (store) => temporal(store),
         });
-        expect(storeWithTemporalWithTemporal.temporal).toHaveProperty('temporal');
+        expect(storeWithTemporalWithTemporal.temporal).toHaveProperty(
+          'temporal',
+        );
       });
 
       it('temporal and persist', () => {
-        const storeWithTemporalWithMiddleware = createVanillaStore(
-          {
-            wrapTemporal: (store) => temporal(persist(store, { name: '123' })),
-          },
+        const storeWithTemporalWithMiddleware = createVanillaStore({
+          wrapTemporal: (store) => temporal(persist(store, { name: '123' })),
+        });
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty(
+          'persist',
         );
-        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty('persist');
-        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty('temporal');
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty(
+          'temporal',
+        );
       });
     });
   });

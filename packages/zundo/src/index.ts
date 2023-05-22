@@ -1,11 +1,11 @@
-import {
-  type StateCreator,
-  type StoreMutatorIdentifier,
-  type Mutate,
-  type StoreApi,
-  createStore,
-} from 'zustand';
+import { createStore } from 'zustand';
 import { temporalStateCreator } from './temporal';
+import type {
+  StateCreator,
+  StoreMutatorIdentifier,
+  Mutate,
+  StoreApi,
+} from 'zustand';
 import type {
   TemporalState,
   _TemporalState,

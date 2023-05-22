@@ -35,7 +35,8 @@ describe('temporalStateCreator', () => {
       store.getState,
       store,
     );
-    const { undo, redo, clear, pastStates, futureStates } = createStore(temporalStore).getState()
+    const { undo, redo, clear, pastStates, futureStates } =
+      createStore(temporalStore).getState();
 
     expect(undo).toBeDefined();
     expect(redo).toBeDefined();

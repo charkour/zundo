@@ -30,7 +30,7 @@ describe('temporal middleware', () => {
             set((state) => ({
               count: state.count + 1,
               count2: state.count2 + 1,
-            }))
+            }));
           },
           decrement: () =>
             set((state) => ({

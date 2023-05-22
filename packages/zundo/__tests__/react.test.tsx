@@ -19,12 +19,16 @@ describe('React Re-renders when state changes', () => {
     fireEvent.click(incrementButton);
 
     expect(queryByText(/bears: 2/i)).toBeTruthy();
-    expect(queryByText(/past states: \[{"bears":0},{"bears":1}\]/i)).toBeTruthy();
+    expect(
+      queryByText(/past states: \[{"bears":0},{"bears":1}\]/i),
+    ).toBeTruthy();
     expect(queryByText(/future states: \[\]/i)).toBeTruthy();
 
-    expect(queryByText(/undo/i, {
-      selector: 'button',
-    })).toBeTruthy();
+    expect(
+      queryByText(/undo/i, {
+        selector: 'button',
+      }),
+    ).toBeTruthy();
 
     const undoButton = getByText(/undo/i, {
       selector: 'button',
@@ -35,6 +39,8 @@ describe('React Re-renders when state changes', () => {
 
     expect(queryByText(/bears: 0/i)).toBeTruthy();
     expect(queryByText(/past states: \[\]/i)).toBeTruthy();
-    expect(queryByText(/future states: \[{"bears":2},{"bears":1}\]/i)).toBeTruthy();
+    expect(
+      queryByText(/future states: \[{"bears":2},{"bears":1}\]/i),
+    ).toBeTruthy();
   });
 });
