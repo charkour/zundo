@@ -36,7 +36,6 @@ declare module 'zustand/vanilla' {
 export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
   {
-    partialize = (state) => state,
     wrapTemporal = (init) => init,
     ...restOptions
   } = {} as ZundoOptions<TState>,
@@ -52,15 +51,11 @@ export const temporal = (<TState>(
     get: StoreApi<TState>['getState'],
     api: StoreApiWithAddition,
   ): TState => {
-    const creator = temporalStateCreator(
-      _set,
-      get,
-      api,
-      partialize,
-      restOptions,
+    api.temporal = createStore(
+      wrapTemporal(temporalStateCreator(_set, get, api, restOptions)),
     );
-    api.temporal = createStore(wrapTemporal(creator));
-    const set = (api.temporal.getState() as TemporalStateWithInternals<TState>).__newSet
+    const set = (api.temporal.getState() as TemporalStateWithInternals<TState>)
+      .__newSet;
 
     return config(set, get, api);
   }) as StateCreator<TState, [], []>;

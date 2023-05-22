@@ -10,7 +10,6 @@ export const temporalStateCreator = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   userApi: StoreApi<TState>,
-  partialize: NonNullable<ZundoOptions<TState>['partialize']>,
   {
     equality,
     onSave,
@@ -18,6 +17,7 @@ export const temporalStateCreator = <TState>(
     pastStates = [],
     futureStates = [],
     handleSet,
+    partialize = (state) => state,
   } = {} as ZundoOptions<TState>,
 ) => {
   type StoreAddition = StoreApi<TemporalState<TState>>;
@@ -26,35 +26,30 @@ export const temporalStateCreator = <TState>(
     [['temporal', StoreAddition]]
   >;
 
-  // Make a reference to the original setState function
-  const setState = userApi.setState;
-
-  const stateCreator: TemporalStateCreator<TState> = (set, get) => {
+  const stateCreator: TemporalStateCreator<TState> = (set, get, api) => {
     // Modify the setState function to call the userlandSet function
     userApi.setState = setterFactory(
-      setState,
-      userGet,
+      userApi.setState,
+      userApi.getState,
       partialize,
-      set,
-      get,
       limit,
       equality,
       handleSet,
+      set,
+      get,
     );
 
-    // Modify the set function to call the userlandSet function
-    const __newSet: typeof userSet = setterFactory(
-      userSet,
-      userGet,
-      partialize,
-      set,
-      get,
-      limit,
-      equality,
-      handleSet,
-    );
     return {
-      __newSet,
+      __newSet: setterFactory(
+        userSet,
+        userGet,
+        partialize,
+        limit,
+        equality,
+        handleSet,
+        set,
+        get,
+      ),
       pastStates,
       futureStates,
       undo: (steps = 1) => {
@@ -137,11 +132,11 @@ const setterFactory = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   partialize: NonNullable<ZundoOptions<TState>['partialize']>,
-  temporalSet: StoreApi<TemporalStateWithInternals<TState>>['setState'],
-  temporalGet: StoreApi<TemporalStateWithInternals<TState>>['getState'],
   limit: ZundoOptions<TState>['limit'],
   equality: ZundoOptions<TState>['equality'],
   handleSet: ZundoOptions<TState>['handleSet'],
+  temporalSet: StoreApi<TemporalStateWithInternals<TState>>['setState'],
+  temporalGet: StoreApi<TemporalStateWithInternals<TState>>['getState'],
 ): StoreApi<TState>['setState'] => {
   return (state, replace) => {
     // For backwards compatibility, will be removed in next version.
