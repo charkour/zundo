@@ -7,7 +7,7 @@ import type {
 import { createVanillaTemporal } from './temporal';
 import type {
   TemporalState,
-  TemporalStateWithInternals,
+  _TemporalState,
   Write,
   ZundoOptions,
 } from './types';
@@ -58,8 +58,8 @@ export const temporal = (<TState>(
     );
 
     const curriedHandleSet = handleSet(
-      (store.temporal.getState() as TemporalStateWithInternals<TState>)
-        .__handleSet,
+      (store.temporal.getState() as _TemporalState<TState>)
+        ._handleSet,
     );
 
     const setState = store.setState;

@@ -5,7 +5,7 @@ type onSave<TState> =
   | ((pastState: TState, currentState: TState) => void)
   | undefined;
 
-export interface TemporalStateWithInternals<TState> {
+export interface _TemporalState<TState> {
   pastStates: Partial<TState>[];
   futureStates: Partial<TState>[];
 
@@ -18,8 +18,8 @@ export interface TemporalStateWithInternals<TState> {
   resume: () => void;
 
   setOnSave: (onSave: onSave<TState>) => void;
-  __onSave: onSave<TState>;
-  __handleSet: (pastState: TState) => void;
+  _onSave: onSave<TState>;
+  _handleSet: (pastState: TState) => void;
 }
 
 export type CreateTemporalOptions<TState> = Pick<
@@ -33,7 +33,7 @@ export type CreateTemporalOptions<TState> = Pick<
 >;
 
 export type TemporalStateCreator<TState> = StateCreator<
-  TemporalStateWithInternals<TState>,
+  _TemporalState<TState>,
   [],
   []
 >;
@@ -50,12 +50,12 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (
     storeInitializer: StateCreator<
-      TemporalStateWithInternals<TState>,
+      _TemporalState<TState>,
       [StoreMutatorIdentifier, unknown][],
       []
     >,
   ) => StateCreator<
-    TemporalStateWithInternals<TState>,
+    _TemporalState<TState>,
     [StoreMutatorIdentifier, unknown][],
     [StoreMutatorIdentifier, unknown][]
   >;
@@ -64,6 +64,6 @@ export interface ZundoOptions<TState, PartialTState = TState> {
 export type Write<T, U> = Omit<T, keyof U> & U;
 
 export type TemporalState<TState> = Omit<
-  TemporalStateWithInternals<TState>,
-  '__onSave' | '__handleSet'
+  _TemporalState<TState>,
+  '_onSave' | '_handleSet'
 >;
