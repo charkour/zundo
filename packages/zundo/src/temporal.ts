@@ -129,6 +129,8 @@ const setterFactory = <TState>(
   temporalSet: StoreApi<_TemporalState<TState>>['setState'],
   temporalGet: StoreApi<_TemporalState<TState>>['getState'],
 ): StoreApi<TState>['setState'] => {
+  // We must curry so that something like lodash.throttle can be used correctly to check function references.
+  const curriedHandleSet = handleSet?.((pastState: TState) => temporalGet()._handleSet(pastState));
   return (state, replace) => {
     // Get most up-to-date state. The state from the callback might be a partial state.
     // The order of the get() and set() calls is important here.
@@ -137,8 +139,8 @@ const setterFactory = <TState>(
     userSet(state, replace);
 
     // For backwards compatibility, will be removed in next version.
-    if (handleSet) {
-      handleSet(temporalGet()._handleSet)(pastState);
+    if (curriedHandleSet) {
+      curriedHandleSet(pastState);
       return;
     }
     // Block above will be removed
