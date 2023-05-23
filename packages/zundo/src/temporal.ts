@@ -1,7 +1,7 @@
 import { createStore, type StoreApi, type StateCreator } from 'zustand';
 import type {
   CreateTemporalOptions,
-  TemporalStateWithInternals as TemporalState,
+  _TemporalState as TemporalState,
   TemporalStateCreator,
   ZundoOptions,
 } from './types';
@@ -67,14 +67,14 @@ export const createVanillaTemporal = <TState>(
         resume: () => {
           set({ trackingStatus: 'tracking' });
         },
-        setOnSave: (__onSave) => {
-          set({ __onSave });
+        setOnSave: (_onSave) => {
+          set({ _onSave });
         },
         // Internal properties
-        __onSave: onSave,
-        __handleSet: (pastState) => {
+        _onSave: onSave,
+        _handleSet: (pastState) => {
           const trackingStatus = get().trackingStatus;
-          const onSave = get().__onSave;
+          const onSave = get()._onSave;
           const pastStates = get().pastStates.slice();
           const currentState = partialize(userGet());
           if (
