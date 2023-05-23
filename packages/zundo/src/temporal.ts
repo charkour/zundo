@@ -49,19 +49,11 @@ export const createVanillaTemporal = <TState>(
           set({ pastStates, futureStates });
         }
       },
-      clear: () => {
-        set({ pastStates: [], futureStates: [] });
-      },
+      clear: () => set({ pastStates: [], futureStates: [] }),
       trackingStatus: 'tracking',
-      pause: () => {
-        set({ trackingStatus: 'paused' });
-      },
-      resume: () => {
-        set({ trackingStatus: 'tracking' });
-      },
-      setOnSave: (_onSave) => {
-        set({ _onSave });
-      },
+      pause: () => set({ trackingStatus: 'paused' }),
+      resume: () => set({ trackingStatus: 'tracking' }),
+      setOnSave: (_onSave) => set({ _onSave }),
       // Internal properties
       _onSave: options?.onSave,
       _handleSet: (pastState) => {
