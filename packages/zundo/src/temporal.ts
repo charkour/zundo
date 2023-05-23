@@ -1,16 +1,15 @@
-import { createStore, type StoreApi, type StateCreator } from 'zustand';
-import type {
-  _TemporalState as TemporalState,
-  TemporalStateCreator,
-  ZundoOptions,
-} from './types';
+import { createStore, type StateCreator, type StoreApi } from 'zustand';
+import type { _TemporalState, ZundoOptions } from './types';
 
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   options?: ZundoOptions<TState>,
 ) => {
-  const stateCreator: TemporalStateCreator<TState> = (set, get) => {
+  const stateCreator: StateCreator<_TemporalState<TState>, [], []> = (
+    set,
+    get,
+  ) => {
     return {
       pastStates: options?.pastStates || [],
       futureStates: options?.futureStates || [],
@@ -54,28 +53,25 @@ export const createVanillaTemporal = <TState>(
       // Internal properties
       _onSave: options?.onSave,
       _handleSet: (pastState) => {
-        const trackingStatus = get().trackingStatus;
-        const onSave = get()._onSave;
-        const pastStates = get().pastStates.slice();
-        const currentState = options?.partialize?.(userGet()) || userGet();
-        if (
-          trackingStatus === 'tracking' &&
-          !options?.equality?.(currentState, pastState)
-        ) {
-          // This naively assumes that only one new state can be added at a time
-          if (options?.limit && pastStates.length >= options?.limit) {
-            pastStates.shift();
+        if (get().trackingStatus === 'tracking') {
+          const currentState = options?.partialize?.(userGet()) || userGet();
+          if (!options?.equality?.(currentState, pastState)) {
+            const pastStates = get().pastStates.slice();
+            // This naively assumes that only one new state can be added at a time
+            if (options?.limit && pastStates.length >= options?.limit) {
+              pastStates.shift();
+            }
+            pastStates.push(pastState);
+            get()._onSave?.(pastState, currentState);
+            set({ pastStates, futureStates: [] });
           }
-          pastStates.push(pastState);
-          onSave?.(pastState, currentState);
-          set({ pastStates, futureStates: [] });
         }
       },
     };
   };
-  return createStore<TemporalState<TState>>(
+  return createStore(
     (options?.wrapTemporal?.(stateCreator) ||
       // Cast to a version of the store that does not include "temporal" addition
-      stateCreator) as TemporalStateCreator<TState>,
+      stateCreator) as StateCreator<_TemporalState<TState>, [], []>,
   );
 };

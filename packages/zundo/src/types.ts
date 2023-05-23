@@ -22,12 +22,6 @@ export interface _TemporalState<TState> {
   _handleSet: (pastState: TState) => void;
 }
 
-export type TemporalStateCreator<TState> = StateCreator<
-  _TemporalState<TState>,
-  [],
-  []
->;
-
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
