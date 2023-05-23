@@ -138,7 +138,7 @@ const setterFactory = <TState>(
 
     // For backwards compatibility, will be removed in next version.
     if (handleSet) {
-      handleSet(temporalGet()._handleSet)(state, replace);
+      handleSet(temporalGet()._handleSet)(pastState);
       return;
     }
     // Block above will be removed

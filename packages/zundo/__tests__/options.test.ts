@@ -403,6 +403,8 @@ describe('Middleware options', () => {
         increment();
         doNothing();
       });
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toMatchObject({ count: 0 });
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toMatchObject({ count: 1 });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       expect(console.info).toHaveBeenCalledTimes(2);
       act(() => {
@@ -433,6 +435,8 @@ describe('Middleware options', () => {
         increment();
         doNothing();
       });
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toMatchObject({ count: 0 });
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toMatchObject({ count: 1 });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       expect(console.info).toHaveBeenCalledTimes(2);
       act(() => {
