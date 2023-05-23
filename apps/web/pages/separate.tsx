@@ -11,16 +11,19 @@ interface MyState {
 }
 
 const useStore = create(
-  temporal<MyState>((set) => ({
-    bears: 0,
-    bees: 10,
-    increment: () => set((state) => ({ bears: state.bears + 1 })),
-    decrement: () => set((state) => ({ bears: state.bears - 1 })),
-    incrementBees: () => set((state) => ({ bees: state.bees + 1 })),
-    decrementBees: () => set((state) => ({ bees: state.bees - 1 })),
-  }), {
-    pastStates: [{ bees: 20}, { bees: 30 }],
-  }),
+  temporal<MyState>(
+    (set) => ({
+      bears: 0,
+      bees: 10,
+      increment: () => set((state) => ({ bears: state.bears + 1 })),
+      decrement: () => set((state) => ({ bears: state.bears - 1 })),
+      incrementBees: () => set((state) => ({ bees: state.bees + 1 })),
+      decrementBees: () => set((state) => ({ bees: state.bees - 1 })),
+    }),
+    {
+      pastStates: [{ bees: 20 }, { bees: 30 }],
+    },
+  ),
 );
 const useTemporalStore = create(useStore.temporal);
 
@@ -64,7 +67,7 @@ const StateBear = () => {
 
 const StateBee = () => {
   const store = useStore();
-  console.log(store)
+  console.log(store);
   const { bees, increment, decrement } = store;
   return (
     <div>

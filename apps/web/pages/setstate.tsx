@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { temporal } from "zundo";
+import { create } from 'zustand';
+import { temporal } from 'zundo';
 
 interface ExampleData {
   key1: boolean;
@@ -9,8 +9,8 @@ interface ExampleData {
 const store = create<ExampleData>()(
   temporal(() => ({
     key1: false as boolean,
-    key2: 32
-  }))
+    key2: 32,
+  })),
 );
 
 const useTemporal = create(store.temporal);
