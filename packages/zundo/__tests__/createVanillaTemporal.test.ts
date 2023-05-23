@@ -33,7 +33,6 @@ describe('createVanillaTemporal', () => {
     const temporalStore = createVanillaTemporal(
       store.setState,
       store.getState,
-      (state) => state,
     );
     const { undo, redo, clear, pastStates, futureStates } =
       temporalStore.getState();
@@ -54,7 +53,6 @@ describe('createVanillaTemporal', () => {
       const temporalStore = createVanillaTemporal(
         store.setState,
         store.getState,
-        (state) => state,
         { wrapTemporal: (store) => persist(store, { name: '123' }) },
       );
       expect(temporalStore).toHaveProperty('persist');
@@ -64,7 +62,6 @@ describe('createVanillaTemporal', () => {
       const temporalStore = createVanillaTemporal(
         store.setState,
         store.getState,
-        (state) => state,
         { wrapTemporal: (store) => temporal(store) },
       );
       expect(temporalStore).toHaveProperty('temporal');
@@ -74,7 +71,6 @@ describe('createVanillaTemporal', () => {
       const temporalStore = createVanillaTemporal(
         store.setState,
         store.getState,
-        (state) => state,
         { wrapTemporal: (store) => temporal(persist(store, { name: '123' })) },
       );
       expect(temporalStore).toHaveProperty('persist');

@@ -17,19 +17,24 @@ const useMyStore = create(
 
 type ExtractState<S> = S extends {
   getState: () => infer T;
-} ? T : never;
+}
+  ? T
+  : never;
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>;
 type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>;
 };
 
-const useTemporalStore = <S extends WithReact<StoreApi<TemporalState<MyState>>>, U>(
+const useTemporalStore = <
+  S extends WithReact<StoreApi<TemporalState<MyState>>>,
+  U,
+>(
   selector: (state: ExtractState<S>) => U,
   equality?: (a: U, b: U) => boolean,
 ): U => {
   const state = useStore(useMyStore.temporal as any, selector, equality);
-  return state
-}
+  return state;
+};
 
 const HistoryBar = () => {
   const futureStates = useTemporalStore((state) => state.futureStates);

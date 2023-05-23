@@ -34,11 +34,7 @@ declare module 'zustand/vanilla' {
 
 export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
-  {
-    partialize = (state) => state,
-    handleSet = (handleSetCb) => handleSetCb,
-    ...restOptions
-  } = {} as ZundoOptions<TState>,
+  options?: ZundoOptions<TState>,
 ): StateCreator<TState, [], []> => {
   type StoreAddition = StoreApi<TemporalState<TState>>;
   type StoreWithAddition = Mutate<
@@ -50,24 +46,19 @@ export const temporal = (<TState>(
     get: StoreApi<TState>['getState'],
     store: StoreWithAddition,
   ) => {
-    store.temporal = createVanillaTemporal<TState>(
-      set,
-      get,
-      partialize,
-      restOptions,
-    );
+    store.temporal = createVanillaTemporal<TState>(set, get, options);
 
-    const curriedHandleSet = handleSet(
-      (store.temporal.getState() as _TemporalState<TState>)
-        ._handleSet,
-    );
+    const curriedHandleSet =
+      options?.handleSet?.(
+        (store.temporal.getState() as _TemporalState<TState>)._handleSet,
+      ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
     store.setState = (state, replace) => {
       // Get most up to date state. The state from the callback might be a partial state.
       // The order of the get() and set() calls is important here.
-      const pastState = partialize(get());
+      const pastState = options?.partialize?.(get()) || get();
       setState(state, replace);
       curriedHandleSet(pastState);
     };
@@ -77,7 +68,7 @@ export const temporal = (<TState>(
       (state, replace) => {
         // Get most up-to-date state. The state from the callback might be a partial state.
         // The order of the get() and set() calls is important here.
-        const pastState = partialize(get());
+        const pastState = options?.partialize?.(get()) || get();
         set(state, replace);
         curriedHandleSet(pastState);
       },
