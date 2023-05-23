@@ -41,7 +41,7 @@ export const temporalStateCreator = <TState>(
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
-        if (pastStates.length > 0) {
+        if (pastStates.length) {
           // Based on the steps, get values from the pastStates array and push them to the futureStates array
           for (let i = 0; i < (steps || 1); i++) {
             const pastState = pastStates.pop();
@@ -58,7 +58,7 @@ export const temporalStateCreator = <TState>(
         // Fastest way to clone an array on Chromium. Needed to create a new array reference
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
-        if (futureStates.length > 0) {
+        if (futureStates.length) {
           // Based on the steps, get values from the futureStates array and push them to the pastStates array
           for (let i = 0; i < (steps || 1); i++) {
             const futureState = futureStates.pop();
