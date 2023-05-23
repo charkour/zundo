@@ -32,7 +32,7 @@ declare module 'zustand/vanilla' {
   }
 }
 
-const zundoImpl = <TState>(
+export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
   {
     partialize = (state: TState) => state,
@@ -86,7 +86,6 @@ const zundoImpl = <TState>(
     );
   };
   return configWithTemporal as StateCreator<TState, [], []>;
-};
+}) as unknown as Zundo;
 
-export const temporal = zundoImpl as unknown as Zundo;
 export type { ZundoOptions, Zundo, TemporalState };
