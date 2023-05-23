@@ -35,7 +35,7 @@ declare module 'zustand/vanilla' {
 export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
   {
-    partialize = (state: TState) => state,
+    partialize = (state) => state,
     handleSet = (handleSetCb) => handleSetCb,
     ...restOptions
   } = {} as ZundoOptions<TState>,
