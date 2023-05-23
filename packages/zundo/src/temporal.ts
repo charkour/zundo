@@ -1,6 +1,5 @@
 import { createStore, type StoreApi, type StateCreator } from 'zustand';
 import type {
-  CreateTemporalOptions,
   _TemporalState as TemporalState,
   TemporalStateCreator,
   ZundoOptions,
@@ -9,8 +8,7 @@ import type {
 export const createVanillaTemporal = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
-  partialize: NonNullable<ZundoOptions<TState>['partialize']>,
-  options?: CreateTemporalOptions<TState>,
+  options?: ZundoOptions<TState>,
 ) => {
   const stateCreator: TemporalStateCreator<TState> = (set, get) => {
     return {
@@ -25,11 +23,10 @@ export const createVanillaTemporal = <TState>(
           for (let i = 0; i < steps; i++) {
             const pastState = pastStates.pop();
             if (pastState) {
-              futureStates.push(partialize(userGet()));
+              futureStates.push(options?.partialize?.(userGet()) || userGet());
               userSet(pastState);
             }
           }
-
           set({ pastStates, futureStates });
         }
       },
@@ -42,7 +39,7 @@ export const createVanillaTemporal = <TState>(
           for (let i = 0; i < steps; i++) {
             const futureState = futureStates.pop();
             if (futureState) {
-              pastStates.push(partialize(userGet()));
+              pastStates.push(options?.partialize?.(userGet()) || userGet());
               userSet(futureState);
             }
           }
@@ -60,7 +57,7 @@ export const createVanillaTemporal = <TState>(
         const trackingStatus = get().trackingStatus;
         const onSave = get()._onSave;
         const pastStates = get().pastStates.slice();
-        const currentState = partialize(userGet());
+        const currentState = options?.partialize?.(userGet()) || userGet();
         if (
           trackingStatus === 'tracking' &&
           !options?.equality?.(currentState, pastState)

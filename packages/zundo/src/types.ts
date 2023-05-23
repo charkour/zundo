@@ -22,16 +22,6 @@ export interface _TemporalState<TState> {
   _handleSet: (pastState: TState) => void;
 }
 
-export type CreateTemporalOptions<TState> = Pick<
-  ZundoOptions<TState>,
-  | 'equality'
-  | 'onSave'
-  | 'limit'
-  | 'pastStates'
-  | 'futureStates'
-  | 'wrapTemporal'
->;
-
 export type TemporalStateCreator<TState> = StateCreator<
   _TemporalState<TState>,
   [],
