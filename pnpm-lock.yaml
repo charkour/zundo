@@ -50,6 +50,9 @@ importers:
 
   apps/web:
     dependencies:
+      immer:
+        specifier: 10.0.2
+        version: 10.0.2
       lodash.merge:
         specifier: 4.6.2
         version: 4.6.2
@@ -73,7 +76,7 @@ importers:
         version: link:../../packages/zundo
       zustand:
         specifier: 4.3.8
-        version: 4.3.8(react@18.2.0)
+        version: 4.3.8(immer@10.0.2)(react@18.2.0)
     devDependencies:
       '@types/lodash.merge':
         specifier: 4.6.7
@@ -199,7 +202,7 @@ importers:
         version: 0.0.1(vitest@0.31.1)
       zustand:
         specifier: 4.3.8
-        version: 4.3.8(react@18.2.0)
+        version: 4.3.8(immer@10.0.2)(react@18.2.0)
 
 packages:
 
@@ -2240,6 +2243,9 @@ packages:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
 
+  /immer@10.0.2:
+    resolution: {integrity: sha512-Rx3CqeqQ19sxUtYV9CU911Vhy8/721wRFnJv3REVGWUmoAcIwzifTsdmJte/MV+0/XpM35LZdQMBGkRIoLPwQA==}
+
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -4052,7 +4058,7 @@ packages:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
 
-  /zustand@4.3.8(react@18.2.0):
+  /zustand@4.3.8(immer@10.0.2)(react@18.2.0):
     resolution: {integrity: sha512-4h28KCkHg5ii/wcFFJ5Fp+k1J3gJoasaIbppdgZFO4BPJnsNxL0mQXBSFgOgAdCdBj35aDTPvdAJReTMntFPGg==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -4064,5 +4070,6 @@ packages:
       react:
         optional: true
     dependencies:
+      immer: 10.0.2
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
