@@ -50,6 +50,9 @@ importers:
 
   apps/web:
     dependencies:
+      just-throttle:
+        specifier: 4.2.0
+        version: 4.2.0
       lodash.merge:
         specifier: 4.6.2
         version: 4.6.2
@@ -2584,6 +2587,10 @@ packages:
     dependencies:
       array-includes: 3.1.6
       object.assign: 4.1.4
+    dev: false
+
+  /just-throttle@4.2.0:
+    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
     dev: false
 
   /language-subtag-registry@0.3.22:
