@@ -43,8 +43,8 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@types/lodash.throttle": "4.1.7",
-    "@types/react-dom": "18.0.11",
-    "jsdom": "21.1.1",
+    "@types/react-dom": "18.2.4",
+    "jsdom": "22.0.0",
     "lodash.throttle": "4.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -53,10 +53,10 @@
     "tsconfig": "workspace:*",
     "tsup": "6.7.0",
     "typescript": "5.0.4",
-    "vite": "4.2.1",
-    "vitest": "0.30.1",
+    "vite": "4.3.8",
+    "vitest": "0.31.1",
     "vitest-localstorage-mock": "0.0.1",
-    "zustand": "4.3.7"
+    "zustand": "4.3.8"
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
