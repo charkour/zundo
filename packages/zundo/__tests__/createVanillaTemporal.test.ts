@@ -3,8 +3,6 @@ vi.mock('zustand');
 import { temporalStateCreator } from '../src/temporal';
 import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
-import { persist } from 'zustand/middleware';
-import { temporal } from '../src';
 
 interface MyState {
   count: number;
