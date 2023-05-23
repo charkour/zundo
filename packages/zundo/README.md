@@ -17,6 +17,7 @@ npm i zustand zundo
 ```
 
 > zustand v4.3.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
+> Node 16 or higher is required.
 
 ## Background
 
