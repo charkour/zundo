@@ -1,6 +1,5 @@
-import type { Mutate, StoreApi } from 'zustand';
+import type { StoreApi } from 'zustand';
 import type {
-  TemporalState,
   TemporalStateCreator,
   _TemporalState,
   ZundoOptions,
