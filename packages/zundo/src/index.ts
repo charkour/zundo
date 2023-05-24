@@ -36,17 +36,15 @@ export const temporal = (<TState>(
   config: StateCreator<TState, [], []>,
   options?: ZundoOptions<TState>,
 ): StateCreator<TState, [], []> => {
-  type StoreAddition = StoreApi<TemporalState<TState>>;
-  type StoreWithAddition = Mutate<
-    StoreApi<TState>,
-    [['temporal', StoreAddition]]
-  >;
   const configWithTemporal = (
     set: StoreApi<TState>['setState'],
     get: StoreApi<TState>['getState'],
-    store: StoreWithAddition,
+    store: Mutate<
+      StoreApi<TState>,
+      [['temporal', StoreApi<TemporalState<TState>>]]
+    >,
   ) => {
-    store.temporal = createVanillaTemporal<TState>(set, get, options);
+    store.temporal = createVanillaTemporal(set, get, options);
 
     const curriedHandleSet =
       options?.handleSet?.(
