@@ -1,10 +1,10 @@
+import { createVanillaTemporal } from './temporal';
 import type {
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
   StoreApi,
-} from 'zustand';
-import { createVanillaTemporal } from './temporal';
+} from 'zustand/vanilla';
 import type {
   TemporalState,
   _TemporalState,

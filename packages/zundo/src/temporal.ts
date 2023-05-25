@@ -1,4 +1,5 @@
-import { createStore, type StateCreator, type StoreApi } from 'zustand';
+import { createStore } from 'zustand/vanilla';
+import type { StateCreator, StoreApi } from 'zustand/vanilla';
 import type { _TemporalState, ZundoOptions } from './types';
 
 export const createVanillaTemporal = <TState>(
@@ -69,7 +70,7 @@ export const createVanillaTemporal = <TState>(
       },
     };
   };
-  return createStore(
+  return createStore<_TemporalState<TState>>(
     (options?.wrapTemporal?.(stateCreator) ||
       // Cast to a version of the store that does not include "temporal" addition
       stateCreator) as StateCreator<_TemporalState<TState>, [], []>,
