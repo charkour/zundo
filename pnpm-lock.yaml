@@ -3,6 +3,10 @@ lockfileVersion: '6.0'
 importers:
 
   .:
+    dependencies:
+      immer:
+        specifier: 10.0.2
+        version: 10.0.2
     devDependencies:
       eslint-config-custom:
         specifier: workspace:*
@@ -50,9 +54,6 @@ importers:
 
   apps/web:
     dependencies:
-      immer:
-        specifier: 10.0.2
-        version: 10.0.2
       lodash.merge:
         specifier: 4.6.2
         version: 4.6.2
