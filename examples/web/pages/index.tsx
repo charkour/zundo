@@ -1,5 +1,4 @@
 import throttle from 'lodash.throttle';
-import { Button } from 'ui';
 import { temporal, type TemporalState } from 'zundo';
 import { useStore, createStore } from 'zustand';
 import { shallow } from 'zustand/shallow';
@@ -58,7 +57,6 @@ export default function Web() {
           <button onClick={() => undo()}>Undo</button>
         </div>
       </div>
-      <Button />
     </div>
   );
 }

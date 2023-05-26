@@ -1,28 +1,72 @@
 {
-  "name": "zundo-monorepo",
-  "version": "0.0.0",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
+  "name": "zundo",
+  "version": "2.0.0-beta.17",
+  "private": false,
+  "description": "🍜 undo/redo middleware for zustand",
+  "keywords": [
+    "undo",
+    "redo",
+    "history",
+    "middleware",
+    "zustand",
+    "react"
+  ],
+  "homepage": "https://github.com/charkour/zundo",
+  "bugs": {
+    "url": "https://github.com/charkour/zundo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charkour/zundo.git"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/charkour"
+  },
+  "license": "MIT",
+  "author": "Charles Kornoelje",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "size": "size-limit",
+    "test": "vitest",
+    "test:ci": "vitest run"
   },
   "devDependencies": {
-    "eslint-config-custom": "workspace:*",
-    "prettier": "2.8.8",
-    "turbo": "1.9.8"
+    "@size-limit/preset-small-lib": "8.2.4",
+    "@testing-library/jest-dom": "5.16.5",
+    "@testing-library/react": "14.0.0",
+    "@types/lodash.throttle": "4.1.7",
+    "@types/react-dom": "18.2.4",
+    "jsdom": "22.0.0",
+    "lodash.throttle": "4.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-test-renderer": "18.2.0",
+    "size-limit": "8.2.4",
+    "tsup": "6.7.0",
+    "typescript": "5.0.4",
+    "vite": "4.3.8",
+    "vitest": "0.31.1",
+    "vitest-localstorage-mock": "0.0.1",
+    "zustand": "4.3.8"
+  },
+  "peerDependencies": {
+    "zustand": "^4.3.0"
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0"
+    "node": ">=12"
   },
-  "packageManager": "pnpm@6.32.25",
-  "dependencies": {
-    "immer": "10.0.2"
-  }
+  "size-limit": [
+    {
+      "limit": "1 kB",
+      "path": "dist/index.js"
+    }
+  ]
 }
