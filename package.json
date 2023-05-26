@@ -31,9 +31,13 @@
     "dist",
     "package.json"
   ],
+  "workspaces": [
+    "examples/*"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "size": "size-limit",
     "test": "vitest",
     "test:ci": "vitest run"
@@ -59,9 +63,6 @@
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
-  },
-  "engines": {
-    "node": ">=12"
   },
   "size-limit": [
     {
