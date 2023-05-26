@@ -501,10 +501,7 @@ describe('Middleware options', () => {
         act(() => {
           (
             storeWithOnSave.temporal.getState() as _TemporalState<MyState>
-          )._onSave(
-            storeWithOnSave.getState(),
-            storeWithOnSave.getState(),
-          );
+          )._onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
         expect(console.dir).toHaveBeenCalledTimes(1);
