@@ -1,4 +1,3 @@
-import { Button } from 'ui';
 import { temporal } from 'zundo';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -71,7 +70,6 @@ export default function Web() {
           <button onClick={() => undo()}>Undo</button>
         </div>
       </div>
-      <Button />
     </div>
   );
 }

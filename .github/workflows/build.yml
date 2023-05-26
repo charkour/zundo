@@ -44,7 +44,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: cd packages/zundo && pnpm run build
+        run: pnpm run build
 
       - name: Test
-        run: cd packages/zundo && pnpm run test:ci
+        run: pnpm run test:ci

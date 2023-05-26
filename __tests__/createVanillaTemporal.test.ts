@@ -30,10 +30,7 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should have the objects defined', () => {
-    const temporalStore = createVanillaTemporal(
-      store.setState,
-      store.getState,
-    );
+    const temporalStore = createVanillaTemporal(store.setState, store.getState);
     const { undo, redo, clear, pastStates, futureStates } =
       temporalStore.getState();
 
