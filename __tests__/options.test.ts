@@ -414,7 +414,7 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
-    it.only('should correctly use throttling', () => {
+    it('should correctly use throttling', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();
       const storeWithHandleSet = createVanillaStore({
@@ -608,5 +608,23 @@ describe('Middleware options', () => {
       });
       expect(storeWithFutureStates.getState().count).toBe(1000);
     });
+  });
+});
+
+describe('setState', () => {
+  it('it should correctly update the state', () => {
+    const store = createVanillaStore();
+    const setState = store.setState;
+    act(() => {
+      setState({ count: 100 });
+    });
+    expect(store.getState().count).toBe(100);
+    expect(store.temporal.getState().pastStates.length).toBe(1);
+    act(() => {
+      store.temporal.getState().undo();
+    });
+    expect(store.getState().count).toBe(0);
+    expect(store.temporal.getState().pastStates.length).toBe(0);
+    expect(store.temporal.getState().futureStates.length).toBe(1);
   });
 });
