@@ -48,7 +48,7 @@
     "@testing-library/react": "14.0.0",
     "@types/lodash.throttle": "4.1.7",
     "@types/react-dom": "18.2.4",
-    "jsdom": "22.0.0",
+    "jsdom": "22.1.0",
     "lodash.throttle": "4.1.1",
     "prettier": "2.8.8",
     "react": "18.2.0",
@@ -57,7 +57,7 @@
     "size-limit": "8.2.4",
     "tsup": "6.7.0",
     "typescript": "5.0.4",
-    "vite": "4.3.8",
+    "vite": "4.3.9",
     "vitest": "0.31.1",
     "vitest-localstorage-mock": "0.0.1",
     "zustand": "4.3.8"
