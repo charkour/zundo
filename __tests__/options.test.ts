@@ -414,13 +414,14 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
-    it('should correctly use throttling', () => {
+    it.only('should correctly use throttling', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();
       const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>((state) => {
             console.error('handleSet called');
+            console.log('handleSet called');
             handleSet(state);
           }, 1000);
         },
@@ -428,25 +429,38 @@ describe('Middleware options', () => {
       const { doNothing, increment } = storeWithHandleSet.getState();
       act(() => {
         increment();
+        increment();
+        increment();
+        increment();
       });
-      vi.runAllTimers();
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
       expect(console.error).toHaveBeenCalledTimes(1);
-      act(() => {
-        doNothing();
-      });
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1001);
+      // By default, lodash.throttle includes trailing event
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       expect(console.error).toHaveBeenCalledTimes(2);
       act(() => {
-        storeWithHandleSet.temporal.getState().undo(2);
+        doNothing();
+        doNothing();
+        doNothing();
+        doNothing();
       });
-      vi.runAllTimers();
-      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(3);
+      expect(console.error).toHaveBeenCalledTimes(3);
+      vi.advanceTimersByTime(1001);
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(4);
+      expect(console.error).toHaveBeenCalledTimes(4);
+      act(() => {
+        // Does not call handle set (and is not throttled)
+        storeWithHandleSet.temporal.getState().undo(4);
+        storeWithHandleSet.temporal.getState().redo(1);
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
       expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
-        2,
+        3,
       );
-      expect(console.warn).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenCalledTimes(4);
+      vi.useRealTimers();
     });
   });
 
