@@ -11,6 +11,7 @@ import type {
   Write,
 } from '../src/types';
 import throttle from 'lodash.throttle';
+import { persist } from 'zustand/middleware';
 
 interface MyState {
   count: number;
@@ -402,6 +403,12 @@ describe('Middleware options', () => {
         increment();
         doNothing();
       });
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toContain({
+        count: 0,
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toContain({
+        count: 1,
+      });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
       expect(console.info).toHaveBeenCalledTimes(2);
       act(() => {
@@ -414,6 +421,43 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(2);
     });
 
+    it('should call function if set (wrapTemporal)', () => {
+      global.console.info = vi.fn();
+      const storeWithHandleSet = createVanillaStore({
+        wrapTemporal: (config) => {
+          return (_set, get, store) => {
+            const set: typeof _set = (partial, replace) => {
+              console.info('handleSet called');
+              _set(partial, replace);
+            };
+            return config(set, get, store);
+          };
+        },
+      });
+      const { doNothing, increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toContain({
+        count: 0,
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toContain({
+        count: 1,
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.info).toHaveBeenCalledTimes(2);
+      act(() => {
+        storeWithHandleSet.temporal.getState().undo(2);
+      });
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+        2,
+      );
+      // Note: in the above test, the handleSet function is called twice, but in this test it is called 3 times because it is also called when undo() and redo() are called.
+      expect(console.info).toHaveBeenCalledTimes(3);
+    });
+
     it('should correctly use throttling', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();
@@ -421,7 +465,6 @@ describe('Middleware options', () => {
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>((state) => {
             console.error('handleSet called');
-            console.log('handleSet called');
             handleSet(state);
           }, 1000);
         },
@@ -461,6 +504,79 @@ describe('Middleware options', () => {
       );
       expect(console.error).toHaveBeenCalledTimes(4);
       vi.useRealTimers();
+    });
+    it('should correctly use throttling (wrapTemporal)', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers();
+      const storeWithHandleSet = createVanillaStore({
+        wrapTemporal: (config) => {
+          return (_set, get, store) => {
+            const set: typeof _set = throttle<typeof _set>(
+              (partial, replace) => {
+                console.error('handleSet called');
+                _set(partial, replace);
+              },
+              1000,
+            );
+            return config(set, get, store);
+          };
+        },
+      });
+      const { doNothing, increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(1);
+      expect(console.error).toHaveBeenCalledTimes(1);
+      act(() => {
+        doNothing();
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
+      expect(console.error).toHaveBeenCalledTimes(2);
+      act(() => {
+        storeWithHandleSet.temporal.getState().undo(2);
+      });
+      vi.runAllTimers();
+      expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(0);
+      expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
+        2,
+      );
+      expect(console.warn).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('wrapTemporal', () => {
+    describe('should wrap temporal store in given middlewares', () => {
+      it('persist', () => {
+        const storeWithTemporalWithPersist = createVanillaStore({
+          wrapTemporal: (config) => persist(config, { name: '123' }),
+        });
+
+        expect(storeWithTemporalWithPersist.temporal).toHaveProperty('persist');
+      });
+
+      it('temporal', () => {
+        const storeWithTemporalWithTemporal = createVanillaStore({
+          wrapTemporal: (store) => temporal(store),
+        });
+        expect(storeWithTemporalWithTemporal.temporal).toHaveProperty(
+          'temporal',
+        );
+      });
+
+      it('temporal and persist', () => {
+        const storeWithTemporalWithMiddleware = createVanillaStore({
+          wrapTemporal: (store) => temporal(persist(store, { name: '123' })),
+        });
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty(
+          'persist',
+        );
+        expect(storeWithTemporalWithMiddleware.temporal).toHaveProperty(
+          'temporal',
+        );
+      });
     });
   });
 
@@ -502,7 +618,7 @@ describe('Middleware options', () => {
           _onSave(storeWithOnSave.getState(), storeWithOnSave.getState());
         });
         expect(storeWithOnSave.temporal.getState().pastStates.length).toBe(0);
-        expect(console.error).toHaveBeenCalledTimes(1);
+        expect(console.info).toHaveBeenCalledTimes(1);
       });
       it('should call onSave cb without adding a new state and respond to new setOnSave', () => {
         global.console.dir = vi.fn();
