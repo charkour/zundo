@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "just-throttle": "4.2.0",
     "lodash.merge": "4.6.2",
     "lodash.throttle": "4.1.1",
     "next": "13.4.3",

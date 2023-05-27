@@ -401,7 +401,6 @@ This is a work in progress. Submit a PR!
 ## Road Map
 
 - [ ] create nicer API, or a helper hook in react land (useTemporal). or vanilla version of the it
-- [ ] create a `present` object that holds the current state? perhaps
 - [ ] support history branches rather than clearing the future states
 - [ ] store state delta rather than full object
 - [ ] track state for multiple stores at once
