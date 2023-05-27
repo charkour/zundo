@@ -10,7 +10,7 @@ import type {
   TemporalState,
   Write,
 } from '../src/types';
-import throttle from '../node_modules/lodash.throttle';
+import throttle from 'lodash.throttle';
 
 interface MyState {
   count: number;
