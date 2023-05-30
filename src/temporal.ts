@@ -19,21 +19,12 @@ export const createVanillaTemporal = <TState>(
         const futureStates = get().futureStates.slice();
         if (pastStates.length) {
           // Based on the steps, get values from the pastStates array and push them to the futureStates array
-          // for (let i = 0; i < steps; i++) {
-          //   const pastState = pastStates.pop();
-          //   if (pastState) {
-          //     futureStates.push(options?.partialize?.(userGet()) || userGet());
-          //     userSet(pastState);
-          //   }
-          // }
-          let x = 0;
-          while (x < steps) {
+          while (steps--) {
             const pastState = pastStates.pop();
             if (pastState) {
               futureStates.push(options?.partialize?.(userGet()) || userGet());
               userSet(pastState);
             }
-            x++;
           }
           set({ pastStates, futureStates });
         }
@@ -43,25 +34,16 @@ export const createVanillaTemporal = <TState>(
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
         if (futureStates.length) {
-          // Based on the steps, get values from the futureStates array and push them to the pastStates array
-          // for (let i = 0; i < steps; i++) {
-          //   const futureState = futureStates.pop();
-          //   if (futureState) {
-          //     pastStates.push(options?.partialize?.(userGet()) || userGet());
-          //     userSet(futureState);
-          //   }
-          // }
           // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
-          let x = 0;
-          while (x < steps) {
+          // https://stackoverflow.com/a/10993837/9931154
+          // Based on the steps, get values from the futureStates array and push them to the pastStates array
+          while (steps--) {
             const futureState = futureStates.pop();
             if (futureState) {
               pastStates.push(options?.partialize?.(userGet()) || userGet());
               userSet(futureState);
             }
-            x++;
           }
-
           set({ pastStates, futureStates });
         }
       },
