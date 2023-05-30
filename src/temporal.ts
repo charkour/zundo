@@ -57,7 +57,7 @@ export const createVanillaTemporal = <TState>(
       _handleSet: (pastState) => {
         if (get().trackingStatus == 'tracking') {
           const currentState = options?.partialize?.(userGet()) || userGet();
-          if (!options?.equality?.(currentState, pastState)) {
+          if (!options?.equality?.(pastState, currentState)) {
             const pastStates = get().pastStates.slice();
             // This naively assumes that only one new state can be added at a time
             if (options?.limit && pastStates.length >= options?.limit) {
