@@ -19,7 +19,7 @@ export const createVanillaTemporal = <TState>(
         const futureStates = get().futureStates.slice();
         if (pastStates.length) {
           // Based on the steps, get values from the pastStates array and push them to the futureStates array
-          for (let i = 0; i < steps; i++) {
+          while (steps--) {
             const pastState = pastStates.pop();
             if (pastState) {
               futureStates.push(options?.partialize?.(userGet()) || userGet());
@@ -34,8 +34,10 @@ export const createVanillaTemporal = <TState>(
         const pastStates = get().pastStates.slice();
         const futureStates = get().futureStates.slice();
         if (futureStates.length) {
+          // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
+          // https://stackoverflow.com/a/10993837/9931154
           // Based on the steps, get values from the futureStates array and push them to the pastStates array
-          for (let i = 0; i < steps; i++) {
+          while (steps--) {
             const futureState = futureStates.pop();
             if (futureState) {
               pastStates.push(options?.partialize?.(userGet()) || userGet());
