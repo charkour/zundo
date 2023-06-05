@@ -53,21 +53,21 @@ export const temporal = (<TState>(
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
-    store.setState = (state, replace) => {
+    store.setState = (...args) => {
       // Get most up to date state. The state from the callback might be a partial state.
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
-      setState(state, replace);
+      setState(...args);
       curriedHandleSet(pastState);
     };
 
     return config(
       // Modify the set function to call the userlandSet function
-      (state, replace) => {
+      (...args) => {
         // Get most up-to-date state. The state from the callback might be a partial state.
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
-        set(state, replace);
+        set(...args);
         curriedHandleSet(pastState);
       },
       get,
