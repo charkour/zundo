@@ -44,7 +44,6 @@ describe('React Re-renders when state changes', () => {
   });
 });
 
-
 // React Code from examples/web/pages/reactive.tsx
 import { TemporalState, temporal } from '../src';
 import { StoreApi, useStore, create } from 'zustand';

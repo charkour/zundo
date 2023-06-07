@@ -14,10 +14,10 @@ export const createVanillaTemporal = <TState>(
       pastStates: options?.pastStates || [],
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
-        // Fastest way to clone an array on Chromium. Needed to create a new array reference
-        const pastStates = get().pastStates.slice();
-        const futureStates = get().futureStates.slice();
-        if (pastStates.length) {
+        if (get().pastStates.length) {
+          // Fastest way to clone an array on Chromium. Needed to create a new array reference
+          const pastStates = get().pastStates.slice();
+          const futureStates = get().futureStates.slice();
           // Based on the steps, get values from the pastStates array and push them to the futureStates array
           while (steps--) {
             const pastState = pastStates.pop();
@@ -30,10 +30,10 @@ export const createVanillaTemporal = <TState>(
         }
       },
       redo: (steps = 1) => {
-        // Fastest way to clone an array on Chromium. Needed to create a new array reference
-        const pastStates = get().pastStates.slice();
-        const futureStates = get().futureStates.slice();
-        if (futureStates.length) {
+        if (get().futureStates.length) {
+          // Fastest way to clone an array on Chromium. Needed to create a new array reference
+          const pastStates = get().pastStates.slice();
+          const futureStates = get().futureStates.slice();
           // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
           // https://stackoverflow.com/a/10993837/9931154
           // Based on the steps, get values from the futureStates array and push them to the pastStates array
