@@ -1,7 +1,7 @@
-import { createStore, type StateCreator, type StoreApi } from 'zustand';
+import type { StateCreator, StoreApi } from 'zustand';
 import type { _TemporalState, ZundoOptions } from './types';
 
-export const createVanillaTemporal = <TState>(
+export const temporalStateCreator = <TState>(
   userSet: StoreApi<TState>['setState'],
   userGet: StoreApi<TState>['getState'],
   options?: ZundoOptions<TState>,
@@ -18,6 +18,7 @@ export const createVanillaTemporal = <TState>(
           // Fastest way to clone an array on Chromium. Needed to create a new array reference
           const pastStates = get().pastStates.slice();
           const futureStates = get().futureStates.slice();
+          // While loop is fastest in Chromium.
           // Based on the steps, get values from the pastStates array and push them to the futureStates array
           while (steps--) {
             const pastState = pastStates.pop();
@@ -34,8 +35,7 @@ export const createVanillaTemporal = <TState>(
           // Fastest way to clone an array on Chromium. Needed to create a new array reference
           const pastStates = get().pastStates.slice();
           const futureStates = get().futureStates.slice();
-          // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
-          // https://stackoverflow.com/a/10993837/9931154
+          // While loop is fastest in Chromium.
           // Based on the steps, get values from the futureStates array and push them to the pastStates array
           while (steps--) {
             const futureState = futureStates.pop();
@@ -71,9 +71,7 @@ export const createVanillaTemporal = <TState>(
       },
     };
   };
-  return createStore(
-    (options?.wrapTemporal?.(stateCreator) ||
-      // Cast to a version of the store that does not include "temporal" addition
-      stateCreator) as StateCreator<_TemporalState<TState>, [], []>,
-  );
+
+  // Cast to a version of the store that does not include "temporal" addition
+  return stateCreator as StateCreator<_TemporalState<TState>, [], []>;
 };

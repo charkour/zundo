@@ -1,10 +1,11 @@
+import { createStore } from 'zustand';
+import { temporalStateCreator } from './temporal';
 import type {
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
   StoreApi,
 } from 'zustand';
-import { createVanillaTemporal } from './temporal';
 import type {
   TemporalState,
   _TemporalState,
@@ -44,7 +45,10 @@ export const temporal = (<TState>(
       [['temporal', StoreApi<TemporalState<TState>>]]
     >,
   ) => {
-    store.temporal = createVanillaTemporal(set, get, options);
+    store.temporal = createStore(
+      options?.wrapTemporal?.(temporalStateCreator(set, get, options)) ||
+        temporalStateCreator(set, get, options),
+    );
 
     const curriedHandleSet =
       options?.handleSet?.(
