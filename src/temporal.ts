@@ -15,30 +15,28 @@ export const temporalStateCreator = <TState>(
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
         if (get().pastStates.length) {
-          // Add the current state to the future states
-          get().futureStates.push(
-            options?.partialize?.(userGet()) || userGet(),
-          );
+          const currentState = options?.partialize?.(userGet()) || userGet();
 
           const statesToApply = get().pastStates.splice(-steps, steps);
+
+          // Use shift here because we use in in _handleSet
           userSet(statesToApply.shift()!);
           set({
             pastStates: get().pastStates,
-            futureStates: get().futureStates.concat(statesToApply.reverse()),
+            futureStates: get().futureStates.concat(currentState, statesToApply.reverse()),
           });
         }
       },
       redo: (steps = 1) => {
         if (get().futureStates.length) {
-          // Add the current state to the past states
-          get().pastStates.push(options?.partialize?.(userGet()) || userGet());
+          const currentState = options?.partialize?.(userGet()) || userGet();
 
           const statesToApply = get().futureStates.splice(-steps, steps);
 
           userSet(statesToApply.shift()!);
           set({
             futureStates: get().futureStates,
-            pastStates: get().pastStates.concat(statesToApply.reverse()),
+            pastStates: get().pastStates.concat(currentState, statesToApply.reverse()),
           });
         }
       },
