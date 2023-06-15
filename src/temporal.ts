@@ -23,7 +23,10 @@ export const temporalStateCreator = <TState>(
           userSet(statesToApply.shift()!);
           set({
             pastStates: get().pastStates,
-            futureStates: get().futureStates.concat(currentState, statesToApply.reverse()),
+            futureStates: get().futureStates.concat(
+              currentState,
+              statesToApply.reverse(),
+            ),
           });
         }
       },
@@ -33,10 +36,14 @@ export const temporalStateCreator = <TState>(
 
           const statesToApply = get().futureStates.splice(-steps, steps);
 
+          // Use shift here because we use in in _handleSet
           userSet(statesToApply.shift()!);
           set({
             futureStates: get().futureStates,
-            pastStates: get().pastStates.concat(currentState, statesToApply.reverse()),
+            pastStates: get().pastStates.concat(
+              currentState,
+              statesToApply.reverse(),
+            ),
           });
         }
       },
