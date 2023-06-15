@@ -13,7 +13,7 @@ export interface _TemporalState<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingStatus: 'paused' | 'tracking';
+  isTracking: boolean;
   pause: () => void;
   resume: () => void;
 

@@ -319,7 +319,7 @@ interface TemporalState<TState> {
   redo: (steps?: number) => void;
   clear: () => void;
 
-  trackingStatus: 'paused' | 'tracking';
+  isTracking: boolean;
   pause: () => void;
   resume: () => void;
 
@@ -361,21 +361,21 @@ interface TemporalState<TState> {
 
 #### **Stop and start history**
 
-`trackingStatus: 'paused' | 'tracking'`
+`isTracking: boolean`
 
-`trackingStatus`: a stateful string in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `'paused'` or `'tracking'`. To programmatically pause and resume tracking, use `pause()` and `resume()` explained below.
+`isTracking`: a stateful flag in the `temporal` store that indicates whether the `temporal` store is tracking state changes or not. Possible values are `true` or `false`. To programmatically pause and resume tracking, use `pause()` and `resume()` explained below.
 
 #### **Pause tracking of history**
 
 `pause: () => void`
 
-`pause`: call function to pause tracking state changes. This will prevent new states from being stored in history within the temporal store.
+`pause`: call function to pause tracking state changes. This will prevent new states from being stored in history within the temporal store. Sets `isTracking` to `false`.
 
 #### **Resume tracking of history**
 
 `resume: () => void`
 
-`resume`: call function to resume tracking state changes. This will allow new states to be stored in history within the temporal store.
+`resume`: call function to resume tracking state changes. This will allow new states to be stored in history within the temporal store. Sets `isTracking` to `true`.
 
 #### **Programmatically add middleware to the setter**
 
@@ -407,7 +407,7 @@ This is a work in progress. Submit a PR!
 
 ## Contributing
 
-PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies. Library code is located at `packages/zundo`.
+PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies.
 
 ## Author
 

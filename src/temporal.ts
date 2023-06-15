@@ -48,14 +48,14 @@ export const createVanillaTemporal = <TState>(
         }
       },
       clear: () => set({ pastStates: [], futureStates: [] }),
-      trackingStatus: 'tracking',
-      pause: () => set({ trackingStatus: 'paused' }),
-      resume: () => set({ trackingStatus: 'tracking' }),
+      isTracking: true,
+      pause: () => set({ isTracking: false }),
+      resume: () => set({ isTracking: true }),
       setOnSave: (_onSave) => set({ _onSave }),
       // Internal properties
       _onSave: options?.onSave,
       _handleSet: (pastState) => {
-        if (get().trackingStatus == 'tracking') {
+        if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           if (!options?.equality?.(pastState, currentState)) {
             const pastStates = get().pastStates.slice();
