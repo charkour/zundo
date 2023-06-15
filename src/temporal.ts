@@ -15,36 +15,31 @@ export const temporalStateCreator = <TState>(
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
         if (get().pastStates.length) {
-          // Fastest way to clone an array on Chromium. Needed to create a new array reference
-          const pastStates = get().pastStates.slice();
-          const futureStates = get().futureStates.slice();
-          // While loop is fastest in Chromium.
-          // Based on the steps, get values from the pastStates array and push them to the futureStates array
-          while (steps--) {
-            const pastState = pastStates.pop();
-            if (pastState) {
-              futureStates.push(options?.partialize?.(userGet()) || userGet());
-              userSet(pastState);
-            }
-          }
-          set({ pastStates, futureStates });
+          // Add the current state to the future states
+          get().futureStates.push(
+            options?.partialize?.(userGet()) || userGet(),
+          );
+
+          const statesToApply = get().pastStates.splice(-steps, steps);
+          userSet(statesToApply.shift()!);
+          set({
+            pastStates: get().pastStates,
+            futureStates: get().futureStates.concat(statesToApply.reverse()),
+          });
         }
       },
       redo: (steps = 1) => {
         if (get().futureStates.length) {
-          // Fastest way to clone an array on Chromium. Needed to create a new array reference
-          const pastStates = get().pastStates.slice();
-          const futureStates = get().futureStates.slice();
-          // While loop is fastest in Chromium.
-          // Based on the steps, get values from the futureStates array and push them to the pastStates array
-          while (steps--) {
-            const futureState = futureStates.pop();
-            if (futureState) {
-              pastStates.push(options?.partialize?.(userGet()) || userGet());
-              userSet(futureState);
-            }
-          }
-          set({ pastStates, futureStates });
+          // Add the current state to the past states
+          get().pastStates.push(options?.partialize?.(userGet()) || userGet());
+
+          const statesToApply = get().futureStates.splice(-steps, steps);
+
+          userSet(statesToApply.shift()!);
+          set({
+            futureStates: get().futureStates,
+            pastStates: get().pastStates.concat(statesToApply.reverse()),
+          });
         }
       },
       clear: () => set({ pastStates: [], futureStates: [] }),
