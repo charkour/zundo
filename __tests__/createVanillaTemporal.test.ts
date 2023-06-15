@@ -1,10 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 vi.mock('zustand');
-import { createVanillaTemporal } from '../src/temporal';
+import { temporalStateCreator } from '../src/temporal';
 import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
-import { persist } from 'zustand/middleware';
-import { temporal } from '../src';
 
 interface MyState {
   count: number;
@@ -12,9 +10,9 @@ interface MyState {
   decrement: () => void;
 }
 
-// tests the createVanillaTemporal function rather than the temporal middleware
+// tests the temporalStateCreator function rather than the temporal middleware
 // Not exhaustive, but also likely not needed
-describe('createVanillaTemporal', () => {
+describe('temporalStateCreator', () => {
   const store = createStore<MyState>((set) => {
     return {
       count: 0,
@@ -30,7 +28,9 @@ describe('createVanillaTemporal', () => {
   });
 
   it('should have the objects defined', () => {
-    const temporalStore = createVanillaTemporal(store.setState, store.getState);
+    const temporalStore = createStore(
+      temporalStateCreator(store.setState, store.getState),
+    );
     const { undo, redo, clear, pastStates, futureStates } =
       temporalStore.getState();
 
@@ -43,35 +43,5 @@ describe('createVanillaTemporal', () => {
     expect(store.getState().count).toBe(0);
     act(store.getState().increment);
     expect(store.getState().count).toBe(1);
-  });
-
-  describe('should wrap temporal store in given middlewares', () => {
-    it('persist', () => {
-      const temporalStore = createVanillaTemporal(
-        store.setState,
-        store.getState,
-        { wrapTemporal: (store) => persist(store, { name: '123' }) },
-      );
-      expect(temporalStore).toHaveProperty('persist');
-    });
-
-    it('temporal', () => {
-      const temporalStore = createVanillaTemporal(
-        store.setState,
-        store.getState,
-        { wrapTemporal: (store) => temporal(store) },
-      );
-      expect(temporalStore).toHaveProperty('temporal');
-    });
-
-    it('temporal and persist', () => {
-      const temporalStore = createVanillaTemporal(
-        store.setState,
-        store.getState,
-        { wrapTemporal: (store) => temporal(persist(store, { name: '123' })) },
-      );
-      expect(temporalStore).toHaveProperty('persist');
-      expect(temporalStore).toHaveProperty('temporal');
-    });
   });
 });
