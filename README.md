@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <1kB
+enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <800B
 
 ![gif displaying undo feature](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
 
@@ -22,8 +22,10 @@ npm i zustand zundo
 ## Background
 
 - Solves the issue of managing state in complex user applications
+- "It Just Works" mentality
+- Small and fast
 - Provides simple middleware to add undo/redo capabilities
-- Leverages zustand for state management, keeping the internals small
+- Leverages zustand for state management
 - Works with multiple stores in the same app
 - Has an unopinionated and extensible API
 
