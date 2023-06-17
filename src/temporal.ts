@@ -15,6 +15,7 @@ export const temporalStateCreator = <TState>(
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
         if (get().pastStates.length) {
+          // userGet must be called before userSet
           const currentState = options?.partialize?.(userGet()) || userGet();
 
           const statesToApply = get().pastStates.splice(-steps, steps);
@@ -32,6 +33,7 @@ export const temporalStateCreator = <TState>(
       },
       redo: (steps = 1) => {
         if (get().futureStates.length) {
+          // userGet must be called before userSet
           const currentState = options?.partialize?.(userGet()) || userGet();
 
           const statesToApply = get().futureStates.splice(-steps, steps);
