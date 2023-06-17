@@ -41,11 +41,11 @@ export const temporalStateCreator = <TState>(
           // Use shift here because we use in in _handleSet
           userSet(statesToApply.shift()!);
           set({
-            futureStates: get().futureStates,
             pastStates: get().pastStates.concat(
               currentState,
               statesToApply.reverse(),
             ),
+            futureStates: get().futureStates,
           });
         }
       },
@@ -61,10 +61,7 @@ export const temporalStateCreator = <TState>(
           const currentState = options?.partialize?.(userGet()) || userGet();
           if (!options?.equality?.(pastState, currentState)) {
             // This naively assumes that only one new state can be added at a time
-            const thing =
-              options?.limit && get().pastStates.length >= options?.limit;
-
-            if (thing) {
+            if (options?.limit && get().pastStates.length >= options?.limit) {
               get().pastStates.shift();
             }
 
