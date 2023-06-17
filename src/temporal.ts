@@ -20,7 +20,7 @@ export const temporalStateCreator = <TState>(
 
           const statesToApply = get().pastStates.splice(-steps, steps);
 
-          // Use shift here because we use in in _handleSet
+          // If there is length, we know that statesToApply is not empty
           userSet(statesToApply.shift()!);
           set({
             pastStates: get().pastStates,
@@ -38,7 +38,7 @@ export const temporalStateCreator = <TState>(
 
           const statesToApply = get().futureStates.splice(-steps, steps);
 
-          // Use shift here because we use in in _handleSet
+          // If there is length, we know that statesToApply is not empty
           userSet(statesToApply.shift()!);
           set({
             pastStates: get().pastStates.concat(
