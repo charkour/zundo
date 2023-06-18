@@ -56,7 +56,9 @@ export const temporalStateCreator = <TState>(
       setOnSave: (_onSave) => set({ _onSave }),
       // Internal properties
       _onSave: options?.onSave,
-      _handleSet: (pastState) => {
+      _handleSet: (...args) => {
+        const pastState = options?.partialize?.(userGet()) || userGet();
+        userSet(...args);
         if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           if (!options?.equality?.(pastState, currentState)) {

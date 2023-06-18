@@ -55,25 +55,14 @@ export const temporal = (<TState>(
         (store.temporal.getState() as _TemporalState<TState>)._handleSet,
       ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
 
-    const setState = store.setState;
+    // const setState = store.setState;
     // Modify the setState function to call the userlandSet function
-    store.setState = (...args) => {
-      // Get most up to date state. The state from the callback might be a partial state.
-      // The order of the get() and set() calls is important here.
-      const pastState = options?.partialize?.(get()) || get();
-      setState(...args);
-      curriedHandleSet(pastState);
-    };
+    // TODO: this isn't using the setState, but instead is using set to call the userlandSet. Is that an issue? It's not pulling off the store.setState function which is an issue we need to fix.
+    store.setState = curriedHandleSet;
 
     return config(
       // Modify the set function to call the userlandSet function
-      (...args) => {
-        // Get most up-to-date state. The state from the callback might be a partial state.
-        // The order of the get() and set() calls is important here.
-        const pastState = options?.partialize?.(get()) || get();
-        set(...args);
-        curriedHandleSet(pastState);
-      },
+      curriedHandleSet,
       get,
       store,
     );
