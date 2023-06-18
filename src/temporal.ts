@@ -15,36 +15,38 @@ export const temporalStateCreator = <TState>(
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
         if (get().pastStates.length) {
-          // Fastest way to clone an array on Chromium. Needed to create a new array reference
-          const pastStates = get().pastStates.slice();
-          const futureStates = get().futureStates.slice();
-          // While loop is fastest in Chromium.
-          // Based on the steps, get values from the pastStates array and push them to the futureStates array
-          while (steps--) {
-            const pastState = pastStates.pop();
-            if (pastState) {
-              futureStates.push(options?.partialize?.(userGet()) || userGet());
-              userSet(pastState);
-            }
-          }
-          set({ pastStates, futureStates });
+          // userGet must be called before userSet
+          const currentState = options?.partialize?.(userGet()) || userGet();
+
+          const statesToApply = get().pastStates.splice(-steps, steps);
+
+          // If there is length, we know that statesToApply is not empty
+          userSet(statesToApply.shift()!);
+          set({
+            pastStates: get().pastStates,
+            futureStates: get().futureStates.concat(
+              currentState,
+              statesToApply.reverse(),
+            ),
+          });
         }
       },
       redo: (steps = 1) => {
         if (get().futureStates.length) {
-          // Fastest way to clone an array on Chromium. Needed to create a new array reference
-          const pastStates = get().pastStates.slice();
-          const futureStates = get().futureStates.slice();
-          // While loop is fastest in Chromium.
-          // Based on the steps, get values from the futureStates array and push them to the pastStates array
-          while (steps--) {
-            const futureState = futureStates.pop();
-            if (futureState) {
-              pastStates.push(options?.partialize?.(userGet()) || userGet());
-              userSet(futureState);
-            }
-          }
-          set({ pastStates, futureStates });
+          // userGet must be called before userSet
+          const currentState = options?.partialize?.(userGet()) || userGet();
+
+          const statesToApply = get().futureStates.splice(-steps, steps);
+
+          // If there is length, we know that statesToApply is not empty
+          userSet(statesToApply.shift()!);
+          set({
+            pastStates: get().pastStates.concat(
+              currentState,
+              statesToApply.reverse(),
+            ),
+            futureStates: get().futureStates,
+          });
         }
       },
       clear: () => set({ pastStates: [], futureStates: [] }),
@@ -58,14 +60,16 @@ export const temporalStateCreator = <TState>(
         if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           if (!options?.equality?.(pastState, currentState)) {
-            const pastStates = get().pastStates.slice();
             // This naively assumes that only one new state can be added at a time
-            if (options?.limit && pastStates.length >= options?.limit) {
-              pastStates.shift();
+            if (options?.limit && get().pastStates.length >= options?.limit) {
+              get().pastStates.shift();
             }
-            pastStates.push(pastState);
+
             get()._onSave?.(pastState, currentState);
-            set({ pastStates, futureStates: [] });
+            set({
+              pastStates: get().pastStates.concat(pastState),
+              futureStates: [],
+            });
           }
         }
       },
