@@ -388,6 +388,7 @@ interface TemporalState<TState> {
 ## Examples
 
 - [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
+- [with lodash.debounce](https://codesandbox.io/s/zundo-handleset-debounce-nq7ml7?file=/src/App.tsx)
 - [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
 - [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
 
