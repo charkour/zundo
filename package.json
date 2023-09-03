@@ -44,23 +44,23 @@
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "8.2.6",
-    "@testing-library/jest-dom": "5.17.0",
+    "@testing-library/jest-dom": "6.1.2",
     "@testing-library/react": "14.0.0",
     "@types/lodash.throttle": "4.1.7",
     "@types/react-dom": "18.2.7",
     "jsdom": "22.1.0",
     "lodash.throttle": "4.1.1",
-    "prettier": "3.0.0",
+    "prettier": "3.0.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-test-renderer": "18.2.0",
     "size-limit": "8.2.6",
-    "tsup": "7.1.0",
-    "typescript": "5.1.6",
-    "vite": "4.4.7",
-    "vitest": "0.33.0",
+    "tsup": "7.2.0",
+    "typescript": "5.2.2",
+    "vite": "4.4.9",
+    "vitest": "0.34.3",
     "vitest-localstorage-mock": "0.0.1",
-    "zustand": "4.3.9"
+    "zustand": "4.4.1"
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
