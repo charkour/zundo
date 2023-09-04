@@ -24,26 +24,21 @@ const withZundo = temporal<MyState>(
     doNothing: () => set((state) => state),
   }),
   {
-    equality: shallow,
-    diff: (state, prevState) => {
-      const myDiff = diff(prevState, state);
+    diff: (pastState, currentState) => {
+      const myDiff = diff(currentState, pastState);
       const newStateFromDiff = myDiff.reduce((acc, difference) => {
-        const { type, path } = difference;
-        if (type === 'CREATE') {
-          const { value } = difference;
-          return { ...acc, [path]: value };
-        }
-        if (type === 'REMOVE') {
-          const { [path]: _, ...rest } = acc;
-          return rest;
-        }
-        if (type === 'CHANGE') {
-          const { value } = difference;
-          return { ...acc, [path]: value };
+        type State = typeof currentState;
+        type Key = keyof State;
+        if (difference.type === 'CHANGE') {
+          // 'count' | 'count2' | 'increment' | 'decrement' | 'increment2' | 'decrement2' | 'doNothing'
+          const pathAsString = difference.path.join('.') as Key;
+          // number | () => void | undefined
+          const value = difference.value;
+          acc[pathAsString] = value;
         }
         return acc;
-      }, {});
-      return isEmpty(newStateFromDiff) ? undefined : newStateFromDiff;
+      }, {} as Partial<typeof currentState>);
+      return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
     },
   },
 );
@@ -67,8 +62,15 @@ const isEmpty = (obj: object) => {
 };
 
 export default function Web() {
-  const { count, increment, decrement, count2, increment2, decrement2, doNothing } =
-    useBaseStore((state) => state);
+  const {
+    count,
+    increment,
+    decrement,
+    count2,
+    increment2,
+    decrement2,
+    doNothing,
+  } = useBaseStore((state) => state);
   const { futureStates, pastStates, undo } = useTemporalStore(
     (state) => state,
     shallow,

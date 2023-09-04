@@ -60,7 +60,7 @@ export const temporalStateCreator = <TState>(
         if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           const deltaState = options?.diff?.(pastState, currentState);
-          if (!options?.equality?.(pastState, currentState) || deltaState) {
+          if (!(options?.equality?.(pastState, currentState) || deltaState === null)) {
             // This naively assumes that only one new state can be added at a time
             if (options?.limit && get().pastStates.length >= options?.limit) {
               get().pastStates.shift();
