@@ -26,18 +26,21 @@ const withZundo = temporal<MyState>(
   {
     diff: (pastState, currentState) => {
       const myDiff = diff(currentState, pastState);
-      const newStateFromDiff = myDiff.reduce((acc, difference) => {
-        type State = typeof currentState;
-        type Key = keyof State;
-        if (difference.type === 'CHANGE') {
-          // 'count' | 'count2' | 'increment' | 'decrement' | 'increment2' | 'decrement2' | 'doNothing'
-          const pathAsString = difference.path.join('.') as Key;
-          // number | () => void | undefined
-          const value = difference.value;
-          acc[pathAsString] = value;
-        }
-        return acc;
-      }, {} as Partial<typeof currentState>);
+      const newStateFromDiff = myDiff.reduce(
+        (acc, difference) => {
+          type State = typeof currentState;
+          type Key = keyof State;
+          if (difference.type === 'CHANGE') {
+            // 'count' | 'count2' | 'increment' | 'decrement' | 'increment2' | 'decrement2' | 'doNothing'
+            const pathAsString = difference.path.join('.') as Key;
+            // number | () => void | undefined
+            const value = difference.value;
+            acc[pathAsString] = value;
+          }
+          return acc;
+        },
+        {} as Partial<typeof currentState>,
+      );
       return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
     },
   },
