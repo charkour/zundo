@@ -26,8 +26,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (pastState: TState, currentState: TState) => boolean;
   diff?: (
-    pastState: PartialTState,
-    currentState: PartialTState,
+    pastState: Partial<PartialTState>,
+    currentState: Partial<PartialTState>,
   ) => Partial<PartialTState> | null;
   onSave?: onSave<TState>;
   handleSet?: (

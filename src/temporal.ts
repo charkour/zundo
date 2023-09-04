@@ -21,11 +21,12 @@ export const temporalStateCreator = <TState>(
           const statesToApply = get().pastStates.splice(-steps, steps);
 
           // If there is length, we know that statesToApply is not empty
-          userSet(statesToApply.shift()!);
+          const nextState = statesToApply.shift()!;
+          userSet(nextState);
           set({
             pastStates: get().pastStates,
             futureStates: get().futureStates.concat(
-              currentState,
+              options?.diff?.(currentState, nextState) || currentState,
               statesToApply.reverse(),
             ),
           });
@@ -39,10 +40,11 @@ export const temporalStateCreator = <TState>(
           const statesToApply = get().futureStates.splice(-steps, steps);
 
           // If there is length, we know that statesToApply is not empty
-          userSet(statesToApply.shift()!);
+          const nextState = statesToApply.shift()!;
+          userSet(nextState);
           set({
             pastStates: get().pastStates.concat(
-              currentState,
+              options?.diff?.(currentState, nextState) || currentState,
               statesToApply.reverse(),
             ),
             futureStates: get().futureStates,
@@ -60,7 +62,12 @@ export const temporalStateCreator = <TState>(
         if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           const deltaState = options?.diff?.(pastState, currentState);
-          if (!(options?.equality?.(pastState, currentState) || deltaState === null)) {
+          if (
+            !(
+              options?.equality?.(pastState, currentState) ||
+              deltaState === null
+            )
+          ) {
             // This naively assumes that only one new state can be added at a time
             if (options?.limit && get().pastStates.length >= options?.limit) {
               get().pastStates.shift();

@@ -74,7 +74,7 @@ export default function Web() {
     decrement2,
     doNothing,
   } = useBaseStore((state) => state);
-  const { futureStates, pastStates, undo } = useTemporalStore(
+  const { futureStates, pastStates, undo, redo } = useTemporalStore(
     (state) => state,
     shallow,
   );
@@ -98,6 +98,7 @@ export default function Web() {
           <h2>Previous States</h2>
           <div>{JSON.stringify(pastStates)}</div>
           <button onClick={() => undo()}>Undo</button>
+          <button onClick={() => redo()}>Redo</button>
         </div>
       </div>
     </div>
