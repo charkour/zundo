@@ -12,6 +12,14 @@ import type {
 } from '../src/types';
 import throttle from 'lodash.throttle';
 import { persist } from 'zustand/middleware';
+import diff from 'microdiff';
+
+const isEmpty = (obj: object) => {
+  for (const _ in obj) {
+    return false;
+  }
+  return true;
+};
 
 interface MyState {
   count: number;
@@ -21,6 +29,7 @@ interface MyState {
   boolean1: boolean;
   boolean2: boolean;
   increment: () => void;
+  incrementOnly2: () => void;
   decrement: () => void;
   doNothing: () => void;
 }
@@ -47,6 +56,7 @@ const createVanillaStore = (
             count: state.count - 1,
             count2: state.count2 - 1,
           })),
+        incrementOnly2: () => set((state) => ({ count2: state.count2 + 1 })),
         doNothing: () => set((state) => ({ ...state })),
       };
     }, options),
@@ -85,6 +95,7 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        incrementOnly2: expect.any(Function),
         myString: 'hello',
         string2: 'world',
         boolean1: true,
@@ -96,6 +107,7 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        incrementOnly2: expect.any(Function),
         myString: 'hello',
         string2: 'world',
         boolean1: true,
@@ -157,6 +169,7 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        incrementOnly2: expect.any(Function),
         boolean1: true,
         boolean2: false,
         myString: 'hello',
@@ -177,6 +190,7 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
+        incrementOnly2: expect.any(Function),
         boolean1: true,
         boolean2: false,
         myString: 'hello',
@@ -227,7 +241,7 @@ describe('Middleware options', () => {
   describe('equality function', () => {
     it('should use the equality function when set', () => {
       const storeWithEquality = createVanillaStore({
-        equality: (currentState, pastState) =>
+        equality: (pastState, currentState) =>
           currentState.count === pastState.count,
       });
       const { doNothing, increment } = storeWithEquality.getState();
@@ -287,6 +301,53 @@ describe('Middleware options', () => {
         increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(6);
+    });
+  });
+
+  describe('diff function', () => {
+    it('should use the diff function when set', () => {
+      const storeWithDiff = createVanillaStore({
+        diff: (pastState, currentState) => {
+          const myDiff = diff(currentState, pastState);
+          const newStateFromDiff = myDiff.reduce(
+            (acc, difference) => {
+              type State = typeof acc;
+              type Key = keyof State;
+              if (difference.type === 'CHANGE') {
+                const pathAsString = difference.path.join('.') as Key;
+                const value = difference.value;
+                acc[pathAsString] = value;
+              }
+              return acc;
+            },
+            {} as Partial<typeof currentState>,
+          );
+          return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
+        },
+      });
+      const { doNothing, increment, incrementOnly2 } = storeWithDiff.getState();
+      act(() => {
+        doNothing();
+        doNothing();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(0);
+      act(() => {
+        increment();
+        doNothing();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(1);
+      expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
+        count: 0,
+        count2: 0,
+      });
+      act(() => {
+        doNothing();
+        incrementOnly2();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(2);
+      expect(storeWithDiff.temporal.getState().pastStates[1]).toEqual({
+        count2: 1,
+      });
     });
   });
 

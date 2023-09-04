@@ -115,7 +115,11 @@ type onSave<TState> =
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (currentState: TState, pastState: TState) => boolean;
+  equality?: (pastState: TState, currentState: TState) => boolean;
+  diff?: (
+    pastState: PartialTState,
+    currentState: PartialTState,
+  ) => Partial<PartialTState> | null;
   onSave?: onSave<TState>;
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
@@ -146,24 +150,32 @@ Use the `partialize` option to omit or include specific fields. Pass a callback 
 // Only field1 and field2 will be tracked
 const useStoreA = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { partialize: (state) => {
-      const { field1, field2, ...rest } = state
-      return { field1, field2 }
-    }}
-  )
-)
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return { field1, field2 };
+      },
+    },
+  ),
+);
 
 // Everything besides field1 and field2 will be tracked
 const useStoreB = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { partialize: (state) => {
-      const { field1, field2, ...rest } = state
-      return rest;
-    }}
-  )
-)
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return rest;
+      },
+    },
+  ),
+);
 ```
 
 #### **Limit number of states stored**
@@ -175,35 +187,78 @@ For performance reasons, you may want to limit the number of previous and future
 ```tsx
 const useStore = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { limit: 100 }
-  )
+    (set) => ({
+      // your store fields
+    }),
+    { limit: 100 },
+  ),
 );
 ```
 
 #### **Prevent unchanged states to be stored**
 
-`equality?: (currentState: TState, pastState: TState) => boolean`
+`equality?: (pastState: TState, currentState: TState) => boolean`
 
-For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like `lodash/deepEqual` or `zustand/shallow`. By default, all state changes to your store are tracked.
+For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like [`fast-equals`](https://github.com/planttheidea/fast-equals), [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal), [`zustand/shallow`](https://github.com/pmndrs/zustand/blob/main/src/shallow.ts), [`lodash.isequal`](https://www.npmjs.com/package/lodash.isequal), or [`underscore.isEqual`](https://github.com/jashkenas/underscore/blob/master/modules/isEqual.js). By default, all state changes to your store are tracked.
 
 ```tsx
-import { shallow } from 'zustand/shallow'
+import { shallow } from 'zustand/shallow';
 
 // Use an existing equality function
 const useStoreA = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { equality: shallow }
-  )
+    (set) => ({
+      // your store fields
+    }),
+    { equality: shallow },
+  ),
 );
 
 // Write your own equality function
 const useStoreB = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { equality: (a, b) => a.field1 !== b.field1 }
-  )
+    (set) => ({
+      // your store fields
+    }),
+    { equality: (a, b) => a.field1 !== b.field1 },
+  ),
+);
+```
+
+#### **Store state delta rather than full object**
+
+`diff?: (pastState: PartialTState, currentState: PartialTState) => Partial<PartialTState> | null`
+
+For performance reasons, you may want to store the state delta rather than the complete (potentially partialized) state object. This can be done by passing a `diff` function. The `diff` function should return an object that represents the difference between the past and current state. By default, the full state object is stored.
+
+If `diff` returns `null`, the state change will not be tracked. This is helpful for a conditionally storing past states or if you have a `doNothing` action that does not change the state.
+
+You can write your own or use something like [`microdiff`](https://github.com/AsyncBanana/microdiff), [`just-diff`](https://github.com/angus-c/just/tree/master/packages/collection-diff), or [`deep-object-diff`](https://github.com/mattphillips/deep-object-diff).
+
+```tsx
+const useStore = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      diff: (pastState, currentState) => {
+        const myDiff = diff(currentState, pastState);
+        const newStateFromDiff = myDiff.reduce(
+          (acc, difference) => {
+            type Key = keyof typeof currentState;
+            if (difference.type === 'CHANGE') {
+              const pathAsString = difference.path.join('.') as Key;
+              acc[pathAsString] = difference.value;
+            }
+            return acc;
+          },
+          {} as Partial<typeof currentState>,
+        );
+        return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
+      },
+    },
+  ),
 );
 ```
 
@@ -214,13 +269,15 @@ const useStoreB = create<StoreState>(
 Sometimes, you may need to call a function when the temporal store is updated. This can be configured using `onSave` in the options, or by programmatically setting the callback if you need lexical context (see the `TemporalState` API below for more information).
 
 ```tsx
-import { shallow } from 'zustand/shallow'
+import { shallow } from 'zustand/shallow';
 
 const useStoreA = create<StoreState>(
   temporal(
-    set => ({ ... }),
-    { onSave: (state) => console.log('saved', state) }
-  )
+    (set) => ({
+      // your store fields
+    }),
+    { onSave: (state) => console.log('saved', state) },
+  ),
 );
 ```
 
@@ -228,11 +285,13 @@ const useStoreA = create<StoreState>(
 
 `handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
 
-Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like `lodash.throttle` or `debounce`. This a way to provide middleware to the temporal store's setter function.
+Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like [`throttle-debounce`](https://github.com/niksy/throttle-debounce), [`just-throttle`](https://github.com/angus-c/just/tree/master/packages/function-throttle), [`just-debounce-it`](https://github.com/angus-c/just/tree/master/packages/function-debounce), [`lodash.throttle`](https://www.npmjs.com/package/lodash.throttle), or [`lodash.debounce`](https://www.npmjs.com/package/lodash.debounce). This a way to provide middleware to the temporal store's setter function.
 
 ```tsx
 const withTemporal = temporal<MyState>(
-  (set) => ({ ... }),
+  (set) => ({
+    // your store fields
+  }),
   {
     handleSet: (handleSet) =>
       throttle<typeof handleSet>((state) => {
@@ -255,7 +314,9 @@ You can initialize the temporal store with past and future states. This is usefu
 
 ```tsx
 const withTemporal = temporal<MyState>(
-  (set) => ({ ... }),
+  (set) => ({
+    // your store fields
+  }),
   {
     pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
     futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
@@ -269,15 +330,20 @@ const withTemporal = temporal<MyState>(
 
 You can wrap the temporal store with your own middleware. This is useful if you want to add additional functionality to the temporal store. For example, you can add `persist` middleware to the temporal store to persist the past and future states to local storage.
 
+For a full list of middleware, see [zustand middleware](https://www.npmjs.com/package/lodash.debounce) and [third-party zustand libraries](https://github.com/pmndrs/zustand#third-party-libraries).
+
 > Note: The `temporal` middleware can be added to the `temporal` store. This way, you could track the history of the history. 🤯
 
 ```tsx
-import { persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware';
 
 const withTemporal = temporal<MyState>(
-  (set) => ({ ... }),
+  (set) => ({
+    // your store fields
+  }),
   {
-    wrapTemporal: (storeInitializer) => persist(storeInitializer, { name: 'temporal-persist' }),
+    wrapTemporal: (storeInitializer) =>
+      persist(storeInitializer, { name: 'temporal-persist' }),
   },
 );
 ```
@@ -288,7 +354,7 @@ When using zustand with the `temporal` middleware, a `temporal` object is attach
 
 Use `temporal.getState()` to access to temporal store!
 
-> While `setState`, `subscribe`, and `destory` exist on `temporal`, you should not need to use them.
+> While `setState`, `subscribe`, and `destroy` exist on `temporal`, you should not need to use them.
 
 #### **React Hooks**
 
@@ -300,9 +366,13 @@ import { temporal } from 'zundo';
 
 const useStore = create(
   temporal(
-    set => ({ ... }),
-    { ... }
-  )
+    (set) => ({
+      // your store fields
+    }),
+    {
+      // temporal options
+    },
+  ),
 );
 
 const useTemporalStore = create(useStore.temporal);

@@ -12,6 +12,7 @@
     "just-throttle": "4.2.0",
     "lodash.merge": "4.6.2",
     "lodash.throttle": "4.1.1",
+    "microdiff": "1.3.2",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
