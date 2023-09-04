@@ -326,6 +326,7 @@ describe('Middleware options', () => {
         },
       });
       const { doNothing, increment, incrementOnly2 } = storeWithDiff.getState();
+      const { undo, redo } = storeWithDiff.temporal.getState();
       act(() => {
         doNothing();
         doNothing();
@@ -333,20 +334,119 @@ describe('Middleware options', () => {
       expect(storeWithDiff.temporal.getState().pastStates.length).toBe(0);
       act(() => {
         increment();
+        increment();
         doNothing();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(2);
+      expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
+        count: 0,
+        count2: 0,
+      });
+      expect(storeWithDiff.temporal.getState().pastStates[1]).toEqual({
+        count: 1,
+        count2: 1,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 2,
+      });
+      act(() => {
+        doNothing();
+        incrementOnly2();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(3);
+      expect(storeWithDiff.temporal.getState().pastStates[2]).toEqual({
+        count2: 2,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 3,
+      });
+      act(() => {
+        doNothing();
+        incrementOnly2();
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(4);
+      expect(storeWithDiff.temporal.getState().pastStates[3]).toEqual({
+        count2: 3,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 4,
+      });
+      act(() => {
+        undo(2);
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(2);
+      expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
+        count: 0,
+        count2: 0,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates.length).toBe(2);
+      expect(storeWithDiff.temporal.getState().futureStates[0]).toEqual({
+        count2: 4,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates[1]).toEqual({
+        count2: 3,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 2,
+      });
+      act(() => {
+        undo();
       });
       expect(storeWithDiff.temporal.getState().pastStates.length).toBe(1);
       expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
         count: 0,
         count2: 0,
       });
+      expect(storeWithDiff.temporal.getState().futureStates.length).toBe(3);
+      expect(storeWithDiff.temporal.getState().futureStates[0]).toEqual({
+        count2: 4,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates[1]).toEqual({
+        count2: 3,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates[2]).toEqual({
+        count: 2,
+        count2: 2,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 1,
+        count2: 1,
+      });
       act(() => {
-        doNothing();
-        incrementOnly2();
+        redo();
       });
       expect(storeWithDiff.temporal.getState().pastStates.length).toBe(2);
-      expect(storeWithDiff.temporal.getState().pastStates[1]).toEqual({
-        count2: 1,
+      expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
+        count: 0,
+        count2: 0,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates.length).toBe(2);
+      expect(storeWithDiff.temporal.getState().futureStates[0]).toEqual({
+        count2: 4,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates[1]).toEqual({
+        count2: 3,
+      });
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 2,
+      });
+      act(() => {
+        redo(2);
+      });
+      expect(storeWithDiff.temporal.getState().pastStates.length).toBe(4);
+      expect(storeWithDiff.temporal.getState().pastStates[0]).toEqual({
+        count: 0,
+        count2: 0,
+      });
+      expect(storeWithDiff.temporal.getState().futureStates.length).toBe(0);
+      expect(storeWithDiff.getState()).toContain({
+        count: 2,
+        count2: 4,
       });
     });
   });

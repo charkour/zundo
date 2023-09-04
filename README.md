@@ -117,8 +117,8 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   limit?: number;
   equality?: (pastState: TState, currentState: TState) => boolean;
   diff?: (
-    pastState: PartialTState,
-    currentState: PartialTState,
+    pastState: Partial<PartialTState>,
+    currentState: Partial<PartialTState>,
   ) => Partial<PartialTState> | null;
   onSave?: onSave<TState>;
   handleSet?: (
@@ -227,7 +227,7 @@ const useStoreB = create<StoreState>(
 
 #### **Store state delta rather than full object**
 
-`diff?: (pastState: PartialTState, currentState: PartialTState) => Partial<PartialTState> | null`
+`diff?: (pastState: Partial<PartialTState>, currentState: Partial<PartialTState>) => Partial<PartialTState> | null`
 
 For performance reasons, you may want to store the state delta rather than the complete (potentially partialized) state object. This can be done by passing a `diff` function. The `diff` function should return an object that represents the difference between the past and current state. By default, the full state object is stored.
 
@@ -475,7 +475,6 @@ This is a work in progress. Submit a PR!
 
 - [ ] create nicer API, or a helper hook in react land (useTemporal). or vanilla version of the it
 - [ ] support history branches rather than clearing the future states
-- [ ] store state delta rather than full object
 - [ ] track state for multiple stores at once
 
 ## Contributing
