@@ -467,7 +467,25 @@ interface TemporalState<TState> {
 <details>
 <summary>Click to expand</summary>
 
-This is a work in progress. Submit a PR!
+## Migrate from v1 to v2
+
+### Breaking Changes
+
+- `include` and `exclude` options are now handled by the `partialize` option
+- `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled lodash.isequal to handle equality checks. In v2, you are able to use any function.
+- `historyDepthLimit` option has been renamed to `limit`
+- `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function (or setTimeout??)
+
+### New Features
+
+- `diff` option to store state delta rather than full object
+- `handleSet` option to throttle or debounce state changes
+- `onSave` option to call a function when the temporal store is updated
+- `wrapTemporal` option to wrap the temporal store with middleware
+- `pastStates` and `futureStates` options to initialize the temporal store with past and future states
+- `undo`, `redo`, and `clear` functions are now available on the temporal store
+- `isTracking`, `pause`, and `resume` functions are now available on the temporal store
+- `setOnSave` function is now available on the temporal store
 
 </details>
 
