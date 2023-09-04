@@ -64,7 +64,9 @@ export const temporalStateCreator = <TState>(
           const deltaState = options?.diff?.(pastState, currentState);
           if (
             !(
+              // If the user has provided an equality function, use it
               options?.equality?.(pastState, currentState) ||
+              // If the user has provided a diff function but nothing has been changed, function returns null
               deltaState === null
             )
           ) {
