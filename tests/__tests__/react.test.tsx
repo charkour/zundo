@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
 describe('React Re-renders when state changes', () => {
   it('it', () => {
@@ -45,7 +45,7 @@ describe('React Re-renders when state changes', () => {
 });
 
 // React Code from examples/web/pages/reactive.tsx
-import { TemporalState, temporal } from '../src';
+import { TemporalState, temporal } from '../../src';
 import { StoreApi, useStore, create } from 'zustand';
 
 interface MyState {

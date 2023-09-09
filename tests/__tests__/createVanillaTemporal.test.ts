@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 vi.mock('zustand');
-import { temporalStateCreator } from '../src/temporal';
+import { temporalStateCreator } from '../../src/temporal';
 import { createStore } from 'zustand';
 import { act } from 'react-dom/test-utils';
 
