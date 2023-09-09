@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand');
-import { temporal } from '../src/index';
+import { temporal } from '../out/index';
 import { createStore, type StoreApi } from 'zustand';
 import { act } from 'react-dom/test-utils';
 import type { TemporalState, Write } from '../src/types';

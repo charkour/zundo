@@ -36,6 +36,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:bun": "bun build ./src/index.ts --outdir ./out --target node --sourcemap=external --external zustand --minify",
     "dev": "tsup --watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "size": "size-limit",
@@ -69,7 +70,7 @@
   "size-limit": [
     {
       "limit": "1 kB",
-      "path": "dist/index.js"
+      "path": "out/index.js"
     }
   ]
 }
