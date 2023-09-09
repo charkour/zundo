@@ -105,6 +105,9 @@ importers:
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
+      vite:
+        specifier: 4.4.9
+        version: 4.4.9(@types/node@20.6.0)
       vitest:
         specifier: 0.34.4
         version: 0.34.4(jsdom@22.1.0)
