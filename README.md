@@ -38,8 +38,8 @@ npm i zustand zundo
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
-import { temporal } from 'zundo';
 import { create } from 'zustand';
+import { temporal } from 'zundo';
 
 // define the store (typescript)
 interface StoreState {
@@ -455,6 +455,14 @@ interface TemporalState<TState> {
 
 `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store.
 
+## Community
+
+`zundo` is used by several projects and teams including [Stability AI](https://github.com/Stability-AI/StableStudio), [Yext](https://github.com/yext/studio), [KaotoIO](https://github.com/KaotoIO/kaoto-ui), and [NutSH.ai](https://github.com/SysCV/nutsh).
+
+If this library is useful to you, please consider [sponsoring](https://github.com/sponsors/charkour) the project. Thank you!
+
+PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies. Thank you for contributing!
+
 ## Examples
 
 - [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
@@ -467,7 +475,185 @@ interface TemporalState<TState> {
 <details>
 <summary>Click to expand</summary>
 
-This is a work in progress. Submit a PR!
+## v2.0.0 - Smaller and more flexible
+
+v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also has a smaller bundle size and allows you to opt into specific performance trade-offs. The API has changed slightly. See the [API](#api) section for more details. Below is a summary of the changes as well as steps to migrate from v1 to v2.
+
+### Breaking Changes
+
+#### Middleware Option Changes
+
+- `include` and `exclude` options are now handled by the `partialize` option.
+- `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled `lodash.isequal` to handle equality checks. In v2, you are able to use any function.
+- `historyDepthLimit` option has been renamed to `limit`.
+- `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function.
+
+#### Import changes
+
+- The middleware is called `temporal` rather than `undoMiddleware`.
+
+### New Features
+
+#### New Options
+
+- `partialize` option to omit or include specific fields. By default, the entire state object is tracked.
+- `limit` option to limit the number of previous and future states stored in history.
+- `equality` option to use a custom equality function to determine when a state change should be tracked. By default, all state changes are tracked.
+- `diff` option to store state delta rather than full object.
+- `onSave` option to call a function when the temporal store is updated.
+- `handleSet` option to throttle or debounce state changes.
+= `pastStates` and `futureStates` options to initialize the temporal store with past and future states.
+- `wrapTemporal` option to wrap the temporal store with middleware. The `temporal` store is a vanilla zustand store.
+
+#### New `temporal.getState()` API
+
+- `undo`, `redo`, and `clear` functions are now always defined. They can no longer be `undefined`.
+- `undo()` and `redo()` functions now accept an optional `steps` parameter to go back or forward multiple states at once.
+- `isTracking` flag, and `pause`, and `resume` functions are now available on the temporal store.
+- `setOnSave` function is now available on the temporal store to change the `onSave` behavior after the store has been created.
+
+### Migration Steps
+
+1. Update zustand to v4.3.0 or higher
+2. Update zundo to v2.0.0 or higher
+3. Update your store to use the new API
+4. Update imports
+
+```diff
+- import { undoMiddleware } from 'zundo';
++ import { temporal } from 'zundo';
+```
+
+- If you're using `include` or `exclude`, use the new `partialize` option
+
+```tsx
+// v1.6.0
+// Only field1 and field2 will be tracked
+const useStoreA = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { include: ['field1', 'field2'] }
+  )
+);
+
+// Everything besides field1 and field2 will be tracked
+const useStoreB = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { exclude: ['field1', 'field2'] }
+  )
+);
+
+// v2.0.0
+// Only field1 and field2 will be tracked
+const useStoreA = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return { field1, field2 };
+      },
+    },
+  ),
+);
+
+// Everything besides field1 and field2 will be tracked
+const useStoreB = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return rest;
+      },
+    },
+  ),
+);
+```
+
+- If you're using `allowUnchanged`, use the new `equality` option
+
+```tsx
+// v1.6.0
+// Use an existing `allowUnchanged` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { allowUnchanged: true }
+  )
+);
+
+// v2.0.0
+// Use an existing equality function
+import { shallow } from 'zustand/shallow'; // or use `lodash.isequal` or any other equality function
+
+// Use an existing equality function
+const useStoreA = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    { equality: shallow },
+  ),
+);
+```
+
+- If you're using `historyDepthLimit`, use the new `limit` option
+
+```tsx
+// v1.6.0
+// Use an existing `historyDepthLimit` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { historyDepthLimit: 100 }
+  )
+);
+
+// v2.0.0
+// Use `limit` option
+const useStore = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    { limit: 100 },
+  ),
+);
+```
+
+- If you're using `coolOffDurationMs`, use the new `handleSet` option
+
+```tsx
+// v1.6.0
+// Use an existing `coolOffDurationMs` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { coolOfDurationMs: 1000 }
+  )
+);
+
+// v2.0.0
+// Use `handleSet` option
+const withTemporal = temporal<MyState>(
+  (set) => ({
+    // your store fields
+  }),
+  {
+    handleSet: (handleSet) =>
+      throttle<typeof handleSet>((state) => {
+        console.info('handleSet called');
+        handleSet(state);
+      }, 1000),
+  },
+);
+```
 
 </details>
 
@@ -477,17 +663,13 @@ This is a work in progress. Submit a PR!
 - [ ] support history branches rather than clearing the future states
 - [ ] track state for multiple stores at once
 
-## Contributing
-
-PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies.
-
 ## Author
 
 Charles Kornoelje ([@\_charkour](https://twitter.com/_charkour))
 
 ## Versioning
 
-View the [releases](https://github.com/charkour/zundo/releases) for the change log.
+View the [releases](https://github.com/charkour/zundo/releases) for the change log. This project follows semantic versioning.
 
 ## Illustration Credits
 

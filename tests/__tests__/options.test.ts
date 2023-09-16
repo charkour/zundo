@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('zustand');
-import { temporal } from '../src/index';
+import { temporal } from '../../src/index';
 import { createStore, type StoreApi } from 'zustand';
 import { act } from 'react-dom/test-utils';
 import { shallow } from 'zustand/shallow';
@@ -9,7 +9,7 @@ import type {
   ZundoOptions,
   TemporalState,
   Write,
-} from '../src/types';
+} from '../../src/types';
 import throttle from 'lodash.throttle';
 import { persist } from 'zustand/middleware';
 import diff from 'microdiff';
