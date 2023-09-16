@@ -484,7 +484,7 @@ v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also 
 #### Middleware Option Changes
 
 - `include` and `exclude` options are now handled by the `partialize` option.
-- `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled lodash.isequal to handle equality checks. In v2, you are able to use any function.
+- `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled `lodash.isequal` to handle equality checks. In v2, you are able to use any function.
 - `historyDepthLimit` option has been renamed to `limit`.
 - `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function.
 
@@ -590,7 +590,7 @@ const useStore = create<StoreState>(
 
 // v2.0.0
 // Use an existing equality function
-import { shallow } from 'zustand/shallow'; // or use lodash
+import { shallow } from 'zustand/shallow'; // or use `lodash.isequal` or any other equality function
 
 // Use an existing equality function
 const useStoreA = create<StoreState>(
@@ -624,6 +624,34 @@ const useStore = create<StoreState>(
     }),
     { limit: 100 },
   ),
+);
+```
+
+- If you're using `coolOffDurationMs`, use the new `handleSet` option
+
+```tsx
+// v1.6.0
+// Use an existing `coolOffDurationMs` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { coolOfDurationMs: 1000 }
+  )
+);
+
+// v2.0.0
+// Use `handleSet` option
+const withTemporal = temporal<MyState>(
+  (set) => ({
+    // your store fields
+  }),
+  {
+    handleSet: (handleSet) =>
+      throttle<typeof handleSet>((state) => {
+        console.info('handleSet called');
+        handleSet(state);
+      }, 1000),
+  },
 );
 ```
 
