@@ -483,14 +483,14 @@ v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also 
 
 #### Middleware Option Changes
 
-- `include` and `exclude` options are now handled by the `partialize` option
+- `include` and `exclude` options are now handled by the `partialize` option.
 - `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled lodash.isequal to handle equality checks. In v2, you are able to use any function.
-- `historyDepthLimit` option has been renamed to `limit`
+- `historyDepthLimit` option has been renamed to `limit`.
 - `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function.
 
 #### Import changes
 
-- The middleware is called `temporal` rather than `undoMiddleware`
+- The middleware is called `temporal` rather than `undoMiddleware`.
 
 ### New Features
 
