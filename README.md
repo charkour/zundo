@@ -455,6 +455,14 @@ interface TemporalState<TState> {
 
 `setOnSave`: call function to set a callback that will be called when the temporal store is updated. This can be used to call the temporal store setter using values from the lexical context. This is useful when needing to throttle or debounce updates to the temporal store.
 
+## Community
+
+`zundo` is used by several projects and teams including [Stability AI](https://github.com/Stability-AI/StableStudio), [Yext](https://github.com/yext/studio), [KaotoIO](https://github.com/KaotoIO/kaoto-ui), and [NutSH.ai](https://github.com/SysCV/nutsh).
+
+If this library is useful to you, please consider [sponsoring](https://github.com/sponsors/charkour) the project. Thank you!
+
+PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies. Thank you for contributing!
+
 ## Examples
 
 - [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
@@ -481,18 +489,28 @@ v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also 
 - `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function.
 
 #### Import changes
+
 - The middleware is called `temporal` rather than `undoMiddleware`
 
 ### New Features
 
-- `diff` option to store state delta rather than full object
-- `handleSet` option to throttle or debounce state changes
-- `onSave` option to call a function when the temporal store is updated
-- `wrapTemporal` option to wrap the temporal store with middleware
-- `pastStates` and `futureStates` options to initialize the temporal store with past and future states
-- `undo`, `redo`, and `clear` functions are now available on the temporal store
-- `isTracking`, `pause`, and `resume` functions are now available on the temporal store
-- `setOnSave` function is now available on the temporal store
+#### New Options
+
+- `partialize` option to omit or include specific fields. By default, the entire state object is tracked.
+- `limit` option to limit the number of previous and future states stored in history.
+- `equality` option to use a custom equality function to determine when a state change should be tracked. By default, all state changes are tracked.
+- `diff` option to store state delta rather than full object.
+- `onSave` option to call a function when the temporal store is updated.
+- `handleSet` option to throttle or debounce state changes.
+= `pastStates` and `futureStates` options to initialize the temporal store with past and future states.
+- `wrapTemporal` option to wrap the temporal store with middleware. The `temporal` store is a vanilla zustand store.
+
+#### New `temporal.getState()` API
+
+- `undo`, `redo`, and `clear` functions are now always defined. They can no longer be `undefined`.
+- `undo()` and `redo()` functions now accept an optional `steps` parameter to go back or forward multiple states at once.
+- `isTracking` flag, and `pause`, and `resume` functions are now available on the temporal store.
+- `setOnSave` function is now available on the temporal store to change the `onSave` behavior after the store has been created.
 
 ### Migration Steps
 
@@ -507,6 +525,7 @@ v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also 
 ```
 
 - If you're using `include` or `exclude`, use the new `partialize` option
+
 ```tsx
 // v1.6.0
 // Only field1 and field2 will be tracked
@@ -558,6 +577,7 @@ const useStoreB = create<StoreState>(
 ```
 
 - If you're using `allowUnchanged`, use the new `equality` option
+
 ```tsx
 // v1.6.0
 // Use an existing `allowUnchanged` option
@@ -584,6 +604,7 @@ const useStoreA = create<StoreState>(
 ```
 
 - If you're using `historyDepthLimit`, use the new `limit` option
+
 ```tsx
 // v1.6.0
 // Use an existing `historyDepthLimit` option
@@ -614,17 +635,13 @@ const useStore = create<StoreState>(
 - [ ] support history branches rather than clearing the future states
 - [ ] track state for multiple stores at once
 
-## Contributing
-
-PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnpm install` to install local dependencies.
-
 ## Author
 
 Charles Kornoelje ([@\_charkour](https://twitter.com/_charkour))
 
 ## Versioning
 
-View the [releases](https://github.com/charkour/zundo/releases) for the change log.
+View the [releases](https://github.com/charkour/zundo/releases) for the change log. This project follows semantic versioning.
 
 ## Illustration Credits
 
