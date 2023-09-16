@@ -38,8 +38,8 @@ npm i zustand zundo
 This returns the familiar store accessible by a hook! But now your store tracks past actions.
 
 ```tsx
-import { temporal } from 'zundo';
 import { create } from 'zustand';
+import { temporal } from 'zundo';
 
 // define the store (typescript)
 interface StoreState {
@@ -467,14 +467,21 @@ interface TemporalState<TState> {
 <details>
 <summary>Click to expand</summary>
 
-## Migrate from v1 to v2
+## v2.0.0 - Smaller and more flexible
+
+v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also has a smaller bundle size and allows you to opt into specific performance trade-offs. The API has changed slightly. See the [API](#api) section for more details. Below is a summary of the changes as well as steps to migrate from v1 to v2.
 
 ### Breaking Changes
+
+#### Middleware Option Changes
 
 - `include` and `exclude` options are now handled by the `partialize` option
 - `allowUnchanged` option is now handled by the `equality` option. By default, all state changes are tracked. In v1, we bundled lodash.isequal to handle equality checks. In v2, you are able to use any function.
 - `historyDepthLimit` option has been renamed to `limit`
-- `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function (or setTimeout??)
+- `coolOffDurationMs` option is now handled by the `handleSet` option by wrapping the setter function with a throttle or debounce function.
+
+#### Import changes
+- The middleware is called `temporal` rather than `undoMiddleware`
 
 ### New Features
 
@@ -486,6 +493,118 @@ interface TemporalState<TState> {
 - `undo`, `redo`, and `clear` functions are now available on the temporal store
 - `isTracking`, `pause`, and `resume` functions are now available on the temporal store
 - `setOnSave` function is now available on the temporal store
+
+### Migration Steps
+
+1. Update zustand to v4.3.0 or higher
+2. Update zundo to v2.0.0 or higher
+3. Update your store to use the new API
+4. Update imports
+
+```diff
+- import { undoMiddleware } from 'zundo';
++ import { temporal } from 'zundo';
+```
+
+- If you're using `include` or `exclude`, use the new `partialize` option
+```tsx
+// v1.6.0
+// Only field1 and field2 will be tracked
+const useStoreA = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { include: ['field1', 'field2'] }
+  )
+);
+
+// Everything besides field1 and field2 will be tracked
+const useStoreB = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { exclude: ['field1', 'field2'] }
+  )
+);
+
+// v2.0.0
+// Only field1 and field2 will be tracked
+const useStoreA = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return { field1, field2 };
+      },
+    },
+  ),
+);
+
+// Everything besides field1 and field2 will be tracked
+const useStoreB = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      partialize: (state) => {
+        const { field1, field2, ...rest } = state;
+        return rest;
+      },
+    },
+  ),
+);
+```
+
+- If you're using `allowUnchanged`, use the new `equality` option
+```tsx
+// v1.6.0
+// Use an existing `allowUnchanged` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { allowUnchanged: true }
+  )
+);
+
+// v2.0.0
+// Use an existing equality function
+import { shallow } from 'zustand/shallow'; // or use lodash
+
+// Use an existing equality function
+const useStoreA = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    { equality: shallow },
+  ),
+);
+```
+
+- If you're using `historyDepthLimit`, use the new `limit` option
+```tsx
+// v1.6.0
+// Use an existing `historyDepthLimit` option
+const useStore = create<StoreState>(
+  undoMiddleware(
+    set => ({ ... }),
+    { historyDepthLimit: 100 }
+  )
+);
+
+// v2.0.0
+// Use `limit` option
+const useStore = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    { limit: 100 },
+  ),
+);
+```
 
 </details>
 
