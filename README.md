@@ -502,7 +502,7 @@ v2.0.0 is a complete rewrite of zundo. It is smaller and more flexible. It also 
 - `diff` option to store state delta rather than full object.
 - `onSave` option to call a function when the temporal store is updated.
 - `handleSet` option to throttle or debounce state changes.
-= `pastStates` and `futureStates` options to initialize the temporal store with past and future states.
+- `pastStates` and `futureStates` options to initialize the temporal store with past and future states.
 - `wrapTemporal` option to wrap the temporal store with middleware. The `temporal` store is a vanilla zustand store.
 
 #### New `temporal.getState()` API
