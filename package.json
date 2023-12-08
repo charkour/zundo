@@ -40,26 +40,17 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "size": "size-limit",
+    "size": "pnpm --filter size size",
     "test": "pnpm --filter tests test",
     "test:ci": "pnpm --filter tests test:ci"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "11.0.1",
     "prettier": "3.1.0",
-    "size-limit": "11.0.1",
     "tsup": "8.0.1",
     "typescript": "5.3.3",
     "zustand": "4.4.7"
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
-  },
-  "size-limit": [
-    {
-      "limit": "1 kB",
-      "path": "dist/index.js",
-      "gzip": true
-    }
-  ]
+  }
 }
