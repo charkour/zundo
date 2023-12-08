@@ -25,6 +25,7 @@
   },
   "license": "MIT",
   "author": "Charles Kornoelje",
+  "type": "module",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
