@@ -32,10 +32,6 @@
     "dist",
     "package.json"
   ],
-  "workspaces": [
-    "examples/*",
-    "tests"
-  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
