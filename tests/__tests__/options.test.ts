@@ -113,7 +113,7 @@ describe('Middleware options', () => {
         boolean1: true,
         boolean2: false,
       });
-      expect(store.getState()).toContain({ count: 2, count2: 2 });
+      expect(store.getState()).toMatchObject({ count: 2, count2: 2 });
     });
 
     it('should partialize the past states', () => {
@@ -137,7 +137,7 @@ describe('Middleware options', () => {
       expect(storeWithPartialize.temporal.getState().pastStates[1]).toEqual({
         count: 1,
       });
-      expect(storeWithPartialize.getState()).toContain({ count: 2, count2: 2 });
+      expect(storeWithPartialize.getState()).toMatchObject({ count: 2, count2: 2 });
     });
 
     it('should partialize the future states', () => {
@@ -210,10 +210,10 @@ describe('Middleware options', () => {
         increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(5);
-      expect(store.temporal.getState().pastStates[0]).toContain({
+      expect(store.temporal.getState().pastStates[0]).toMatchObject({
         count: 0,
       });
-      expect(store.temporal.getState().pastStates[2]).toContain({
+      expect(store.temporal.getState().pastStates[2]).toMatchObject({
         count: 2,
       });
     });
@@ -229,10 +229,10 @@ describe('Middleware options', () => {
         increment();
       });
       expect(storeWithLimit.temporal.getState().pastStates.length).toBe(3);
-      expect(storeWithLimit.temporal.getState().pastStates[0]).toContain({
+      expect(storeWithLimit.temporal.getState().pastStates[0]).toMatchObject({
         count: 2,
       });
-      expect(storeWithLimit.temporal.getState().pastStates[2]).toContain({
+      expect(storeWithLimit.temporal.getState().pastStates[2]).toMatchObject({
         count: 4,
       });
     });
@@ -346,7 +346,7 @@ describe('Middleware options', () => {
         count: 1,
         count2: 1,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 2,
       });
@@ -358,7 +358,7 @@ describe('Middleware options', () => {
       expect(storeWithDiff.temporal.getState().pastStates[2]).toEqual({
         count2: 2,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 3,
       });
@@ -370,7 +370,7 @@ describe('Middleware options', () => {
       expect(storeWithDiff.temporal.getState().pastStates[3]).toEqual({
         count2: 3,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 4,
       });
@@ -389,7 +389,7 @@ describe('Middleware options', () => {
       expect(storeWithDiff.temporal.getState().futureStates[1]).toEqual({
         count2: 3,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 2,
       });
@@ -412,7 +412,7 @@ describe('Middleware options', () => {
         count: 2,
         count2: 2,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 1,
         count2: 1,
       });
@@ -431,7 +431,7 @@ describe('Middleware options', () => {
       expect(storeWithDiff.temporal.getState().futureStates[1]).toEqual({
         count2: 3,
       });
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 2,
       });
@@ -444,7 +444,7 @@ describe('Middleware options', () => {
         count2: 0,
       });
       expect(storeWithDiff.temporal.getState().futureStates.length).toBe(0);
-      expect(storeWithDiff.getState()).toContain({
+      expect(storeWithDiff.getState()).toMatchObject({
         count: 2,
         count2: 4,
       });
@@ -564,10 +564,10 @@ describe('Middleware options', () => {
         increment();
         doNothing();
       });
-      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toContain({
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toMatchObject({
         count: 0,
       });
-      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toContain({
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toMatchObject({
         count: 1,
       });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
@@ -600,10 +600,10 @@ describe('Middleware options', () => {
         increment();
         doNothing();
       });
-      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toContain({
+      expect(storeWithHandleSet.temporal.getState().pastStates[0]).toMatchObject({
         count: 0,
       });
-      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toContain({
+      expect(storeWithHandleSet.temporal.getState().pastStates[1]).toMatchObject({
         count: 1,
       });
       expect(storeWithHandleSet.temporal.getState().pastStates.length).toBe(2);
