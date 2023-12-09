@@ -1,0 +1,19 @@
+{
+  "name": "size",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "size": "size-limit"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "11.0.1",
+    "size-limit": "11.0.1"
+  },
+  "size-limit": [
+    {
+      "limit": "1 kB",
+      "path": "../dist/index.js",
+      "gzip": true
+    }
+  ]
+}

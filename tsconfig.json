@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Zundo",
+  "display": "zundo",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
