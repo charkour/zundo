@@ -347,17 +347,17 @@ describe('temporal middleware', () => {
         store.getState().increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(0);
-      expect(store.getState()).toContain({ count: 1, count2: 1 });
+      expect(store.getState()).toMatchObject({ count: 1, count2: 1 });
       act(() => {
         resume();
         store.getState().increment();
       });
       expect(store.temporal.getState().pastStates.length).toBe(1);
-      expect(store.temporal.getState().pastStates[0]).toContain({
+      expect(store.temporal.getState().pastStates[0]).toMatchObject({
         count: 1,
         count2: 1,
       });
-      expect(store.getState()).toContain({ count: 2, count2: 2 });
+      expect(store.getState()).toMatchObject({ count: 2, count2: 2 });
     });
   });
 
