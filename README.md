@@ -4,7 +4,7 @@ enable time-travel in your apps. undo/redo middleware for [zustand](https://gith
 
 ![gif displaying undo feature](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
 
-[![Build Size](https://img.shields.io/bundlephobia/minzip/zundo/beta?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
+[![Build Size](https://img.shields.io/bundlephobia/minzip/zundo?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zundo)
 [![Version](https://img.shields.io/npm/v/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 [![Downloads](https://img.shields.io/npm/dt/zundo?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zundo)
 
