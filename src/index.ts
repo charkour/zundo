@@ -72,7 +72,21 @@ export const temporal = (<TState>(
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
         set(...args);
-        curriedHandleSet(pastState);
+        const currentState = options?.partialize?.(get()) || get();
+        const deltaState = options?.diff?.(pastState, currentState);
+        // Don't call handleSet if state hasn't changed
+          if (
+              !(
+              // If the user has provided an equality function, use it
+              (
+                  options?.equality?.(pastState, currentState) ||
+                  // If the user has provided a diff function but nothing has been changed, function returns null
+                  deltaState === null
+              )
+          )
+          ) {
+              curriedHandleSet(pastState);
+          }
       },
       get,
       store,
