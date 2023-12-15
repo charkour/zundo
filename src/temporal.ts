@@ -62,27 +62,17 @@ export const temporalStateCreator = <TState>(
         if (get().isTracking) {
           const currentState = options?.partialize?.(userGet()) || userGet();
           const deltaState = options?.diff?.(pastState, currentState);
-          if (
-            !(
-              // If the user has provided an equality function, use it
-              (
-                options?.equality?.(pastState, currentState) ||
-                // If the user has provided a diff function but nothing has been changed, function returns null
-                deltaState === null
-              )
-            )
-          ) {
-            // This naively assumes that only one new state can be added at a time
-            if (options?.limit && get().pastStates.length >= options?.limit) {
-              get().pastStates.shift();
-            }
 
-            get()._onSave?.(pastState, currentState);
-            set({
-              pastStates: get().pastStates.concat(deltaState || pastState),
-              futureStates: [],
-            });
+          // This naively assumes that only one new state can be added at a time
+          if (options?.limit && get().pastStates.length >= options?.limit) {
+            get().pastStates.shift();
           }
+
+          get()._onSave?.(pastState, currentState);
+          set({
+            pastStates: get().pastStates.concat(deltaState || pastState),
+            futureStates: [],
+          });
         }
       },
     };
