@@ -50,10 +50,13 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
-    const curriedHandleSet =
-      options?.handleSet?.(
-        (store.temporal.getState() as _TemporalState<TState>)._handleSet,
-      ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
+    const internalHandleSet = (
+      store.temporal.getState() as _TemporalState<TState>
+    )._handleSet;
+
+    const userHandleSet = options?.handleSet?.(
+      (store.temporal.getState() as _TemporalState<TState>)._handleSet,
+    );
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
@@ -62,7 +65,12 @@ export const temporal = (<TState>(
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
       setState(...args);
-      curriedHandleSet(pastState);
+      const currentState = options?.partialize?.(get()) || get();
+      if (userHandleSet) {
+        userHandleSet(internalHandleSet, pastState, currentState);
+      } else {
+        internalHandleSet(pastState);
+      }
     };
 
     return config(
@@ -72,7 +80,12 @@ export const temporal = (<TState>(
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
         set(...args);
-        curriedHandleSet(pastState);
+        const currentState = options?.partialize?.(get()) || get();
+        if (userHandleSet) {
+          userHandleSet(internalHandleSet, pastState, currentState);
+        } else {
+          internalHandleSet(pastState);
+        }
       },
       get,
       store,
