@@ -635,7 +635,7 @@ describe('Middleware options', () => {
       vi.useFakeTimers();
       const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
-          return throttle<typeof handleSet>((state) => {
+          return throttle((state) => {
             console.error('handleSet called');
             handleSet(state);
           }, 1000);

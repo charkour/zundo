@@ -33,8 +33,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => (
-    handleSet?: StoreApi<TState>['setState'],
-    pastState?: Partial<PartialTState>,
+    pastState: Partial<PartialTState>,
     currentState?: Partial<PartialTState>,
   ) => void;
   pastStates?: Partial<PartialTState>[];

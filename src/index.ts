@@ -67,7 +67,7 @@ export const temporal = (<TState>(
       setState(...args);
       const currentState = options?.partialize?.(get()) || get();
       if (userHandleSet) {
-        userHandleSet(internalHandleSet, pastState, currentState);
+        userHandleSet(pastState, currentState);
       } else {
         internalHandleSet(pastState);
       }
@@ -82,7 +82,7 @@ export const temporal = (<TState>(
         set(...args);
         const currentState = options?.partialize?.(get()) || get();
         if (userHandleSet) {
-          userHandleSet(internalHandleSet, pastState, currentState);
+          userHandleSet(pastState, currentState);
         } else {
           internalHandleSet(pastState);
         }
