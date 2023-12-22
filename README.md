@@ -33,22 +33,22 @@ npm i zustand zundo
 <img src="https://github.com/charkour/zundo/blob/main/zundo-mascot.png" style="margin: auto;" alt="Bear wearing a button up shirt textured with blue recycle symbols eating a bowl of noodles with chopsticks." width=300 />
 </div>
 
-## First create a vanilla store with temporal middleware
+## First create a vanilla store with `temporal` middleware
 
-This returns the familiar store accessible by a hook! But now your store tracks past actions.
+This returns the familiar store accessible by a hook! But now your store also tracks past states.
 
 ```tsx
 import { create } from 'zustand';
 import { temporal } from 'zundo';
 
-// define the store (typescript)
+// Define the type of your store state (typescript)
 interface StoreState {
   bears: number;
   increasePopulation: () => void;
   removeAllBears: () => void;
 }
 
-// creates a store with undo/redo capability
+// Use `temporal` middleware to create a store with undo/redo capabilities
 const useStoreWithUndo = create<StoreState>()(
   temporal((set) => ({
     bears: 0,
@@ -58,9 +58,35 @@ const useStoreWithUndo = create<StoreState>()(
 );
 ```
 
-## Convert to React Store
+## Then access `temporal` functions and properties of your store
 
-If you're using React, you can convert the store to a React hook using create from `zustand`.
+Your zustand store will now have an attached `temporal` object that
+provides access to useful time-travel utilities, including `undo`, `redo`, and `clear`!
+
+```tsx
+const App = () => {
+  const { bears, increasePopulation, removeAllBears } = useStoreWithUndo();
+  // See API section for temporal.getState() for all functions and
+  // properties provided by `temporal`
+  const { undo, redo, clear } = useStoreWithUndo.temporal.getState();
+
+  return (
+    <>
+      bears: {bears}
+      <button onClick={() => increasePopulation}>increase</button>
+      <button onClick={() => removeAllBears}>remove</button>
+      <button onClick={() => undo()}>undo</button>
+      <button onClick={() => redo()}>redo</button>
+      <button onClick={() => clear()}>clear</button>
+    </>
+  );
+};
+```
+
+## For reactive changes to member properties of the `temporal` object, optionally convert to a React store hook
+
+In React, to subscribe components or custom hooks to member properties of the `temporal` object (like the array
+of `pastStates` or `currentStates`), you can create a `useTemporalStore` hook.
 
 ```tsx
 import { useStore } from 'zustand';
@@ -69,24 +95,20 @@ import type { TemporalState } from 'zundo';
 const useTemporalStore = <T,>(
   selector: (state: TemporalState<StoreState>) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(originalStore.temporal, selector, equality);
-```
+) => useStore(useStoreWithUndo.temporal, selector, equality);
 
-## Then bind your components
-
-Use your store anywhere, including `undo`, `redo`, and `clear`!
-
-```tsx
 const App = () => {
   const { bears, increasePopulation, removeAllBears } = useStoreWithUndo();
-  const { undo, redo, clear } = useTemporalStore((state) => state);
-  // or if you don't use create from zustand, you can use the store directly.
-  // } = useStoreWithUndo.temporal.getState();
-  // if you want reactivity, you'll need to subscribe to the temporal store.
+  // changes to pastStates and futureStates will now trigger a reactive component rerender
+  const { undo, redo, clear, pastStates, futureStates } = useTemporalStore(
+    (state) => state,
+  );
 
   return (
     <>
-      bears: {bears}
+      <p> bears: {bears}</p>
+      <p> pastStates: {JSON.stringify(pastStates)}</p>
+      <p> futureStates: {JSON.stringify(futureStates)}</p>
       <button onClick={() => increasePopulation}>increase</button>
       <button onClick={() => removeAllBears}>remove</button>
       <button onClick={() => undo()}>undo</button>
@@ -115,7 +137,7 @@ type onSave<TState> =
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (pastState: TState, currentState: TState) => boolean;
+  equality?: (pastState: PartialTState, currentState: PartialTState) => boolean;
   diff?: (
     pastState: Partial<PartialTState>,
     currentState: Partial<PartialTState>,
@@ -148,7 +170,7 @@ Use the `partialize` option to omit or include specific fields. Pass a callback 
 
 ```tsx
 // Only field1 and field2 will be tracked
-const useStoreA = create<StoreState>(
+const useStoreWithUndoA = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -163,7 +185,7 @@ const useStoreA = create<StoreState>(
 );
 
 // Everything besides field1 and field2 will be tracked
-const useStoreB = create<StoreState>(
+const useStoreWithUndoB = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -178,6 +200,39 @@ const useStoreB = create<StoreState>(
 );
 ```
 
+If converting temporal store to a React Store Hook with typescript, be sure to define the type of
+your partialized state
+
+```tsx
+interface StoreState {
+  bears: number;
+  untrackedStateField: number;
+}
+
+type PartializedStoreState = Pick<StoreState, 'untrackedStateField'>;
+
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      bears: 0,
+      untrackedStateField: 0,
+    }),
+    {
+      partialize: (state) => {
+        const { bears } = state;
+        return { bears };
+      },
+    },
+  ),
+);
+
+const useTemporalStore = <T,>(
+  // Use partalized StoreState type as the generic here
+  selector: (state: TemporalState<PartializedStoreState>) => T,
+  equality?: (a: T, b: T) => boolean,
+) => useStore(useStoreWithUndo.temporal, selector, equality);
+```
+
 #### **Limit number of states stored**
 
 `limit?: number`
@@ -185,7 +240,7 @@ const useStoreB = create<StoreState>(
 For performance reasons, you may want to limit the number of previous and future states stored in history. Setting `limit` will limit the number of previous and future states stored in the `temporal` store. When the limit is reached, the oldest state is dropped. By default, no limit is set.
 
 ```tsx
-const useStore = create<StoreState>(
+const useStoreWithUndo = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -197,15 +252,17 @@ const useStore = create<StoreState>(
 
 #### **Prevent unchanged states to be stored**
 
-`equality?: (pastState: TState, currentState: TState) => boolean`
+`equality?: (pastState: PartialTState, currentState: PartialTState) => boolean`
 
-For performance reasons, you may want to use a custom `equality` function to determine when a state change should be tracked. You can write your own or use something like [`fast-equals`](https://github.com/planttheidea/fast-equals), [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal), [`zustand/shallow`](https://github.com/pmndrs/zustand/blob/main/src/shallow.ts), [`lodash.isequal`](https://www.npmjs.com/package/lodash.isequal), or [`underscore.isEqual`](https://github.com/jashkenas/underscore/blob/master/modules/isEqual.js). By default, all state changes to your store are tracked.
+Provide an `equality` function to determine when a state change should be tracked.
+You can write your own or use something like [`fast-equals`](https://github.com/planttheidea/fast-equals), [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal), [`zustand/shallow`](https://github.com/pmndrs/zustand/blob/main/src/shallow.ts), [`lodash.isequal`](https://www.npmjs.com/package/lodash.isequal), or [`underscore.isEqual`](https://github.com/jashkenas/underscore/blob/master/modules/isEqual.js).
+By default, all state changes to your store are tracked (even ones that don't change the values of store fields).
 
 ```tsx
 import { shallow } from 'zustand/shallow';
 
 // Use an existing equality function
-const useStoreA = create<StoreState>(
+const useStoreWithUndoA = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -215,7 +272,7 @@ const useStoreA = create<StoreState>(
 );
 
 // Write your own equality function
-const useStoreB = create<StoreState>(
+const useStoreWithUndoB = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -236,7 +293,7 @@ If `diff` returns `null`, the state change will not be tracked. This is helpful 
 You can write your own or use something like [`microdiff`](https://github.com/AsyncBanana/microdiff), [`just-diff`](https://github.com/angus-c/just/tree/master/packages/collection-diff), or [`deep-object-diff`](https://github.com/mattphillips/deep-object-diff).
 
 ```tsx
-const useStore = create<StoreState>(
+const useStoreWithUndo = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -271,7 +328,7 @@ Sometimes, you may need to call a function when the temporal store is updated. T
 ```tsx
 import { shallow } from 'zustand/shallow';
 
-const useStoreA = create<StoreState>(
+const useStoreWithUndo = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
@@ -288,17 +345,19 @@ const useStoreA = create<StoreState>(
 Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like [`throttle-debounce`](https://github.com/niksy/throttle-debounce), [`just-throttle`](https://github.com/angus-c/just/tree/master/packages/function-throttle), [`just-debounce-it`](https://github.com/angus-c/just/tree/master/packages/function-debounce), [`lodash.throttle`](https://www.npmjs.com/package/lodash.throttle), or [`lodash.debounce`](https://www.npmjs.com/package/lodash.debounce). This a way to provide middleware to the temporal store's setter function.
 
 ```tsx
-const withTemporal = temporal<MyState>(
-  (set) => ({
-    // your store fields
-  }),
-  {
-    handleSet: (handleSet) =>
-      throttle<typeof handleSet>((state) => {
-        console.info('handleSet called');
-        handleSet(state);
-      }, 1000),
-  },
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      handleSet: (handleSet) =>
+        throttle<typeof handleSet>((state) => {
+          console.info('handleSet called');
+          handleSet(state);
+        }, 1000),
+    },
+  ),
 );
 ```
 
@@ -313,14 +372,16 @@ You can initialize the temporal store with past and future states. This is usefu
 > Note: The `pastStates` and `futureStates` do not respect the limit set in the options. If you want to limit the number of past and future states, you must do so manually prior to initializing the store.
 
 ```tsx
-const withTemporal = temporal<MyState>(
-  (set) => ({
-    // your store fields
-  }),
-  {
-    pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
-    futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
-  },
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      pastStates: [{ field1: 'value1' }, { field1: 'value2' }],
+      futureStates: [{ field1: 'value3' }, { field1: 'value4' }],
+    },
+  ),
 );
 ```
 
@@ -337,14 +398,16 @@ For a full list of middleware, see [zustand middleware](https://www.npmjs.com/pa
 ```tsx
 import { persist } from 'zustand/middleware';
 
-const withTemporal = temporal<MyState>(
-  (set) => ({
-    // your store fields
-  }),
-  {
-    wrapTemporal: (storeInitializer) =>
-      persist(storeInitializer, { name: 'temporal-persist' }),
-  },
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      wrapTemporal: (storeInitializer) =>
+        persist(storeInitializer, { name: 'temporal-persist' }),
+    },
+  ),
 );
 ```
 
@@ -355,28 +418,6 @@ When using zustand with the `temporal` middleware, a `temporal` object is attach
 Use `temporal.getState()` to access to temporal store!
 
 > While `setState`, `subscribe`, and `destroy` exist on `temporal`, you should not need to use them.
-
-#### **React Hooks**
-
-To use within React hooks, we need to convert the vanilla store to a React-based store using `create` from `zustand`. This is done by passing the vanilla store to `create` from `zustand`.
-
-```tsx
-import { create } from 'zustand';
-import { temporal } from 'zundo';
-
-const useStore = create(
-  temporal(
-    (set) => ({
-      // your store fields
-    }),
-    {
-      // temporal options
-    },
-  ),
-);
-
-const useTemporalStore = create(useStore.temporal);
-```
 
 ### `useStore.temporal.getState()`
 
