@@ -209,7 +209,7 @@ interface StoreState {
   untrackedStateField: number;
 }
 
-type PartializedStoreState = Pick<StoreState, 'untrackedStateField'>;
+type PartializedStoreState = Pick<StoreState, 'bears'>;
 
 const useStoreWithUndo = create<StoreState>(
   temporal(
