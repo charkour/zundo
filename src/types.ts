@@ -24,7 +24,7 @@ export interface _TemporalState<TState> {
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
-  equality?: (pastState: TState, currentState: TState) => boolean;
+  equality?: (pastState: PartialTState, currentState: PartialTState) => boolean;
   diff?: (
     pastState: Partial<PartialTState>,
     currentState: Partial<PartialTState>,
