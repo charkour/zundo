@@ -125,15 +125,11 @@ const App = () => {
 
 `(config: StateCreator, options?: ZundoOptions) => StateCreator`
 
-zundo has one export: `temporal`. It is used to as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
+`zundo` has one export: `temporal`. It is used as middleware for `create` from zustand. The `config` parameter is your store created by zustand. The second `options` param is optional and has the following API.
 
-### Middleware Options
+### Bear's eye view:
 
 ```tsx
-type onSave<TState> =
-  | ((pastState: TState, currentState: TState) => void)
-  | undefined;
-
 export interface ZundoOptions<TState, PartialTState = TState> {
   partialize?: (state: TState) => PartialTState;
   limit?: number;
@@ -142,7 +138,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
     pastState: Partial<PartialTState>,
     currentState: Partial<PartialTState>,
   ) => Partial<PartialTState> | null;
-  onSave?: onSave<TState>;
+  onSave?: (pastState: TState, currentState: TState) => void;
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
   ) => StoreApi<TState>['setState'];
@@ -162,7 +158,7 @@ export interface ZundoOptions<TState, PartialTState = TState> {
 }
 ```
 
-#### **Exclude fields from being tracked in history**
+### Exclude fields from being tracked in history
 
 `partialize?: (state: TState) => PartialTState`
 
@@ -200,6 +196,8 @@ const useStoreWithUndoB = create<StoreState>(
 );
 ```
 
+#### `useTemporalStore` with `partialize`
+
 If converting temporal store to a React Store Hook with typescript, be sure to define the type of
 your partialized state
 
@@ -233,7 +231,7 @@ const useTemporalStore = <T,>(
 ) => useStore(useStoreWithUndo.temporal, selector, equality);
 ```
 
-#### **Limit number of states stored**
+### Limit number of historical states stored
 
 `limit?: number`
 
@@ -250,39 +248,86 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-#### **Prevent unchanged states to be stored**
+### Prevent unchanged states from getting stored in history
 
 `equality?: (pastState: PartialTState, currentState: PartialTState) => boolean`
 
-Provide an `equality` function to determine when a state change should be tracked.
-You can write your own or use something like [`fast-equals`](https://github.com/planttheidea/fast-equals), [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal), [`zustand/shallow`](https://github.com/pmndrs/zustand/blob/main/src/shallow.ts), [`lodash.isequal`](https://www.npmjs.com/package/lodash.isequal), or [`underscore.isEqual`](https://github.com/jashkenas/underscore/blob/master/modules/isEqual.js).
-By default, all state changes to your store are tracked (even ones that don't change the values of store fields).
+By default, a state snapshot is stored in `temporal` history when _any_ `zustand` state setter is
+called -- even if no value in your `zustand` store has changed.
+
+If all of your `zustand` state setters modify state in a way that you want tracked in history,
+this default is sufficient.
+
+However, for more precise control over when a state snapshot is stored in `zundo` history, you can provide
+an `equality` function.
+
+You can write your own equality function or use something like [`fast-equals`](https://github.com/planttheidea/fast-equals), [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal), [`zustand/shallow`](https://github.com/pmndrs/zustand/blob/main/src/shallow.ts), [`lodash.isequal`](https://www.npmjs.com/package/lodash.isequal), or [`underscore.isEqual`](https://github.com/jashkenas/underscore/blob/master/modules/isEqual.js).
+
+#### Example with deep equality
 
 ```tsx
-import { shallow } from 'zustand/shallow';
+import isDeepEqual from 'fast-deep-equal';
 
-// Use an existing equality function
-const useStoreWithUndoA = create<StoreState>(
+// Use a deep equality function to only store history when currentState has changed
+const useStoreWithUndo = create<StoreState>(
   temporal(
     (set) => ({
       // your store fields
     }),
-    { equality: shallow },
-  ),
-);
-
-// Write your own equality function
-const useStoreWithUndoB = create<StoreState>(
-  temporal(
-    (set) => ({
-      // your store fields
-    }),
-    { equality: (a, b) => a.field1 !== b.field1 },
+    // a state snapshot will only be stored in history when currentState is not deep-equal to pastState
+    // Note: this can also be more concisely written as {equality: isDeepEqual}
+    {
+      equality: (pastState, currentState) =>
+        isDeepEqual(pastState, currentState),
+    },
   ),
 );
 ```
 
-#### **Store state delta rather than full object**
+#### Example with shallow equality
+
+If your state or specific application does not require deep equality (for example, if you're only using non-nested primitives),
+you may for performance reasons choose to use a shallow equality fn that does not do deep comparison.
+
+```tsx
+import shallow from 'zustand/shallow';
+
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    // a state snapshot will only be stored in history when currentState is not deep-equal to pastState
+    // Note: this can also be more concisely written as {equality: shallow}
+    {
+      equality: (pastState, currentState) => shallow(pastState, currentState),
+    },
+  ),
+);
+```
+
+#### Example with custom equality
+
+You can also just as easily use custom equality functions for your specific application
+
+```tsx
+const useStoreWithUndo = create<StoreState>(
+  temporal(
+    (set) => ({
+      // your store fields
+    }),
+    {
+      // Only track history when field1 AND field2 diverge from their pastState
+      // Why would you do this? I don't know! But you can do it!
+      equality: (pastState, currentState) =>
+        pastState.field1 !== currentState.field1 &&
+        pastState.field2 !== currentState.field2,
+    },
+  ),
+);
+```
+
+### Store state delta rather than full object
 
 `diff?: (pastState: Partial<PartialTState>, currentState: Partial<PartialTState>) => Partial<PartialTState> | null`
 
@@ -319,7 +364,7 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-#### **Callback when temporal store is updated**
+### Callback when temporal store is updated
 
 `onSave?: (pastState: TState, currentState: TState) => void`
 
@@ -338,7 +383,7 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-#### **Cool-off period**
+### Cool-off period
 
 `handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
 
@@ -361,7 +406,7 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-#### **Initialize temporal store with past and future states**
+### Initialize temporal store with past and future states
 
 `pastStates?: Partial<PartialTState>[]`
 
@@ -385,7 +430,7 @@ const useStoreWithUndo = create<StoreState>(
 );
 ```
 
-#### **Wrap temporal store**
+### Wrap temporal store
 
 `wrapTemporal?: (storeInitializer: StateCreator<_TemporalState<TState>, [StoreMutatorIdentifier, unknown][], []>) => StateCreator<_TemporalState<TState>, [StoreMutatorIdentifier, unknown][], [StoreMutatorIdentifier, unknown][]>`
 
