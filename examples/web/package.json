@@ -22,9 +22,9 @@
   "devDependencies": {
     "@types/lodash.merge": "4.6.9",
     "@types/lodash.throttle": "4.1.9",
-    "@types/node": "20.10.4",
-    "@types/react": "18.2.42",
-    "eslint": "8.55.0",
+    "@types/node": "20.10.5",
+    "@types/react": "18.2.45",
+    "eslint": "8.56.0",
     "typescript": "5.3.3"
   }
 }
