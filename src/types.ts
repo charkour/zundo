@@ -18,7 +18,11 @@ export interface _TemporalState<TState> {
 
   setOnSave: (onSave: onSave<TState>) => void;
   _onSave: onSave<TState>;
-  _handleSet: (pastState: TState) => void;
+  _handleSet: (
+    pastState: TState,
+    currentState: TState,
+    deltaState?: Partial<TState> | null,
+  ) => void;
 }
 
 export interface ZundoOptions<TState, PartialTState = TState> {
@@ -32,7 +36,11 @@ export interface ZundoOptions<TState, PartialTState = TState> {
   onSave?: onSave<TState>;
   handleSet?: (
     handleSet: StoreApi<TState>['setState'],
-  ) => StoreApi<TState>['setState'];
+  ) => (
+    pastState: PartialTState,
+    currentState: PartialTState,
+    deltaState?: Partial<PartialTState> | null,
+  ) => void;
   pastStates?: Partial<PartialTState>[];
   futureStates?: Partial<PartialTState>[];
   wrapTemporal?: (

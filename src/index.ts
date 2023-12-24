@@ -50,10 +50,36 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
-    const curriedHandleSet =
-      options?.handleSet?.(
-        (store.temporal.getState() as _TemporalState<TState>)._handleSet,
-      ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
+    const userHandleSet = options?.handleSet?.(
+      (store.temporal.getState() as _TemporalState<TState>)
+        ._handleSet as StoreApi<TState>['setState'],
+    );
+
+    const internalHandleSet = (
+      store.temporal.getState() as _TemporalState<TState>
+    )._handleSet;
+
+    const curriedHandleSet = userHandleSet || internalHandleSet;
+
+    const temporalHandleSet = (
+      pastState: TState,
+      currentState: TState,
+      deltaState?: Partial<TState> | null,
+    ) => {
+      // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
+      if (
+        !(
+          // If the user has provided a diff function but nothing has been changed, deltaState will be null
+          (
+            deltaState === null ||
+            // If the user has provided an equality function, use it
+            options?.equality?.(pastState, currentState)
+          )
+        )
+      ) {
+        curriedHandleSet(pastState, currentState, deltaState);
+      }
+    };
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
@@ -62,7 +88,9 @@ export const temporal = (<TState>(
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
       setState(...args);
-      curriedHandleSet(pastState);
+      const currentState = options?.partialize?.(get()) || get();
+      const deltaState = options?.diff?.(pastState, currentState);
+      temporalHandleSet(pastState, currentState, deltaState);
     };
 
     return config(
@@ -74,19 +102,7 @@ export const temporal = (<TState>(
         set(...args);
         const currentState = options?.partialize?.(get()) || get();
         const deltaState = options?.diff?.(pastState, currentState);
-        // Don't call handleSet if state hasn't changed, as determined by equality or diff fn
-        if (
-          !(
-            // If the user has provided an equality function, use it
-            (
-              options?.equality?.(pastState, currentState) ||
-              // If the user has provided a diff function but nothing has been changed, function returns null
-              deltaState === null
-            )
-          )
-        ) {
-          curriedHandleSet(pastState);
-        }
+        temporalHandleSet(pastState, currentState, deltaState);
       },
       get,
       store,
