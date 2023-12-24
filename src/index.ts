@@ -61,11 +61,9 @@ export const temporal = (<TState>(
 
     const curriedHandleSet = userHandleSet || internalHandleSet;
 
-    const temporalHandleSet = (
-      pastState: TState,
-      currentState: TState,
-      deltaState?: Partial<TState> | null,
-    ) => {
+    const temporalHandleSet = (pastState: TState) => {
+      const currentState = options?.partialize?.(get()) || get();
+      const deltaState = options?.diff?.(pastState, currentState);
       // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
       if (
         !(
@@ -88,9 +86,7 @@ export const temporal = (<TState>(
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
       setState(...args);
-      const currentState = options?.partialize?.(get()) || get();
-      const deltaState = options?.diff?.(pastState, currentState);
-      temporalHandleSet(pastState, currentState, deltaState);
+      temporalHandleSet(pastState);
     };
 
     return config(
@@ -100,9 +96,7 @@ export const temporal = (<TState>(
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
         set(...args);
-        const currentState = options?.partialize?.(get()) || get();
-        const deltaState = options?.diff?.(pastState, currentState);
-        temporalHandleSet(pastState, currentState, deltaState);
+        temporalHandleSet(pastState);
       },
       get,
       store,
