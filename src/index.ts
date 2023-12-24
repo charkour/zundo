@@ -54,6 +54,24 @@ export const temporal = (<TState>(
       options?.handleSet?.(
         (store.temporal.getState() as _TemporalState<TState>)._handleSet,
       ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
+    
+    const temporalHandleSet = (pastState: TState) => {
+        const currentState = options?.partialize?.(get()) || get();
+        const deltaState = options?.diff?.(pastState, currentState);
+        // Don't call handleSet if state hasn't changed, as determined by equality or diff fn
+        if (
+            !(
+                // If the user has provided an equality function, use it
+                (
+                    deltaState === null ||
+                    // If the user has provided a diff function but nothing has been changed, function returns null
+                    options?.equality?.(pastState, currentState)
+                )
+            )
+        ) {
+            curriedHandleSet(pastState);
+        }
+    }
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
@@ -62,7 +80,7 @@ export const temporal = (<TState>(
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
       setState(...args);
-      curriedHandleSet(pastState);
+      temporalHandleSet(pastState);
     };
 
     return config(
@@ -72,21 +90,7 @@ export const temporal = (<TState>(
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
         set(...args);
-        const currentState = options?.partialize?.(get()) || get();
-        const deltaState = options?.diff?.(pastState, currentState);
-        // Don't call handleSet if state hasn't changed, as determined by equality or diff fn
-        if (
-          !(
-            // If the user has provided an equality function, use it
-            (
-              options?.equality?.(pastState, currentState) ||
-              // If the user has provided a diff function but nothing has been changed, function returns null
-              deltaState === null
-            )
-          )
-        ) {
-          curriedHandleSet(pastState);
-        }
+        temporalHandleSet(pastState)
       },
       get,
       store,
