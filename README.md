@@ -546,8 +546,10 @@ PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnp
 
 - [Basic](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.tsx)
 - [with lodash.debounce](https://codesandbox.io/s/zundo-handleset-debounce-nq7ml7?file=/src/App.tsx)
+- [with just-debounce-it](https://codesandbox.io/p/sandbox/zundo-forked-9yp7df)
 - [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
 - [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
+- [with deep equal](https://codesandbox.io/p/sandbox/zundo-deep-equal-qg69lj)
 
 ## Migrate from v1 to v2
 
