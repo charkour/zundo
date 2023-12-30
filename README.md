@@ -1,6 +1,6 @@
 # 🍜 Zundo
 
-enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <1 kB
+enable time-travel in your apps. undo/redo middleware for [zustand](https://github.com/pmndrs/zustand). built with zustand. <700 B
 
 ![gif displaying undo feature](https://github.com/charkour/zundo/raw/v0.2.0/zundo.gif)
 

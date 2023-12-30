@@ -59,5 +59,10 @@
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
+  },
+  "peerDependenciesMeta": {
+    "zustand": {
+      "optional": false
+    }
   }
 }
