@@ -11,9 +11,14 @@
   },
   "size-limit": [
     {
-      "limit": "1 kB",
+      "limit": "700 B",
       "path": "../dist/index.js",
-      "gzip": true
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "zustand"
+      ]
     }
   ]
 }
