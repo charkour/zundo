@@ -378,7 +378,15 @@ const useStoreWithUndo = create<StoreState>()(
 
 ### Cool-off period
 
-`handleSet?: (handleSet: StoreApi<TState>['setState']) => StoreApi<TState>['setState']`
+```typescript
+  handleSet?: (handleSet: StoreApi<TState>['setState']) => (
+    pastState: Parameters<StoreApi<TState>['setState']>[0],
+    // `replace` will likely be deprecated and removed in the future
+    replace: Parameters<StoreApi<TState>['setState']>[1],
+    currentState: PartialTState,
+    deltaState?: Partial<PartialTState> | null,
+) => void
+```
 
 Sometimes multiple state changes might happen in a short amount of time and you only want to store one change in history. To do so, we can utilize the `handleSet` callback to set a timeout to prevent new changes from being stored in history. This can be used with something like [`throttle-debounce`](https://github.com/niksy/throttle-debounce), [`just-throttle`](https://github.com/angus-c/just/tree/master/packages/function-throttle), [`just-debounce-it`](https://github.com/angus-c/just/tree/master/packages/function-debounce), [`lodash.throttle`](https://www.npmjs.com/package/lodash.throttle), or [`lodash.debounce`](https://www.npmjs.com/package/lodash.debounce). This a way to provide middleware to the temporal store's setter function.
 

@@ -50,22 +50,19 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
-    const userHandleSet = options?.handleSet?.(
-      (store.temporal.getState() as _TemporalState<TState>)
-        ._handleSet as StoreApi<TState>['setState'],
-    );
-
-    const internalHandleSet = (
-      store.temporal.getState() as _TemporalState<TState>
-    )._handleSet;
-
-    const curriedHandleSet = userHandleSet || internalHandleSet;
+    const curriedHandleSet =
+      options?.handleSet?.(
+        (store.temporal.getState() as _TemporalState<TState>)
+          ._handleSet as StoreApi<TState>['setState'],
+      ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
 
     const temporalHandleSet = (pastState: TState) => {
+      if (!store.temporal.getState().isTracking) return;
+
       const currentState = options?.partialize?.(get()) || get();
       const deltaState = options?.diff?.(pastState, currentState);
-      // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
       if (
+        // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
         !(
           // If the user has provided a diff function but nothing has been changed, deltaState will be null
           (
@@ -75,7 +72,7 @@ export const temporal = (<TState>(
           )
         )
       ) {
-        curriedHandleSet(pastState, currentState, deltaState);
+        curriedHandleSet(pastState, undefined, currentState, deltaState);
       }
     };
 

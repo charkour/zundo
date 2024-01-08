@@ -1019,27 +1019,9 @@ describe('Middleware options', () => {
         const { _handleSet } =
           store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          _handleSet(store.getState());
+          _handleSet(store.getState(), undefined, store.getState(), null);
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
-      });
-
-      it('should only update if the the status is tracking', () => {
-        const { _handleSet } =
-          store.temporal.getState() as _TemporalState<MyState>;
-        act(() => {
-          _handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().pause();
-          _handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().resume();
-          _handleSet(store.getState());
-        });
       });
 
       // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
