@@ -52,8 +52,29 @@ export const temporal = (<TState>(
 
     const curriedHandleSet =
       options?.handleSet?.(
-        (store.temporal.getState() as _TemporalState<TState>)._handleSet,
+        (store.temporal.getState() as _TemporalState<TState>)
+          ._handleSet as StoreApi<TState>['setState'],
       ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
+
+    const temporalHandleSet = (pastState: TState) => {
+      if (!store.temporal.getState().isTracking) return;
+
+      const currentState = options?.partialize?.(get()) || get();
+      const deltaState = options?.diff?.(pastState, currentState);
+      if (
+        // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
+        !(
+          // If the user has provided a diff function but nothing has been changed, deltaState will be null
+          (
+            deltaState === null ||
+            // If the user has provided an equality function, use it
+            options?.equality?.(pastState, currentState)
+          )
+        )
+      ) {
+        curriedHandleSet(pastState, undefined, currentState, deltaState);
+      }
+    };
 
     const setState = store.setState;
     // Modify the setState function to call the userlandSet function
@@ -62,7 +83,7 @@ export const temporal = (<TState>(
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
       setState(...args);
-      curriedHandleSet(pastState);
+      temporalHandleSet(pastState);
     };
 
     return config(
@@ -72,7 +93,7 @@ export const temporal = (<TState>(
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
         set(...args);
-        curriedHandleSet(pastState);
+        temporalHandleSet(pastState);
       },
       get,
       store,

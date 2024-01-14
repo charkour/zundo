@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 vi.mock('zustand');
 import { temporal } from '../../src/index';
 import { createStore, type StoreApi } from 'zustand';
@@ -29,7 +30,8 @@ interface MyState {
   boolean1: boolean;
   boolean2: boolean;
   increment: () => void;
-  incrementOnly2: () => void;
+  incrementCountOnly: () => void;
+  incrementCount2Only: () => void;
   decrement: () => void;
   doNothing: () => void;
 }
@@ -56,7 +58,9 @@ const createVanillaStore = (
             count: state.count - 1,
             count2: state.count2 - 1,
           })),
-        incrementOnly2: () => set((state) => ({ count2: state.count2 + 1 })),
+        incrementCountOnly: () => set((state) => ({ count: state.count + 1 })),
+        incrementCount2Only: () =>
+          set((state) => ({ count2: state.count2 + 1 })),
         doNothing: () => set((state) => ({ ...state })),
       };
     }, options),
@@ -95,7 +99,8 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
-        incrementOnly2: expect.any(Function),
+        incrementCountOnly: expect.any(Function),
+        incrementCount2Only: expect.any(Function),
         myString: 'hello',
         string2: 'world',
         boolean1: true,
@@ -107,7 +112,8 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
-        incrementOnly2: expect.any(Function),
+        incrementCountOnly: expect.any(Function),
+        incrementCount2Only: expect.any(Function),
         myString: 'hello',
         string2: 'world',
         boolean1: true,
@@ -172,7 +178,8 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
-        incrementOnly2: expect.any(Function),
+        incrementCountOnly: expect.any(Function),
+        incrementCount2Only: expect.any(Function),
         boolean1: true,
         boolean2: false,
         myString: 'hello',
@@ -193,7 +200,8 @@ describe('Middleware options', () => {
         increment: expect.any(Function),
         decrement: expect.any(Function),
         doNothing: expect.any(Function),
-        incrementOnly2: expect.any(Function),
+        incrementCountOnly: expect.any(Function),
+        incrementCount2Only: expect.any(Function),
         boolean1: true,
         boolean2: false,
         myString: 'hello',
@@ -328,7 +336,8 @@ describe('Middleware options', () => {
           return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
         },
       });
-      const { doNothing, increment, incrementOnly2 } = storeWithDiff.getState();
+      const { doNothing, increment, incrementCount2Only } =
+        storeWithDiff.getState();
       const { undo, redo } = storeWithDiff.temporal.getState();
       act(() => {
         doNothing();
@@ -355,7 +364,7 @@ describe('Middleware options', () => {
       });
       act(() => {
         doNothing();
-        incrementOnly2();
+        incrementCount2Only();
       });
       expect(storeWithDiff.temporal.getState().pastStates.length).toBe(3);
       expect(storeWithDiff.temporal.getState().pastStates[2]).toEqual({
@@ -367,7 +376,7 @@ describe('Middleware options', () => {
       });
       act(() => {
         doNothing();
-        incrementOnly2();
+        incrementCount2Only();
       });
       expect(storeWithDiff.temporal.getState().pastStates.length).toBe(4);
       expect(storeWithDiff.temporal.getState().pastStates[3]).toEqual({
@@ -677,6 +686,7 @@ describe('Middleware options', () => {
       expect(console.error).toHaveBeenCalledTimes(4);
       vi.useRealTimers();
     });
+
     it('should correctly use throttling (wrapTemporal)', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();
@@ -716,6 +726,184 @@ describe('Middleware options', () => {
         2,
       );
       expect(console.warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not call throttle function if partialized state is unchanged according to equality fn', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers();
+      const throttleIntervalInMs = 1000;
+      const storeWithHandleSetAndPartializeAndEquality = createVanillaStore({
+        handleSet: (handleSet) => {
+          return throttle<typeof handleSet>(
+            (state) => {
+              // used for determining how many times `handleSet` is called
+              console.error('handleSet called');
+              handleSet(state);
+            },
+            throttleIntervalInMs,
+            // Call throttle only on leading edge of timeout
+            { leading: true, trailing: false },
+          );
+        },
+        partialize: (state) => ({
+          count: state.count,
+        }),
+        equality: (pastState, currentState) =>
+          diff(pastState, currentState).length === 0,
+      });
+
+      const { incrementCountOnly, incrementCount2Only } =
+        storeWithHandleSetAndPartializeAndEquality.getState();
+      // Increment value not included in partialized state
+      act(() => {
+        incrementCount2Only();
+      });
+      // Proxy for determining how many times `handleSet` is called.
+      // handleSet should not be called if partialized state is unchanged
+      expect(console.error).toHaveBeenCalledTimes(0);
+      expect(
+        storeWithHandleSetAndPartializeAndEquality.temporal.getState()
+          .pastStates.length,
+      ).toBe(0);
+      // Advance timer to be within throttle interval
+      vi.advanceTimersByTime(throttleIntervalInMs / 2);
+      act(() => {
+        incrementCountOnly();
+      });
+      // Count is in partialized state, so handleSet should have been called
+      expect(console.error).toHaveBeenCalledTimes(1);
+      // The first instance of a partialized state changing should add to history
+      expect(
+        storeWithHandleSetAndPartializeAndEquality.temporal.getState()
+          .pastStates.length,
+      ).toBe(1);
+      vi.useRealTimers();
+    });
+
+    it('should not call throttle function if partialized state is unchanged according to diff fn', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers();
+      const throttleIntervalInMs = 1000;
+      const storeWithHandleSetAndPartializeAndDiff = createVanillaStore({
+        handleSet: (handleSet) => {
+          return throttle<typeof handleSet>(
+            (state) => {
+              // used for determining how many times `handleSet` is called
+              console.error('handleSet called');
+              handleSet(state);
+            },
+            throttleIntervalInMs,
+            // Call throttle only on leading edge of timeout
+            { leading: true, trailing: false },
+          );
+        },
+        partialize: (state) => ({
+          count: state.count,
+        }),
+        diff: (pastState, currentState) => {
+          const myDiff = diff(currentState, pastState);
+          const newStateFromDiff = myDiff.reduce(
+            (acc, difference) => {
+              type State = typeof acc;
+              type Key = keyof State;
+              if (difference.type === 'CHANGE') {
+                const pathAsString = difference.path.join('.') as Key;
+                const value = difference.value;
+                acc[pathAsString] = value;
+              }
+              return acc;
+            },
+            {} as Partial<typeof currentState>,
+          );
+          return isEmpty(newStateFromDiff) ? null : newStateFromDiff;
+        },
+      });
+
+      const { incrementCountOnly, incrementCount2Only } =
+        storeWithHandleSetAndPartializeAndDiff.getState();
+      // Increment value not included in partialized state
+      act(() => {
+        incrementCount2Only();
+      });
+      // Proxy for determining how many times `handleSet` is called.
+      // handleSet should not be called if partialized state is unchanged
+      expect(console.error).toHaveBeenCalledTimes(0);
+      expect(
+        storeWithHandleSetAndPartializeAndDiff.temporal.getState().pastStates
+          .length,
+      ).toBe(0);
+      // Advance timer to be within throttle interval
+      vi.advanceTimersByTime(throttleIntervalInMs / 2);
+      act(() => {
+        incrementCountOnly();
+      });
+      // Count is in partialized state, so handleSet should have been called
+      expect(console.error).toHaveBeenCalledTimes(1);
+      // The first instance of a partialized state changing should add to history
+      expect(
+        storeWithHandleSetAndPartializeAndDiff.temporal.getState().pastStates
+          .length,
+      ).toBe(1);
+      vi.useRealTimers();
+    });
+
+    it('should always call throttle function on any partialized or non-partialized state change if no equality or diff fn is provided', () => {
+      global.console.error = vi.fn();
+      vi.useFakeTimers();
+      const throttleIntervalInMs = 1000;
+      const storeWithHandleSetAndPartializeAndDiff = createVanillaStore({
+        handleSet: (handleSet) => {
+          return throttle<typeof handleSet>(
+            (state) => {
+              // used for determining how many times `handleSet` is called
+              console.error('handleSet called');
+              handleSet(state);
+            },
+            throttleIntervalInMs,
+            // Call throttle only on leading edge of timeout
+            { leading: true, trailing: false },
+          );
+        },
+        partialize: (state) => ({
+          count: state.count,
+        }),
+      });
+
+      const { incrementCountOnly, incrementCount2Only } =
+        storeWithHandleSetAndPartializeAndDiff.getState();
+      // Increment value not included in partialized state
+      act(() => {
+        incrementCount2Only();
+      });
+      // Proxy for determining how many times `handleSet` is called.
+      // If no diff nor equality fn is provided, handleSet will be called on all zustand state setting calls.
+      expect(console.error).toHaveBeenCalledTimes(1);
+      expect(
+        storeWithHandleSetAndPartializeAndDiff.temporal.getState().pastStates
+          .length,
+      ).toBe(1);
+      // Advance timer to be within throttle interval
+      vi.advanceTimersByTime(throttleIntervalInMs / 2);
+      act(() => {
+        incrementCountOnly();
+      });
+      // Throttle should be active, so handleSet shouldn't have been called again
+      expect(console.error).toHaveBeenCalledTimes(1);
+      // The first instance of a partialized state changing should add to history
+      expect(
+        storeWithHandleSetAndPartializeAndDiff.temporal.getState().pastStates
+          .length,
+      ).toBe(1);
+      // Advance timer to be out of throttle interval
+      vi.advanceTimersByTime(throttleIntervalInMs);
+      act(() => {
+        incrementCountOnly();
+      });
+      expect(
+        storeWithHandleSetAndPartializeAndDiff.temporal.getState().pastStates
+          .length,
+      ).toBe(2);
+      vi.useRealTimers();
     });
   });
 
@@ -831,27 +1019,9 @@ describe('Middleware options', () => {
         const { _handleSet } =
           store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          _handleSet(store.getState());
+          _handleSet(store.getState(), undefined, store.getState(), null);
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
-      });
-
-      it('should only update if the the status is tracking', () => {
-        const { _handleSet } =
-          store.temporal.getState() as _TemporalState<MyState>;
-        act(() => {
-          _handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().pause();
-          _handleSet(store.getState());
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-        act(() => {
-          store.temporal.getState().resume();
-          _handleSet(store.getState());
-        });
       });
 
       // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
