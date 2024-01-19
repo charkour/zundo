@@ -942,9 +942,7 @@ describe('Middleware options', () => {
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { _handleSet, _onSave } =
-        store.temporal.getState() as _TemporalState<MyState>;
-      expect(_handleSet).toBeInstanceOf(Function);
+      const { _onSave } = store.temporal.getState() as _TemporalState<MyState>;
       expect(_onSave).toBe(undefined);
     });
     describe('onSave', () => {
@@ -1012,19 +1010,6 @@ describe('Middleware options', () => {
         expect(console.dir).toHaveBeenCalledTimes(1);
         expect(console.trace).toHaveBeenCalledTimes(1);
       });
-    });
-
-    describe('handleUserSet', () => {
-      it('should update the temporal store with the pastState when called', () => {
-        const { _handleSet } =
-          store.temporal.getState() as _TemporalState<MyState>;
-        act(() => {
-          _handleSet(store.getState(), undefined, store.getState(), null);
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-      });
-
-      // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
     });
   });
 
