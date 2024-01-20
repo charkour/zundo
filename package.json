@@ -52,10 +52,10 @@
     "test:ci": "pnpm --filter tests test:ci"
   },
   "devDependencies": {
-    "prettier": "3.1.1",
+    "prettier": "3.2.4",
     "tsup": "8.0.1",
     "typescript": "5.3.3",
-    "zustand": "4.4.7"
+    "zustand": "4.5.0"
   },
   "peerDependencies": {
     "zustand": "^4.3.0"
