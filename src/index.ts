@@ -52,8 +52,7 @@ export const temporal = (<TState>(
 
     const curriedHandleSet =
       options?.handleSet?.(
-        (store.temporal.getState() as _TemporalState<TState>)
-          ._handleSet as StoreApi<TState>['setState'],
+        (store.temporal.getState() as _TemporalState<TState>)._handleSet,
       ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
 
     const temporalHandleSet = (pastState: TState) => {
@@ -72,7 +71,7 @@ export const temporal = (<TState>(
           )
         )
       ) {
-        curriedHandleSet(pastState, undefined, currentState, deltaState);
+        curriedHandleSet(pastState, currentState, deltaState);
       }
     };
 

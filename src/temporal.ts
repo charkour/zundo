@@ -58,7 +58,7 @@ export const temporalStateCreator = <TState>(
       setOnSave: (_onSave) => set({ _onSave }),
       // Internal properties
       _onSave: options?.onSave,
-      _handleSet: (pastState, replace, currentState, deltaState) => {
+      _handleSet: (pastState, currentState, deltaState) => {
         // This naively assumes that only one new state can be added at a time
         if (options?.limit && get().pastStates.length >= options?.limit) {
           get().pastStates.shift();

@@ -398,9 +398,9 @@ const useStoreWithUndo = create<StoreState>()(
     }),
     {
       handleSet: (handleSet) =>
-        throttle<typeof handleSet>((state) => {
+        throttle<typeof handleSet>((...args) => {
           console.info('handleSet called');
-          handleSet(state);
+          handleSet(...args);
         }, 1000),
     },
   ),
