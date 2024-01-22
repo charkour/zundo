@@ -607,6 +607,7 @@ describe('Middleware options', () => {
               console.info('handleSet called');
               _set(partial, replace);
             };
+            store.setState = set;
             return config(set, get, store);
           };
         },
@@ -700,6 +701,7 @@ describe('Middleware options', () => {
               },
               1000,
             );
+            store.setState = set;
             return config(set, get, store);
           };
         },
