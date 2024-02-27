@@ -640,6 +640,28 @@ describe('Middleware options', () => {
       expect(console.info).toHaveBeenCalledTimes(3);
     });
 
+    it('should not call function if `store.setState` is not assigned to `set` (wrapTemporal)', () => {
+      global.console.info = vi.fn();
+      const storeWithHandleSet = createVanillaStore({
+        wrapTemporal: (config) => {
+          return (_set, get, store) => {
+            const set: typeof _set = (partial, replace) => {
+              console.info('handleSet called');
+              _set(partial, replace);
+            };
+            // intentionally commented out
+            // store.setState = set;
+            return config(set, get, store);
+          };
+        },
+      });
+      const { increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+      });
+      expect(console.info).toHaveBeenCalledTimes(0);
+    });
+
     it('should correctly use throttling', () => {
       global.console.error = vi.fn();
       vi.useFakeTimers();

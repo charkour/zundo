@@ -71,7 +71,6 @@ export const temporal = (<TState>(
           currentState,
         );
         store.temporal.setState({
-          ...store.temporal.getState(),
           pastStates: store.temporal
             .getState()
             .pastStates.concat(deltaState || pastState),
