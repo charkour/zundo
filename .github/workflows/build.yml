@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x]
-        zustand: [latest, 4.2.0]
+        zustand: [latest, 4.2.0, 4.1.0]
 
     steps:
       - uses: actions/checkout@v3
@@ -46,6 +46,11 @@ jobs:
 
       - name: Install Zustand ${{ matrix.zustand }}
         run: pnpm add zustand@${{ matrix.zustand }} -w
+
+      - name: Patch tsup config
+        if: ${{ matrix.zustand == '4.1.0' }}
+        # Patch the tsup config to use `dts: false` for Zustand 4.1.0
+        run: sed -i~ 's/"dts": true/"dts": false/' tsup.config.json
 
       - name: Build
         run: pnpm run build
