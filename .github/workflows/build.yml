@@ -51,7 +51,7 @@ jobs:
         if: ${{ matrix.zustand == '4.1.0' }}
         # Patch the tsup config to use `dts: false` for Zustand 4.1.0
         run: |
-          sed -i~ 's/"dts": true/"dts": false/' tsup.config.json
+          sed -i~ 's/dts: true/dts: false/' tsup.config.ts
 
       - name: Build
         run: pnpm run build
