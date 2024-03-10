@@ -66,7 +66,7 @@ Your zustand store will now have an attached `temporal` object that provides acc
 const App = () => {
   const { bears, increasePopulation, removeAllBears } = useStoreWithUndo();
   // See API section for temporal.getState() for all functions and
-  // properties provided by `temporal`
+  // properties provided by `temporal`, but note that properties, such as `pastStates` and `futureStates`, are not reactive when accessed directly from the store.
   const { undo, redo, clear } = useStoreWithUndo.temporal.getState();
 
   return (
