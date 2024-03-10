@@ -10,16 +10,17 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x]
+        zustand: [latest, 4.2.0, 4.0.0, 5.0.0-alpha.5]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         name: Install pnpm
         id: pnpm-install
         with:
@@ -32,7 +33,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -42,6 +43,15 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install
+
+      - name: Install Zustand ${{ matrix.zustand }}
+        run: pnpm add zustand@${{ matrix.zustand }} -w
+
+      - name: Patch tsup config
+        if: ${{ matrix.zustand == '4.0.0' }}
+        # Patch the tsup config to use `dts: false` for Zustand 4.0.0
+        run: |
+          sed -i~ 's/dts: true/dts: false/' tsup.config.ts
 
       - name: Build
         run: pnpm run build
