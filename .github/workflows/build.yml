@@ -10,9 +10,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x]
-        # zustand: [4.0.0, 4.1.0, 4.5.2]
-        # zustand: [4.3.0, 4.5.2]
-        zustand: [4.5.2]
+        zustand: [latest, 4.4.0, 4.3.0]
 
     steps:
       - uses: actions/checkout@v3
