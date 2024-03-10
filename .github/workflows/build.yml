@@ -45,7 +45,7 @@ jobs:
         run: pnpm install
 
       - name: Install Zustand ${{ matrix.zustand }}
-        run: pnpm add zustand@${{ matrix.zustand }}
+        run: pnpm add zustand@${{ matrix.zustand }} -w
 
       - name: Build
         run: pnpm run build
