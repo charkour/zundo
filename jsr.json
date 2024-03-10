@@ -1,8 +1,0 @@
-{
-  "name": "@charkour/zundo",
-  "version": "2.1.0",
-  "exports": "./src/index.ts",
-  "publish": {
-    "include": ["src", "package.json", "README.md", "LICENSE"]
-  }
-}
