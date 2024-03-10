@@ -749,7 +749,7 @@ describe('Middleware options', () => {
       expect(storeWithHandleSet.temporal.getState().futureStates.length).toBe(
         2,
       );
-      expect(console.warn).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenCalledTimes(3);
     });
 
     it('should not call throttle function if partialized state is unchanged according to equality fn', () => {
