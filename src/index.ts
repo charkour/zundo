@@ -11,6 +11,7 @@ import type {
   _TemporalState,
   Write,
   ZundoOptions,
+  HandleSet,
 } from './types';
 
 type Zundo = <
@@ -50,23 +51,23 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
-    const handleSet = (
-      pastState: TState,
-      // `replace` will likely be deprecated and removed in the future
-      replace: boolean | undefined,
-      currentState: TState,
-      deltaState?: Partial<TState>,
+    const getTemporal = store.temporal.getState;
+
+    const handleSet: HandleSet<TState> = (
+      pastState,
+      currentState,
+      deltaState,
     ) => {
-      if (store.temporal.getState().isTracking) {
+      if (getTemporal().isTracking) {
         // This naively assumes that only one new state can be added at a time
         if (
           options?.limit &&
-          store.temporal.getState().pastStates.length >= options?.limit
+          getTemporal().pastStates.length >= options?.limit
         ) {
-          store.temporal.getState().pastStates.shift();
+          getTemporal().pastStates.shift();
         }
 
-        (store.temporal.getState() as _TemporalState<TState>)._onSave?.(
+        (getTemporal() as _TemporalState<TState>)._onSave?.(
           pastState,
           currentState,
         );
@@ -79,9 +80,7 @@ export const temporal = (<TState>(
       }
     };
 
-    const curriedHandleSet =
-      options?.handleSet?.(handleSet as StoreApi<TState>['setState']) ||
-      handleSet;
+    const curriedHandleSet = options?.handleSet?.(handleSet) || handleSet;
 
     const temporalHandleSet = (pastState: TState) => {
       if (!store.temporal.getState().isTracking) return;
@@ -99,7 +98,7 @@ export const temporal = (<TState>(
           )
         )
       ) {
-        curriedHandleSet(pastState, undefined, currentState, deltaState);
+        curriedHandleSet(pastState, currentState, deltaState);
       }
     };
 

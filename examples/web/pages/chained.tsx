@@ -17,9 +17,9 @@ interface MyState {
 //   }),
 //   {
 //     handleSet: (handleSet) =>
-//       throttle<typeof handleSet>((state) => {
+//       throttle<typeof handleSet>((...args) => {
 //         console.error('handleSet called');
-//         handleSet(state);
+//         handleSet(...args);
 //       }, 1000),
 //   },
 // );
