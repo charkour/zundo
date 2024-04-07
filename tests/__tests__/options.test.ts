@@ -155,7 +155,7 @@ describe('Middleware options', () => {
           count: state.count,
         }),
       });
-      const { undo } = storeWithPartialize.temporal.getState();
+      const { undo, redo } = storeWithPartialize.temporal.getState();
       expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(0);
       expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
         0,
@@ -196,6 +196,30 @@ describe('Middleware options', () => {
       });
       expect(storeWithPartialize.getState()).toEqual({
         count: 0,
+        count2: 2,
+        increment: expect.any(Function),
+        decrement: expect.any(Function),
+        doNothing: expect.any(Function),
+        incrementCountOnly: expect.any(Function),
+        incrementCount2Only: expect.any(Function),
+        boolean1: true,
+        boolean2: false,
+        myString: 'hello',
+        string2: 'world',
+      });
+
+      act(() => {
+        redo();
+      })
+      expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
+        1,
+      );
+      expect(storeWithPartialize.temporal.getState().pastStates.length).toBe(1);
+      expect(storeWithPartialize.temporal.getState().futureStates[0]).toEqual({
+        count: 2,
+      });
+      expect(storeWithPartialize.getState()).toEqual({
+        count: 1,
         count2: 2,
         increment: expect.any(Function),
         decrement: expect.any(Function),
