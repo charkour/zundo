@@ -96,6 +96,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 1.6.0
         version: 1.6.0(vitest@1.6.0(@types/node@20.13.0)(@vitest/ui@1.6.0)(happy-dom@14.12.0))
+      '@vitest/ui':
+        specifier: 1.6.0
+        version: 1.6.0(vitest@1.6.0)
       happy-dom:
         specifier: 14.12.0
         version: 14.12.0
@@ -2466,8 +2469,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@polka/url@1.0.0-next.25':
-    optional: true
+  '@polka/url@1.0.0-next.25': {}
 
   '@rollup/rollup-android-arm-eabi@4.18.0':
     optional: true
@@ -2658,7 +2660,6 @@ snapshots:
       picocolors: 1.0.1
       sirv: 2.0.4
       vitest: 1.6.0(@types/node@20.13.0)(@vitest/ui@1.6.0)(happy-dom@14.12.0)
-    optional: true
 
   '@vitest/utils@1.6.0':
     dependencies:
@@ -3045,8 +3046,7 @@ snapshots:
     dependencies:
       reusify: 1.0.4
 
-  fflate@0.8.2:
-    optional: true
+  fflate@0.8.2: {}
 
   file-entry-cache@8.0.0:
     dependencies:
@@ -3326,8 +3326,7 @@ snapshots:
       pkg-types: 1.1.1
       ufo: 1.5.3
 
-  mrmime@2.0.0:
-    optional: true
+  mrmime@2.0.0: {}
 
   ms@2.1.2: {}
 
@@ -3573,7 +3572,6 @@ snapshots:
       '@polka/url': 1.0.0-next.25
       mrmime: 2.0.0
       totalist: 3.0.1
-    optional: true
 
   size-limit@11.1.4:
     dependencies:
@@ -3686,8 +3684,7 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  totalist@3.0.1:
-    optional: true
+  totalist@3.0.1: {}
 
   tr46@1.0.1:
     dependencies:
