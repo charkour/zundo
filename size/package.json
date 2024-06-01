@@ -6,8 +6,8 @@
     "size": "size-limit"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "11.1.2",
-    "size-limit": "11.1.2"
+    "@size-limit/preset-small-lib": "11.1.4",
+    "size-limit": "11.1.4"
   },
   "size-limit": [
     {

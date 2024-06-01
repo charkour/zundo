@@ -13,18 +13,18 @@
     "lodash.merge": "4.6.2",
     "lodash.throttle": "4.1.1",
     "microdiff": "1.4.0",
-    "next": "14.1.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "next": "14.2.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "zundo": "workspace:*",
     "zustand": "4.5.2"
   },
   "devDependencies": {
     "@types/lodash.merge": "4.6.9",
     "@types/lodash.throttle": "4.1.9",
-    "@types/node": "20.12.5",
-    "@types/react": "18.2.74",
-    "eslint": "9.0.0",
-    "typescript": "5.4.4"
+    "@types/node": "20.13.0",
+    "@types/react": "18.3.3",
+    "eslint": "9.4.0",
+    "typescript": "5.4.5"
   }
 }

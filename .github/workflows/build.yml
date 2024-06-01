@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 20.x]
-        zustand: [latest, 4.2.0, 4.0.0, 5.0.0-alpha.6]
+        zustand: [latest, 4.2.0, 4.0.0, next]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,26 +20,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: latest
+          version: 8
           run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-${{ matrix.node-version }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-pnpm-store-
 
       - name: Install Dependencies
         run: pnpm install
