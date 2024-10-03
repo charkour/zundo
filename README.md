@@ -398,9 +398,9 @@ const useStoreWithUndo = create<StoreState>()(
     }),
     {
       handleSet: (handleSet) =>
-        throttle<typeof handleSet>((state) => {
+        throttle<typeof handleSet>((...args) => {
           console.info('handleSet called');
-          handleSet(state);
+          handleSet(...args);
         }, 1000),
     },
   ),
@@ -558,6 +558,40 @@ PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnp
 - [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
 - [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
 - [with deep equal](https://codesandbox.io/p/sandbox/zundo-deep-equal-qg69lj)
+
+## Migrate from v2 to v3
+
+<details>
+<summary>Click to expand</summary>
+
+## v3.0.0
+
+### Breaking Changes
+
+#### `wrapTemporal` behavior changes
+
+If you were previously modifying the store with returning a new `set` in the `config`, you'll need to overwrite the `store.setState` function.
+
+```tsx
+// v2.0.0
+
+// v3.0.0
+
+```
+
+#### `handleSet` argument
+
+The second parameter of `handleSet` has been removed. If you were previously using `replace` in `handleSet`, you'll need to modify your `handleSet` function.
+
+```tsx
+// v2.0.0
+
+
+// v3.0.0
+
+```
+
+</details>
 
 ## Migrate from v1 to v2
 

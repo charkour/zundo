@@ -589,9 +589,9 @@ describe('Middleware options', () => {
       global.console.info = vi.fn();
       const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
-          return (state) => {
+          return (...args) => {
             console.info('handleSet called');
-            handleSet(state);
+            handleSet(...args);
           };
         },
       });
@@ -691,9 +691,9 @@ describe('Middleware options', () => {
       vi.useFakeTimers();
       const storeWithHandleSet = createVanillaStore({
         handleSet: (handleSet) => {
-          return throttle<typeof handleSet>((state) => {
+          return throttle<typeof handleSet>((...args) => {
             console.error('handleSet called');
-            handleSet(state);
+            handleSet(...args);
           }, 1000);
         },
       });
@@ -783,10 +783,10 @@ describe('Middleware options', () => {
       const storeWithHandleSetAndPartializeAndEquality = createVanillaStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>(
-            (state) => {
+            (...args) => {
               // used for determining how many times `handleSet` is called
               console.error('handleSet called');
-              handleSet(state);
+              handleSet(...args);
             },
             throttleIntervalInMs,
             // Call throttle only on leading edge of timeout
@@ -835,10 +835,10 @@ describe('Middleware options', () => {
       const storeWithHandleSetAndPartializeAndDiff = createVanillaStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>(
-            (state) => {
+            (...args) => {
               // used for determining how many times `handleSet` is called
               console.error('handleSet called');
-              handleSet(state);
+              handleSet(...args);
             },
             throttleIntervalInMs,
             // Call throttle only on leading edge of timeout
@@ -902,10 +902,10 @@ describe('Middleware options', () => {
       const storeWithHandleSetAndPartializeAndDiff = createVanillaStore({
         handleSet: (handleSet) => {
           return throttle<typeof handleSet>(
-            (state) => {
+            (...args) => {
               // used for determining how many times `handleSet` is called
               console.error('handleSet called');
-              handleSet(state);
+              handleSet(...args);
             },
             throttleIntervalInMs,
             // Call throttle only on leading edge of timeout
