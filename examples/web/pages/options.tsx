@@ -1,9 +1,9 @@
-import { temporal, type TemporalState } from "zundo";
-import { create } from "zustand";
-import { useStoreWithEqualityFn } from "zustand/traditional";
-import deepEqual from "fast-deep-equal";
-import throttle from "just-throttle";
-import "./styles.css";
+import { temporal, type TemporalState } from 'zundo';
+import { create } from 'zustand';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
+import deepEqual from 'fast-deep-equal';
+import throttle from 'just-throttle';
+import './styles.css';
 
 interface MyState {
   bears: number;
@@ -13,7 +13,7 @@ interface MyState {
   incrementUntrackedValue: () => void;
 }
 
-type HistoryTrackedState = Omit<MyState, "untrackedValue">;
+type HistoryTrackedState = Omit<MyState, 'untrackedValue'>;
 
 const useMyStore = create<MyState>()(
   temporal(
@@ -54,13 +54,13 @@ const App = () => {
   return (
     <div>
       <h1>
-        {" "}
+        {' '}
         <span role="img" aria-label="bear">
           🐻
-        </span>{" "}
+        </span>{' '}
         <span role="img" aria-label="recycle">
           ♻️
-        </span>{" "}
+        </span>{' '}
         Zundo!
       </h1>
       <h2>
