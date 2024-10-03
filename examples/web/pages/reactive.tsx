@@ -1,5 +1,5 @@
-import { TemporalState, temporal } from 'zundo';
-import { StoreApi, useStore, create } from 'zustand';
+import { type TemporalState, temporal } from 'zundo';
+import { type StoreApi, useStore, create } from 'zustand';
 
 interface MyState {
   bears: number;

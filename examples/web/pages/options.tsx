@@ -1,4 +1,4 @@
-import { temporal, TemporalState } from "zundo";
+import { temporal, type TemporalState } from "zundo";
 import { create } from "zustand";
 import { useStoreWithEqualityFn } from "zustand/traditional";
 import deepEqual from "fast-deep-equal";
