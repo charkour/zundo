@@ -210,7 +210,7 @@ describe('Middleware options', () => {
 
       act(() => {
         redo();
-      })
+      });
       expect(storeWithPartialize.temporal.getState().futureStates.length).toBe(
         1,
       );
