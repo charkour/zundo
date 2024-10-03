@@ -16,7 +16,7 @@ Try a live [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.t
 npm i zustand zundo
 ```
 
-> zustand v4.2.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage. zundo v2 works with zustand v5.0.0 or higher.
+> zustand v4.2.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
 > Node 16 or higher is required.
 
 ## Background
