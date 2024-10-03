@@ -1,0 +1,33 @@
+name: 'Test'
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 8
+        run_install: false
+    - name: Install Node
+      uses: actions/setup-node@v4
+    - name: Install Deps
+      run: pnpm install
+    - name: Test
+      run: pnpm test
+    - name: Report Coverage
+      # Set if: always() to also generate the report if tests are failing
+      # Only works if you set `reportOnFailure: true` in your vite config as specified above
+      if: always()
+      uses:  davelosert/vitest-coverage-report-action@v2
+      with:
+        working-directory: ./tests

@@ -1,24 +1,36 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "zundo",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "target": "ESNext",
+    "baseUrl": ".",
     "composite": false,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
     "isolatedModules": true,
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "preserveWatchOutput": true,
+    "outDir": "dist",
+    "rootDir": ".",
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "target": "esnext",
+    "verbatimModuleSyntax": true
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src"]
+  "display": "zundo",
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
 }
