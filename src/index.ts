@@ -101,7 +101,7 @@ export const temporal = (<TState>(
       // Get most up to date state. The state from the callback might be a partial state.
       // The order of the get() and set() calls is important here.
       const pastState = options?.partialize?.(get()) || get();
-      setState(...args);
+      setState(...args as Parameters<typeof setState>);
       temporalHandleSet(pastState);
     };
 
@@ -111,7 +111,7 @@ export const temporal = (<TState>(
         // Get most up-to-date state. The state from the callback might be a partial state.
         // The order of the get() and set() calls is important here.
         const pastState = options?.partialize?.(get()) || get();
-        set(...args);
+        set(...args as Parameters<typeof set>);
         temporalHandleSet(pastState);
       },
       get,

@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 
 describe('React Re-renders when state changes', () => {
   it('it', () => {
-    const { queryByLabelText, getByLabelText, queryByText, getByText } = render(
+    const { queryByText, getByText } = render(
       <Reactive />,
     );
 
@@ -77,9 +76,8 @@ const useTemporalStore = <
   U,
 >(
   selector: (state: ExtractState<S>) => U,
-  equality?: (a: U, b: U) => boolean,
 ): U => {
-  const state = useStore(useMyStore.temporal as any, selector, equality);
+  const state = useStore(useMyStore.temporal as any, selector);
   return state;
 };
 
@@ -97,10 +95,8 @@ const HistoryBar = () => {
 };
 
 const UndoBar = () => {
-  const { undo, redo } = useTemporalStore((state) => ({
-    undo: state.undo,
-    redo: state.redo,
-  }));
+  const undo = useTemporalStore((state) => state.undo);
+  const redo = useTemporalStore((state) => state.redo);
   return (
     <div>
       <button onClick={() => undo()}>undo</button>

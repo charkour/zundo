@@ -17,7 +17,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "zundo": "workspace:*",
-    "zustand": "4.5.2"
+    "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {
     "@types/lodash.merge": "4.6.9",
