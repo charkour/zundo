@@ -1,6 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('zustand');
 import { temporal } from '../../src/index';
 import { createStore, type StoreApi } from 'zustand';
 import { act } from '@testing-library/react';

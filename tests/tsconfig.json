@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["**/*.ts", "**/*.tsx", "**/*.mjs", "__mocks__/zustand/global.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mjs"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -13,5 +13,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "Bundler",
+    "types": ["vitest/globals"]
   }
 }

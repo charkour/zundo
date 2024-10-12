@@ -3,9 +3,7 @@ import { fireEvent, render } from '@testing-library/react';
 
 describe('React Re-renders when state changes', () => {
   it('it', () => {
-    const { queryByText, getByText } = render(
-      <Reactive />,
-    );
+    const { queryByText, getByText } = render(<Reactive />);
 
     expect(queryByText(/bears: 0/i)).toBeTruthy();
     expect(queryByText(/increment/i)).toBeTruthy();
