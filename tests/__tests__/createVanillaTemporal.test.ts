@@ -1,8 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-vi.mock('zustand');
+import { describe, it, expect } from 'vitest';
 import { temporalStateCreator } from '../../src/temporal';
 import { createStore } from 'zustand';
-import { act } from 'react-dom/test-utils';
+import { act } from '@testing-library/react';
 
 interface MyState {
   count: number;
