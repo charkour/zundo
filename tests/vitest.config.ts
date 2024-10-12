@@ -7,7 +7,6 @@ export default defineConfig({
     environment: 'happy-dom',
     dir: '.',
     setupFiles: ['./vitest.setup.ts', 'vitest-localstorage-mock'],
-    mockReset: false,
     coverage: {
       include: ['**/src/**/*.{ts,tsx}'],
       allowExternal: true,

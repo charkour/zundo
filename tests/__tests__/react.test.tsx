@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 
 describe('React Re-renders when state changes', () => {

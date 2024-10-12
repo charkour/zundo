@@ -1,8 +1,4 @@
-import { afterEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import '@testing-library/jest-dom/vitest';
+// https://github.com/pmndrs/zustand/blob/main/docs/guides/testing.md
+import '@testing-library/jest-dom';
 
-// runs a cleanup after each test case (e.g. clearing happy-dom)
-afterEach(() => {
-  cleanup();
-});
+vi.mock('zustand'); // to make it work like Jest (auto-mocking)
