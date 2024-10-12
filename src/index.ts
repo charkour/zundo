@@ -11,6 +11,7 @@ import type {
   _TemporalState,
   Write,
   ZundoOptions,
+  HandleSet,
 } from './types';
 
 type Zundo = <
@@ -50,40 +51,34 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
-    const handleSet = (
-      pastState: TState,
-      // `replace` will likely be deprecated and removed in the future
-      replace: boolean | undefined,
-      currentState: TState,
-      deltaState?: Partial<TState>,
+    const handleSet: HandleSet<TState> = (
+      pastState,
+      currentState,
+      deltaState,
     ) => {
-      if (store.temporal.getState().isTracking) {
-        // This naively assumes that only one new state can be added at a time
-        if (
-          options?.limit &&
-          store.temporal.getState().pastStates.length >= options?.limit
-        ) {
-          store.temporal.getState().pastStates.shift();
-        }
-
-        (store.temporal.getState() as _TemporalState<TState>)._onSave?.(
-          pastState,
-          currentState,
-        );
-        store.temporal.setState({
-          pastStates: store.temporal
-            .getState()
-            .pastStates.concat(deltaState || pastState),
-          futureStates: [],
-        });
+      // This naively assumes that only one new state can be added at a time
+      if (
+        options?.limit &&
+        store.temporal.getState().pastStates.length >= options?.limit
+      ) {
+        store.temporal.getState().pastStates.shift();
       }
+
+      (store.temporal.getState() as _TemporalState<TState>)._onSave?.(
+        pastState,
+        currentState,
+      );
+      store.temporal.setState({
+        pastStates: store.temporal
+          .getState()
+          .pastStates.concat(deltaState || pastState),
+        futureStates: [],
+      });
     };
 
-    const curriedHandleSet =
-      options?.handleSet?.(handleSet as StoreApi<TState>['setState']) ||
-      handleSet;
+    const curriedHandleSet = options?.handleSet?.(handleSet) || handleSet;
 
-    const temporalHandleSet = (pastState: TState) => {
+    const temporalHandleSet = (pastState: TState): void => {
       if (!store.temporal.getState().isTracking) return;
 
       const currentState = options?.partialize?.(get()) || get();
@@ -92,14 +87,11 @@ export const temporal = (<TState>(
         // Don't call handleSet if state hasn't changed, as determined by diff fn or equality fn
         !(
           // If the user has provided a diff function but nothing has been changed, deltaState will be null
-          (
-            deltaState === null ||
-            // If the user has provided an equality function, use it
-            options?.equality?.(pastState, currentState)
-          )
+          // If the user has provided an equality function, use it
+          (deltaState === null || options?.equality?.(pastState, currentState))
         )
       ) {
-        curriedHandleSet(pastState, undefined, currentState, deltaState);
+        curriedHandleSet(pastState, currentState, deltaState);
       }
     };
 

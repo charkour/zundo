@@ -28,8 +28,8 @@ const useMyStore = create<MyState>()(
     {
       equality: deepEqual,
       handleSet: (handleSet) =>
-        throttle<typeof handleSet>((state) => {
-          handleSet(state);
+        throttle<typeof handleSet>((...args) => {
+          handleSet(...args);
         }, 500),
       partialize: (state): HistoryTrackedState => {
         const { untrackedValue, ...trackedValues } = state;
