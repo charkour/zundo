@@ -17,6 +17,7 @@ interface MyState {
 
 type HistoryTrackedState = Omit<MyState, 'untrackedValue'>;
 
+// Note: This one is incomplete
 const middle = <
   T extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
