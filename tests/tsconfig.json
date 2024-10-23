@@ -12,7 +12,6 @@
     "module": "ESNext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "moduleResolution": "Bundler",
-    "types": ["vitest/globals"]
+    "moduleResolution": "Bundler"
   }
 }
