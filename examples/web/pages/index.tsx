@@ -1,7 +1,8 @@
 import throttle from 'lodash.throttle';
 import { temporal, type TemporalState } from 'zundo';
-import { useStore, createStore } from 'zustand';
+import { createStore } from 'zustand';
 import { shallow } from 'zustand/shallow';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 interface MyState {
   count: number;
@@ -29,11 +30,11 @@ const originalStore = createStore(withZundo);
 const useBaseStore = <T,>(
   selector: (state: MyState) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(originalStore, selector, equality);
+) => useStoreWithEqualityFn(originalStore, selector, equality);
 const useTemporalStore = <T,>(
   selector: (state: TemporalState<MyState>) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(originalStore.temporal, selector, equality);
+) => useStoreWithEqualityFn(originalStore.temporal, selector, equality);
 
 export default function Web() {
   const { count, increment, decrement } = useBaseStore((state) => state);

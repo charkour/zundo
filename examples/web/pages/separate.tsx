@@ -1,5 +1,5 @@
 import { temporal } from 'zundo';
-import create from 'zustand';
+import { create, useStore } from 'zustand';
 
 interface MyState {
   bears: number;
@@ -10,7 +10,7 @@ interface MyState {
   decrementBees: () => void;
 }
 
-const useStore = create(
+const useMyStore = create(
   temporal<MyState>(
     (set) => ({
       bears: 0,
@@ -25,7 +25,7 @@ const useStore = create(
     },
   ),
 );
-const useTemporalStore = create(useStore.temporal);
+const useTemporalStore = () => useStore(useMyStore.temporal);
 
 const UndoBar = () => {
   const { undo, redo, futureStates, pastStates } = useTemporalStore();
@@ -46,7 +46,7 @@ const UndoBar = () => {
 };
 
 const StateBear = () => {
-  const store = useStore((state) => ({
+  const store = useMyStore((state) => ({
     bears: state.bears,
     increment: state.increment,
     decrement: state.decrement,
@@ -66,7 +66,7 @@ const StateBear = () => {
 };
 
 const StateBee = () => {
-  const store = useStore();
+  const store = useMyStore();
   console.log(store);
   const { bees, increment, decrement } = store;
   return (

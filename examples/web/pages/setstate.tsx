@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create, useStore } from 'zustand';
 import { temporal } from 'zundo';
 
 interface ExampleData {
@@ -13,7 +13,7 @@ const store = create<ExampleData>()(
   })),
 );
 
-const useTemporal = create(store.temporal);
+const useTemporal = () => useStore(store.temporal);
 
 const App = () => {
   const data = store();

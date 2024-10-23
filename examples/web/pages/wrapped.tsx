@@ -1,5 +1,5 @@
 import { temporal } from 'zundo';
-import create from 'zustand';
+import { create, useStore } from 'zustand';
 
 interface MyState {
   bears: number;
@@ -10,7 +10,7 @@ interface MyState {
   decrementBees: () => void;
 }
 
-const useStore = create(
+const useMyStore = create(
   temporal<MyState>(
     (set) => ({
       bears: 0,
@@ -23,13 +23,13 @@ const useStore = create(
     {
       wrapTemporal: (config) => {
         const thing: typeof config = (_set, get, store) => {
-          const set: typeof _set = (partial, replace) => {
+          const set: typeof _set = (...args) => {
             console.info('handleSet called');
             console.log(
               'calling wrapped setter',
-              JSON.stringify(partial, null, 2),
+              JSON.stringify(args[0], null, 2),
             );
-            _set(partial, replace);
+            _set(...(args as Parameters<typeof _set>));
           };
           return config(set, get, store);
         };
@@ -38,7 +38,7 @@ const useStore = create(
     },
   ),
 );
-const useTemporalStore = create(useStore.temporal);
+const useTemporalStore = () => useStore(useMyStore.temporal);
 
 const UndoBar = () => {
   const { undo, redo, futureStates, pastStates } = useTemporalStore();
@@ -59,7 +59,7 @@ const UndoBar = () => {
 };
 
 const StateBear = () => {
-  const store = useStore((state) => ({
+  const store = useMyStore((state) => ({
     bears: state.bears,
     increment: state.increment,
     decrement: state.decrement,
@@ -79,7 +79,7 @@ const StateBear = () => {
 };
 
 const StateBee = () => {
-  const store = useStore();
+  const store = useMyStore();
   console.log(store);
   const { bees, increment, decrement } = store;
   return (
