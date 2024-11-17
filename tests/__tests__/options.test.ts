@@ -629,6 +629,7 @@ describe('Middleware options', () => {
               console.info('handleSet called');
               _set(partial, replace);
             };
+            store.setState = set;
             return config(set, get, store);
           };
         },
@@ -659,6 +660,28 @@ describe('Middleware options', () => {
       );
       // Note: in the above test, the handleSet function is called twice, but in this test it is called 3 times because it is also called when undo() and redo() are called.
       expect(console.info).toHaveBeenCalledTimes(3);
+    });
+
+    it('should not call function if `store.setState` is not assigned to `set` (wrapTemporal)', () => {
+      global.console.info = vi.fn();
+      const storeWithHandleSet = createVanillaStore({
+        wrapTemporal: (config) => {
+          return (_set, get, store) => {
+            const set: typeof _set = (partial, replace) => {
+              console.info('handleSet called');
+              _set(partial, replace);
+            };
+            // intentionally commented out
+            // store.setState = set;
+            return config(set, get, store);
+          };
+        },
+      });
+      const { increment } = storeWithHandleSet.getState();
+      act(() => {
+        increment();
+      });
+      expect(console.info).toHaveBeenCalledTimes(0);
     });
 
     it('should correctly use throttling', () => {
@@ -722,6 +745,7 @@ describe('Middleware options', () => {
               },
               1000,
             );
+            store.setState = set;
             return config(set, get, store);
           };
         },
@@ -964,9 +988,7 @@ describe('Middleware options', () => {
 
   describe('secret internals', () => {
     it('should have a secret internal state', () => {
-      const { _handleSet, _onSave } =
-        store.temporal.getState() as _TemporalState<MyState>;
-      expect(_handleSet).toBeInstanceOf(Function);
+      const { _onSave } = store.temporal.getState() as _TemporalState<MyState>;
       expect(_onSave).toBe(undefined);
     });
     describe('onSave', () => {
@@ -1034,19 +1056,6 @@ describe('Middleware options', () => {
         expect(console.dir).toHaveBeenCalledTimes(1);
         expect(console.trace).toHaveBeenCalledTimes(1);
       });
-    });
-
-    describe('handleUserSet', () => {
-      it('should update the temporal store with the pastState when called', () => {
-        const { _handleSet } =
-          store.temporal.getState() as _TemporalState<MyState>;
-        act(() => {
-          _handleSet(store.getState(), undefined, store.getState(), null);
-        });
-        expect(store.temporal.getState().pastStates.length).toBe(1);
-      });
-
-      // TODO: should this check the equality function, limit, and call onSave? These are already tested but indirectly.
     });
   });
 

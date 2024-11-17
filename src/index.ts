@@ -50,11 +50,38 @@ export const temporal = (<TState>(
         temporalStateCreator(set, get, options),
     );
 
+    const handleSet = (
+      pastState: TState,
+      // `replace` will likely be deprecated and removed in the future
+      replace: boolean | undefined,
+      currentState: TState,
+      deltaState?: Partial<TState>,
+    ) => {
+      if (store.temporal.getState().isTracking) {
+        // This naively assumes that only one new state can be added at a time
+        if (
+          options?.limit &&
+          store.temporal.getState().pastStates.length >= options?.limit
+        ) {
+          store.temporal.getState().pastStates.shift();
+        }
+
+        (store.temporal.getState() as _TemporalState<TState>)._onSave?.(
+          pastState,
+          currentState,
+        );
+        store.temporal.setState({
+          pastStates: store.temporal
+            .getState()
+            .pastStates.concat(deltaState || pastState),
+          futureStates: [],
+        });
+      }
+    };
+
     const curriedHandleSet =
-      options?.handleSet?.(
-        (store.temporal.getState() as _TemporalState<TState>)
-          ._handleSet as StoreApi<TState>['setState'],
-      ) || (store.temporal.getState() as _TemporalState<TState>)._handleSet;
+      options?.handleSet?.(handleSet as StoreApi<TState>['setState']) ||
+      handleSet;
 
     const temporalHandleSet = (pastState: TState) => {
       if (!store.temporal.getState().isTracking) return;
