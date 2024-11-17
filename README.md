@@ -232,8 +232,7 @@ const useStoreWithUndo = create<StoreState>()(
 const useTemporalStore = <T,>(
   // Use partalized StoreState type as the generic here
   selector: (state: TemporalState<PartializedStoreState>) => T,
-  equality?: (a: T, b: T) => boolean,
-) => useStore(useStoreWithUndo.temporal, selector, equality);
+) => useStore(useStoreWithUndo.temporal, selector);
 ```
 
 ### Limit number of historical states stored
