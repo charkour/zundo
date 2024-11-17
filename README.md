@@ -100,7 +100,7 @@ function useTemporalStore<T>(
   selector?: (state: TemporalState<MyState>) => T,
   equality?: (a: T, b: T) => boolean,
 ) {
-  return useStoreWithEqualityFn(originalStore.temporal, selector!, equality);
+  return useStoreWithEqualityFn(useStoreWithUndo.temporal, selector!, equality);
 }
 
 const App = () => {
