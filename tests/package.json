@@ -10,19 +10,19 @@
     "test:ui": "vitest --ui --coverage"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "6.6.2",
+    "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.0.1",
     "@types/lodash.throttle": "4.1.9",
     "@types/react-dom": "18.3.1",
-    "@vitest/coverage-v8": "2.1.3",
-    "@vitest/ui": "2.1.3",
-    "happy-dom": "15.7.4",
+    "@vitest/coverage-v8": "2.1.5",
+    "@vitest/ui": "2.1.5",
+    "happy-dom": "15.11.6",
     "lodash.throttle": "4.1.1",
     "microdiff": "1.4.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "vitest": "2.1.3",
+    "vitest": "2.1.5",
     "vitest-localstorage-mock": "0.1.2",
-    "zustand": "5.0.0"
+    "zustand": "5.0.1"
   }
 }
