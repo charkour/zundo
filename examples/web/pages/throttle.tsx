@@ -1,5 +1,5 @@
 import { temporal } from 'zundo';
-import { create } from 'zustand';
+import { create, useStore } from 'zustand';
 import throttle from 'just-throttle';
 
 interface MyState {
@@ -24,13 +24,13 @@ const useMyStore = create(
     {
       wrapTemporal: (config) => {
         const thing: typeof config = (_set, get, store) => {
-          const set: typeof _set = throttle((partial, replace) => {
+          const set: typeof _set = throttle((...args) => {
             console.info('handleSet called');
             console.log(
               'calling wrapped setter',
-              JSON.stringify(partial, null, 2),
+              JSON.stringify(args[0], null, 2),
             );
-            _set(partial, replace);
+            _set(...(args as Parameters<typeof _set>));
           }, 1000);
           return config(set, get, store);
         };
@@ -39,7 +39,7 @@ const useMyStore = create(
     },
   ),
 );
-const useTemporalStore = create(useMyStore.temporal);
+const useTemporalStore = () => useStore(useMyStore.temporal);
 
 const UndoBar = () => {
   const { undo, redo, futureStates, pastStates } = useTemporalStore();

@@ -625,9 +625,9 @@ describe('Middleware options', () => {
       const storeWithHandleSet = createVanillaStore({
         wrapTemporal: (config) => {
           return (_set, get, store) => {
-            const set: typeof _set = (partial, replace) => {
+            const set: typeof _set = (...args) => {
               console.info('handleSet called');
-              _set(partial, replace);
+              _set(...args as Parameters<typeof set>);
             };
             return config(set, get, store);
           };
@@ -715,10 +715,10 @@ describe('Middleware options', () => {
       const storeWithHandleSet = createVanillaStore({
         wrapTemporal: (config) => {
           return (_set, get, store) => {
-            const set: typeof _set = throttle<typeof _set>(
-              (partial, replace) => {
+            const set: typeof _set = throttle(
+              (...args) => {
                 console.error('handleSet called');
-                _set(partial, replace);
+                _set(...args as Parameters<typeof set>);
               },
               1000,
             );
@@ -1041,7 +1041,12 @@ describe('Middleware options', () => {
         const { _handleSet } =
           store.temporal.getState() as _TemporalState<MyState>;
         act(() => {
-          _handleSet(store.getState(), undefined, store.getState(), null);
+          _handleSet(
+            store.getState(),
+            undefined as unknown as Parameters<typeof _handleSet>[1],
+            store.getState(),
+            null,
+          );
         });
         expect(store.temporal.getState().pastStates.length).toBe(1);
       });

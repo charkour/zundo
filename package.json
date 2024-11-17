@@ -54,11 +54,11 @@
   "devDependencies": {
     "prettier": "3.3.3",
     "tsup": "8.3.0",
-    "typescript": "5.6.2",
-    "zustand": "4.5.2"
+    "typescript": "5.6.3",
+    "zustand": "5.0.0"
   },
   "peerDependencies": {
-    "zustand": "^4.3.0"
+    "zustand": "^4.3.0 || ^5.0.0"
   },
   "peerDependenciesMeta": {
     "zustand": {

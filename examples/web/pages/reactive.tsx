@@ -1,5 +1,6 @@
 import { type TemporalState, temporal } from 'zundo';
-import { type StoreApi, useStore, create } from 'zustand';
+import { type StoreApi, create } from 'zustand';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 interface MyState {
   bears: number;
@@ -32,7 +33,11 @@ const useTemporalStore = <
   selector: (state: ExtractState<S>) => U,
   equality?: (a: U, b: U) => boolean,
 ): U => {
-  const state = useStore(useMyStore.temporal as any, selector, equality);
+  const state = useStoreWithEqualityFn(
+    useMyStore.temporal as any,
+    selector,
+    equality,
+  );
   return state;
 };
 

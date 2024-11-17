@@ -1,7 +1,8 @@
 import { temporal, type TemporalState } from 'zundo';
-import { useStore, createStore } from 'zustand';
+import { createStore } from 'zustand';
 import { shallow } from 'zustand/shallow';
 import diff from 'microdiff';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 interface MyState {
   count: number;
@@ -51,11 +52,20 @@ const originalStore = createStore(withZundo);
 const useBaseStore = <T,>(
   selector: (state: MyState) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(originalStore, selector, equality);
-const useTemporalStore = <T,>(
+) => useStoreWithEqualityFn(originalStore, selector, equality);
+
+function useTemporalStore(): TemporalState<MyState>;
+function useTemporalStore<T>(selector: (state: TemporalState<MyState>) => T): T;
+function useTemporalStore<T>(
   selector: (state: TemporalState<MyState>) => T,
+  equality: (a: T, b: T) => boolean,
+): T;
+function useTemporalStore<T>(
+  selector?: (state: TemporalState<MyState>) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(originalStore.temporal, selector, equality);
+) {
+  return useStoreWithEqualityFn(originalStore.temporal, selector!, equality);
+}
 
 const isEmpty = (obj: object) => {
   for (const _ in obj) {

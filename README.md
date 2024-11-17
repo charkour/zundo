@@ -16,7 +16,7 @@ Try a live [demo](https://codesandbox.io/s/currying-flower-2dom9?file=/src/App.t
 npm i zustand zundo
 ```
 
-> zustand v4.2.0 or higher is required for TS usage. v4.0.0 or higher is required for JS usage.
+> zustand v4.2.0+ or v5 is required for TS usage. v4.0.0 or higher is required for JS usage.
 > Node 16 or higher is required.
 
 ## Background
@@ -87,13 +87,21 @@ const App = () => {
 In React, to subscribe components or custom hooks to member properties of the `temporal` object (like the array of `pastStates` or `currentStates`), you can create a `useTemporalStore` hook.
 
 ```tsx
-import { useStore } from 'zustand';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 import type { TemporalState } from 'zundo';
 
-const useTemporalStore = <T,>(
-  selector: (state: TemporalState<StoreState>) => T,
+function useTemporalStore(): TemporalState<MyState>;
+function useTemporalStore<T>(selector: (state: TemporalState<MyState>) => T): T;
+function useTemporalStore<T>(
+  selector: (state: TemporalState<MyState>) => T,
+  equality: (a: T, b: T) => boolean,
+): T;
+function useTemporalStore<T>(
+  selector?: (state: TemporalState<MyState>) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStore(useStoreWithUndo.temporal, selector, equality);
+) {
+  return useStoreWithEqualityFn(useStoreWithUndo.temporal, selector!, equality);
+}
 
 const App = () => {
   const { bears, increasePopulation, removeAllBears } = useStoreWithUndo();
@@ -224,8 +232,7 @@ const useStoreWithUndo = create<StoreState>()(
 const useTemporalStore = <T,>(
   // Use partalized StoreState type as the generic here
   selector: (state: TemporalState<PartializedStoreState>) => T,
-  equality?: (a: T, b: T) => boolean,
-) => useStore(useStoreWithUndo.temporal, selector, equality);
+) => useStore(useStoreWithUndo.temporal, selector);
 ```
 
 ### Limit number of historical states stored
@@ -558,6 +565,7 @@ PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnp
 - [SubscribeWithSelector](https://codesandbox.io/s/zundo-with-subscribe-with-selector-forked-mug69t)
 - [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
 - [with deep equal](https://codesandbox.io/p/sandbox/zundo-deep-equal-qg69lj)
+- [with input](https://stackblitz.com/edit/vitejs-vite-jqngm9?file=src%2FApp.tsx)
 
 ## Migrate from v1 to v2
 

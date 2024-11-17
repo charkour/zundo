@@ -10,7 +10,12 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 20.x]
-        zustand: [4.2.0, 4.0.0]
+        zustand: [
+          4.2.0, # Oldest zustand TS supported
+          4.0.0, # Oldest zustand JS supported
+          4,     # Latest zustand v5 supported
+          latest # Latest zustand supported
+        ]
 
     steps:
       - uses: actions/checkout@v4

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { create } from 'zustand';
+import { create, useStore } from 'zustand';
 import { temporal } from 'zundo';
 import { persist, type PersistOptions } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -16,7 +16,7 @@ const persistOptions: PersistOptions<Store> = {
   name: 'some-store',
 };
 
-const useStore = create<Store>()(
+const useMyStore = create<Store>()(
   persist(
     temporal(
       immer((set) => ({
@@ -44,11 +44,11 @@ const useStore = create<Store>()(
   ),
 );
 
-const useTemporalStore = create(useStore.temporal);
+const useTemporalStore = () => useStore(useMyStore.temporal);
 
 export const Persist = dynamic(
   Promise.resolve(() => {
-    const state = useStore();
+    const state = useMyStore();
     const temporalState = useTemporalStore();
 
     const localStorageStateOnLoad = useMemo(
