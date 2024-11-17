@@ -53,10 +53,19 @@ const useBaseStore = <T,>(
   selector: (state: MyState) => T,
   equality?: (a: T, b: T) => boolean,
 ) => useStoreWithEqualityFn(originalStore, selector, equality);
-const useTemporalStore = <T,>(
+
+function useTemporalStore(): TemporalState<MyState>;
+function useTemporalStore<T>(selector: (state: TemporalState<MyState>) => T): T;
+function useTemporalStore<T>(
   selector: (state: TemporalState<MyState>) => T,
+  equality: (a: T, b: T) => boolean,
+): T;
+function useTemporalStore<T>(
+  selector?: (state: TemporalState<MyState>) => T,
   equality?: (a: T, b: T) => boolean,
-) => useStoreWithEqualityFn(originalStore.temporal, selector, equality);
+) {
+  return useStoreWithEqualityFn(originalStore.temporal, selector!, equality);
+}
 
 const isEmpty = (obj: object) => {
   for (const _ in obj) {

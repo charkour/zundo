@@ -13,7 +13,7 @@ jobs:
         zustand: [
           4.2.0, # Oldest zustand TS supported
           4.0.0, # Oldest zustand JS supported
-          4,    # Latest zustand v5 supported
+          4,     # Latest zustand v5 supported
           latest # Latest zustand supported
         ]
 
