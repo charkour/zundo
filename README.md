@@ -566,6 +566,7 @@ PRs are welcome! [pnpm](https://pnpm.io/) is used as a package manager. Run `pnp
 - [canUndo, canRedo, undoDepth, redoDepth](https://codesandbox.io/s/zundo-canundo-and-undodepth-l6jclx?file=/src/App.tsx:572-731)
 - [with deep equal](https://codesandbox.io/p/sandbox/zundo-deep-equal-qg69lj)
 - [with input](https://stackblitz.com/edit/vitejs-vite-jqngm9?file=src%2FApp.tsx)
+- [with slices pattern](https://codesandbox.io/p/sandbox/pttx6c)
 
 ## Migrate from v1 to v2
 
