@@ -16,6 +16,7 @@
     "next": "15.0.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "simple-zustand-devtools": "1.1.0",
     "zundo": "workspace:*",
     "zustand": "5.0.1"
   },
