@@ -551,7 +551,7 @@ interface TemporalState<TState> {
 
 ## Community
 
-`zundo` is used by several projects and teams including [Stability AI](https://github.com/Stability-AI/StableStudio), [Yext](https://github.com/yext/studio), [KaotoIO](https://github.com/KaotoIO/kaoto-ui), and [NutSH.ai](https://github.com/SysCV/nutsh).
+`zundo` is used by several projects and teams including [Alibaba](https://github.com/alibaba/x-render), [Dify.ai](https://github.com/langgenius/dify), [Stability AI](https://github.com/Stability-AI/StableStudio), [Yext](https://github.com/yext/studio), [KaotoIO](https://github.com/KaotoIO/kaoto-ui), and [NutSH.ai](https://github.com/SysCV/nutsh).
 
 If this library is useful to you, please consider [sponsoring](https://github.com/sponsors/charkour) the project. Thank you!
 
