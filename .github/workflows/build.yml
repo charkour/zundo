@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [17.x, 23.x]
+        node-version: [18.x, 23.x]
         zustand: [
           4.2.0, # Oldest zustand TS supported
           4.0.0, # Oldest zustand JS supported
