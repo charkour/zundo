@@ -452,17 +452,25 @@ For a full list of middleware, see [zustand middleware](https://www.npmjs.com/pa
 import { persist } from 'zustand/middleware';
 
 const useStoreWithUndo = create<StoreState>()(
-  temporal(
-    (set) => ({
-      // your store fields
-    }),
-    {
-      wrapTemporal: (storeInitializer) =>
-        persist(storeInitializer, { name: 'temporal-persist' }),
-    },
-  ),
+  persist(                                      // <-- persist
+    temporal(
+      (set) => ({
+       // your store fields
+      }),
+      {
+        wrapTemporal: (storeInitializer) => {
+          persist(storeInitializer, {           // <-- persist 
+            name: 'temporal-persist' 
+          });
+        },
+      }
+    )
+  )
 );
 ```
+
+> In the example above, note that we use `persist` twice. The outer persist is persisting your user facing store, and the inner persist, as part of the temporal options, will persist the temporal store that's created by the middleware. Simply put: there are two zustand stores, so you must persist both.
+
 
 ### `useStore.temporal`
 
