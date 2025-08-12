@@ -458,11 +458,10 @@ const useStoreWithUndo = create<StoreState>()(
        // your store fields
       }),
       {
-        wrapTemporal: (storeInitializer) => {
+        wrapTemporal: (storeInitializer) =>
           persist(storeInitializer, {           // <-- persist 
             name: 'temporal-persist' 
-          });
-        },
+          }),
       }
     )
   )
