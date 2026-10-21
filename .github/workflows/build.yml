@@ -11,8 +11,6 @@ jobs:
       matrix:
         node-version: [18.x, 23.x]
         zustand: [
-          4.2.0, # Oldest zustand TS supported
-          4.0.0, # Oldest zustand JS supported
           4,     # Latest zustand v5 supported
           latest # Latest zustand supported
         ]
@@ -37,12 +35,6 @@ jobs:
 
       - name: Install Zustand ${{ matrix.zustand }}
         run: pnpm add zustand@${{ matrix.zustand }} -w
-
-      - name: Patch tsup config
-        if: ${{ matrix.zustand == '4.0.0' }}
-        # Patch the tsup config to use `dts: false` for Zustand 4.0.0
-        run: |
-          sed -i~ 's/dts: true/dts: false/' tsup.config.ts
 
       - name: Build
         run: pnpm run build
