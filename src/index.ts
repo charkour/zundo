@@ -1,4 +1,4 @@
-import { createStore } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 import { temporalStateCreator } from './temporal';
 import type {
   StateCreator,
