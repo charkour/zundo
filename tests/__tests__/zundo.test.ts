@@ -69,6 +69,44 @@ describe('temporal middleware', () => {
     expect(store.getState().count).toBe(1);
   });
 
+  describe.each(['undo', 'redo'] as const)('%s invalid steps', (operation) => {
+    it.each([0, -1, -Infinity, NaN, 0.5, null, '1', { type: 'click' }])(
+      'leaves state and history unchanged for %j',
+      (steps) => {
+        store.getState().increment();
+        store.getState().increment();
+        store.temporal.getState().undo();
+        const state = store.getState();
+        const past = [...store.temporal.getState().pastStates];
+        const future = [...store.temporal.getState().futureStates];
+        const listener = vi.fn();
+        const unsubscribe = store.subscribe(listener);
+
+        store.temporal.getState()[operation](steps as number);
+
+        expect(store.getState()).toBe(state);
+        expect(store.temporal.getState().pastStates).toEqual(past);
+        expect(store.temporal.getState().futureStates).toEqual(future);
+        expect(listener).not.toHaveBeenCalled();
+        unsubscribe();
+      },
+    );
+  });
+
+  it.each([10, Infinity])(
+    'limits %s steps to the available history',
+    (steps) => {
+      store.getState().increment();
+      store.getState().increment();
+      store.temporal.getState().undo(steps);
+      expect(store.getState().count).toBe(0);
+      expect(store.temporal.getState().pastStates).toEqual([]);
+      store.temporal.getState().redo(steps);
+      expect(store.getState().count).toBe(2);
+      expect(store.temporal.getState().futureStates).toEqual([]);
+    },
+  );
+
   describe('undo', () => {
     it('should undo', () => {
       const { undo } = store.temporal.getState();

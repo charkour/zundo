@@ -517,13 +517,13 @@ interface TemporalState<TState> {
 
 `undo: (steps?: number) => void`
 
-`undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo to go back multiple state at once.
+`undo`: call function to apply previous state (if there are previous states). Optionally pass a number of steps to undo to go back multiple state at once. Non-numeric values, `NaN`, and values less than one are ignored.
 
 #### **Take it back now y'all**
 
 `redo: (steps?: number) => void`
 
-`redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo go forward multiple states at once.
+`redo`: call function to apply future state (if there are future states). Future states are "previous previous states." Optionally pass a number of steps to redo go forward multiple states at once. Non-numeric values, `NaN`, and values less than one are ignored.
 
 #### **Remove all knowledge of time**
 
