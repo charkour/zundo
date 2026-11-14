@@ -14,7 +14,11 @@ export const temporalStateCreator = <TState>(
       pastStates: options?.pastStates || [],
       futureStates: options?.futureStates || [],
       undo: (steps = 1) => {
-        if (get().pastStates.length) {
+        if (
+          typeof steps === 'number' &&
+          steps >= 1 &&
+          get().pastStates.length
+        ) {
           // userGet must be called before userSet
           const currentState = options?.partialize?.(userGet()) || userGet();
 
@@ -33,7 +37,11 @@ export const temporalStateCreator = <TState>(
         }
       },
       redo: (steps = 1) => {
-        if (get().futureStates.length) {
+        if (
+          typeof steps === 'number' &&
+          steps >= 1 &&
+          get().futureStates.length
+        ) {
           // userGet must be called before userSet
           const currentState = options?.partialize?.(userGet()) || userGet();
 
